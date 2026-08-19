@@ -5,5 +5,19 @@
       "fr": "Les femmes, les filles et les personnes bispirituelles disparu·es et assassiné·es, 6 fois plus que dans la population allochtone.",
       "en": null
     }
+  },
+  "transformation-coeur": {
+    "titre": { "fr": "Intention", "en": null },
+    "texte": {
+      "fr": "La réalité des personnes survivant·es, porteur·ses de la mémoire.",
+      "en": null
+    }
+  },
+  "communaute-etoiles": {
+    "titre": { "fr": "Intention", "en": null },
+    "texte": {
+      "fr": "Les femmes, les filles et les personnes bispirituelles sont gardien·nes de la mémoire, de la culture, créateur·trice et solidaire.",
+      "en": null
+    }
   }
 }
