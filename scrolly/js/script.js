@@ -11,3 +11,33 @@
 // FF2EplusADA (scrollyFFADA2S v2)
 // Isabel Cayer · Atelier Love & Code · 2026
 // ==================================================
+
+import { initI18n, resolve } from "../../shared/js/i18n.js";
+import { initTimeline, goToStep, getOrder } from "./timeline.js";
+
+async function afficherTexte(stepId) {
+  const steps = await fetch("/scrolly/data/steps.json").then(r => r.json());
+  const contenu = steps[stepId];
+  document.getElementById("texteStep").innerHTML = contenu
+    ? `<h2>${resolve(contenu.titre)}</h2><p>${resolve(contenu.texte)}</p>`
+    : "";
+}
+
+async function init() {
+  await initI18n('fr');
+  await initTimeline();
+  const order = getOrder();
+
+  const curseur = document.getElementById("curseurTest");
+  curseur.max = order.length - 1;
+  curseur.addEventListener("input", (e) => {
+    const index = parseInt(e.target.value, 10);
+    goToStep(index);
+    afficherTexte(order[index].id);
+  });
+
+  goToStep(0);
+  afficherTexte(order[0].id);
+}
+
+init();

@@ -93,7 +93,8 @@ La v2 est développée en solo par Isabel avec Claude comme collaborateur techni
 | 18 août | Gouvernance | Projet fait *avec et pour* les femmes autochtones, pas *sur elles* — contenu et données sous gouvernance des artistes/Déline, pas traité comme un jeu de données neutre |
 | 18 août | Production | Registre + Kanban Notion minimal mis en place cette semaine ; framework "AtelierL&C" généralisé reporté après la diffusion du 4 octobre (documenté à partir du vécu réel, comme MasterCayer et GameCayer) |
 | 18 août | Production | Dépôt FF2EplusADA laissé public (aucune donnée sensible actuellement) ; à réévaluer dès l'arrivée de contenu réel (audio, récits) des femmes autochtones |
- 
+| 19 août | Contenu | Seuls step7, step9, step10 de la v1 sont conservés en v2 ; tous les nouveaux steps de Déline seront en SVG (animations riches) — pas de conversion raster envisagée pour l'instant |
+| 19 août | Production | SVGO (S1B3T2) mis en pause jusqu'à avoir l'ensemble des steps v2 et une décision sur le support mobile |
 ---
  
 ## Journal des versions du Registre
