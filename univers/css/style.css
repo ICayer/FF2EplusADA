@@ -286,3 +286,30 @@
     transform: translate(-50%, -50%) scale(1) !important;
   }
 }
+
+/* --- Bouton de sortie vers la Partie 4 (transitionValeurs.js) ---
+   Apparaît AVANT la transition (sur le ciel étoilé encore sombre) — c'est le
+   clic dessus qui déclenche l'animation, pas l'inverse. Palette pâle, cohérente
+   avec le tooltip/la modale, pour rester lisible sur fond sombre. */
+#bouton-explorer-valeurs {
+  position: fixed;
+  bottom: 8%;
+  left: 50%;
+  transform: translate(-50%, 0);
+  padding: 0.9rem 2.2rem;
+  font-family: var(--font-title, sans-serif);
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  color: #1a1a1a;
+  background-color: #f2ede2;
+  border-radius: 4px;
+  text-decoration: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+  z-index: 20;
+}
+#bouton-explorer-valeurs.visible {
+  opacity: 1;
+  pointer-events: auto;
+}

@@ -15,6 +15,7 @@
 
 import { calculerDisposition, cheminArc } from "./constellations.js";
 import { initTestimonyModal, showTestimony } from "./testimonyModal.js";
+import { initConditionSortie, lancerTransitionValeurs } from "./transitionValeurs.js";
 
 // --- Réglages visuels ---
 // Tout est en coordonnées du viewBox (1000 x 1000), pas en pixels d'écran :
@@ -35,6 +36,7 @@ const ORDRE_DECENNIES = ['1950s','1960s','1970s','1980s','1990s','2000s','2010s'
 const LUNE_CENTRE_SOURCE = { x: 238.07, y: 60.60 };
 
 let universContainer = null;
+let signalerInteractionFn = null; // référence mise à jour après initConditionSortie()
 
 /**
  * Point d'entrée : construit la carte du ciel dans le conteneur donné.
@@ -62,7 +64,34 @@ export async function initUnivers(selecteurConteneur = "#univers-canvas") {
   });
 
   initTestimonyModal(selecteurConteneur);
-  await dessiner({ nations, secteurs, noeuds, liens });
+  const resultats = await dessiner({ nations, secteurs, noeuds, liens });
+
+  const boutonTransition = document.getElementById("bouton-explorer-valeurs");
+
+  const { signalerInteraction } = initConditionSortie(() => {
+    // La condition est atteinte : on RÉVÈLE le bouton, on ne lance rien tout
+    // seul — la personne décide elle-même du moment (décision du 24 août).
+    if (boutonTransition) boutonTransition.classList.add("visible");
+  });
+  signalerInteractionFn = signalerInteraction;
+
+  if (boutonTransition) {
+    boutonTransition.addEventListener("click", (e) => {
+      e.preventDefault();
+      boutonTransition.classList.remove("visible"); // évite un double-clic pendant l'animation
+      lancerTransitionValeurs({
+        svg: resultats.svg,
+        groupeLune: resultats.groupeLune,
+        echelleLuneActuelle: resultats.echelle,
+        luneCentreSource: LUNE_CENTRE_SOURCE,
+        selectionEtoiles: resultats.selectionEtoiles,
+        groupeEtiquettes: resultats.groupeEtiquettes,
+        canvasEl: universContainer,
+        centre: CENTRE
+      });
+    });
+  }
+
   console.log(`🌌 Univers : ${noeuds.length} étoiles réparties dans ${nations.length} constellations.`);
 }
 
@@ -186,6 +215,7 @@ async function dessiner({ nations, secteurs, noeuds, liens }) {
     })
     .on("click", (event, d) => {
       showTestimony(d.data, nationParId[d.data.nation]);
+      if (signalerInteractionFn) signalerInteractionFn();
     });
 
   // --- Entrée en scène progressive : la voie lactée seule d'abord, puis la
@@ -205,4 +235,8 @@ async function dessiner({ nations, secteurs, noeuds, liens }) {
       stagger: reduireAnimation ? 0 : { amount: 1.6, from: "random" },
       ease: "power1.out"
     }, "-=0.3");
+
+  // Références renvoyées à initUnivers() pour piloter la transition de sortie
+  // (S2B3T3) sans que ce fichier ait besoin de connaître cette logique lui-même.
+  return { svg, groupeLune, echelle, selectionEtoiles, groupeEtiquettes };
 }
