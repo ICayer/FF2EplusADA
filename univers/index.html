@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scrollyFFADA2S — Univers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../shared/css/variables.css" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+</head>
+<body>
+
+  <div id="univers-canvas">
+    <div id="univers-tooltip"></div>
+  </div>
+
+  <script type="module">
+    import { initUnivers } from "./js/etoiles.js";
+    initUnivers("#univers-canvas");
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+[
+  {
+    "id": "anishinaabe",
+    "nom": "Anishinaabe",
+    "couleur": "#cdc310"
+  },
+  {
+    "id": "atikamekw",
+    "nom": "Atikamekw Nehirowisiw",
+    "couleur": "#5f6f3c"
+  },
+  {
+    "id": "eeyou",
+    "nom": "Eeyou",
+    "couleur": "#882851"
+  },
+  {
+    "id": "innu",
+    "nom": "Innu/Ilnu",
+    "couleur": "#e9bcb7"
+  },
+  {
+    "id": "inuit",
+    "nom": "Inuit",
+    "couleur": "#133e63"
+  },
+  {
+    "id": "kanienkeha",
+    "nom": "Kanien'kehá:ka",
+    "couleur": "#dddbf1"
+  },
+  {
+    "id": "metis-ouest",
+    "nom": "Métis de l'Ouest / Western Métis",
+    "couleur": "#a1e8af"
+  },
+  {
+    "id": "mikmaq",
+    "nom": "Mi'gmaq",
+    "couleur": "#673104"
+  },
+  {
+    "id": "naskapi",
+    "nom": "Naskapi",
+    "couleur": "#a6cfd5"
+  },
+  {
+    "id": "w8banaki",
+    "nom": "W8banaki",
+    "couleur": "#d89a3a"
+  },
+  {
+    "id": "inconnue",
+    "nom": "Inconnue",
+    "couleur": "#aaaaaa"
+  }
+]

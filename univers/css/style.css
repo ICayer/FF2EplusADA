@@ -1,0 +1,62 @@
+/* ==================================================
+   univers/css/style.css
+   Styles de la Partie 3 — carte du ciel (étoiles + constellations)
+
+   FF2EplusADA (scrollyFFADA2S v2)
+   Isabel Cayer · Atelier Love & Code · 2026
+   ================================================== */
+
+#univers-canvas {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#univers-canvas svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.etoile {
+  cursor: pointer;
+}
+
+.lien-constellation {
+  stroke: var(--color-text, #ffffff);
+  stroke-opacity: 0.25;
+  stroke-width: 1;
+  fill: none;
+}
+
+/* Placeholder — sera remplacé par le SVG de Lune de Déline */
+.lune-placeholder {
+  fill: #2a2a35;
+  stroke: #444;
+  stroke-width: 1;
+}
+
+.arc-etiquette-path {
+  fill: none;
+}
+
+.arc-etiquette-texte {
+  font-family: var(--font-title, sans-serif);
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+#univers-tooltip {
+  position: fixed;
+  pointer-events: none;
+  display: none;
+  background: rgba(20, 20, 25, 0.95);
+  color: var(--color-text, #eee);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-family: var(--font-body, sans-serif);
+  font-size: 13px;
+  max-width: 220px;
+  z-index: 9999;
+}

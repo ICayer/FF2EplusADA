@@ -52,7 +52,10 @@ La v2 est développée en solo par Isabel avec Claude comme collaborateur techni
 | 19 août | Production | SVGO (S1B3T2) mis en pause jusqu'à avoir l'ensemble des steps v2 et une décision sur le support mobile |
 | 19 août | Architecture | Convention de nommage SVG (S1B3T1) appliquée seulement aux nouveaux assets v2 — les steps hérités de la v1 restent protégés par le scoping systématique des requêtes (containerX.querySelector), pas par l'unicité des noms |
 | 19 août | Production | Vertical slice validé (S1B4) : timeline générique + registry + i18n fonctionnent de bout en bout sur 3 steps, transitions show→hide→show comprises |
- 
+| 21 août | Gouvernance | 221 étoiles = preuve de concept avec répartition par nation générique/synthétique (pas de vraie donnée individuelle sans autorisation FAQ) ; à actualiser par l'organisation qui héritera du projet, idéalement FAQ elle-même |
+| 21 août | Architecture | Témoignages des étoiles : texte primaire toujours dans la langue de la nation (via nations.json→langue), traduction secondaire selon la langue d'interface choisie (resolve()) — distinct du reste du site qui suit uniquement la langue globale |
+
+
 ## Journal des versions du Registre
  
 | Version | Date | Ajouts |
