@@ -2,56 +2,67 @@
   {
     "id": "anishinaabe",
     "nom": "Anishinaabe",
-    "couleur": "#cdc310"
+    "couleur": "#cdc310",
+    "langue": "Anishinaabemowin"
   },
   {
     "id": "atikamekw",
     "nom": "Atikamekw Nehirowisiw",
-    "couleur": "#5f6f3c"
+    "couleur": "#5f6f3c",
+    "langue": "Atikamekw"
   },
   {
     "id": "eeyou",
     "nom": "Eeyou",
-    "couleur": "#882851"
+    "couleur": "#882851",
+    "langue": "Iiyiyuu ayimuun"
   },
   {
     "id": "innu",
     "nom": "Innu/Ilnu",
-    "couleur": "#e9bcb7"
+    "couleur": "#e9bcb7",
+    "langue": "Innu-aimun"
   },
   {
     "id": "inuit",
     "nom": "Inuit",
-    "couleur": "#133e63"
+    "couleur": "#133e63",
+    "langue": "Inuktitut"
   },
   {
     "id": "kanienkeha",
     "nom": "Kanien'kehá:ka",
-    "couleur": "#dddbf1"
+    "couleur": "#dddbf1",
+    "langue": "Kanien'kéhà"
   },
   {
     "id": "metis-ouest",
     "nom": "Métis de l'Ouest / Western Métis",
-    "couleur": "#a1e8af"
+    "couleur": "#a1e8af",
+    "langue": null
   },
   {
     "id": "mikmaq",
     "nom": "Mi'gmaq",
-    "couleur": "#673104"
+    "couleur": "#673104",
+    "langue": "Migmaq, Mi'kmaq"
   },
   {
     "id": "naskapi",
     "nom": "Naskapi",
-    "couleur": "#a6cfd5"
+    "couleur": "#a6cfd5",
+    "langue": "Naskapi Iyuw-Iyimuun"
   },
   {
     "id": "w8banaki",
     "nom": "W8banaki",
-    "couleur": "#d89a3a"
+    "couleur": "#d89a3a",
+    "langue": "Aln8ba8dwaw8gan"
   },
   {
     "id": "inconnue",
     "nom": "Inconnue",
-    "couleur": "#aaaaaa"
+    "couleur": "#aaaaaa",
+    "langue": null
   }
 ]

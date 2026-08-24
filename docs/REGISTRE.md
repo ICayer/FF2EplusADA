@@ -38,22 +38,36 @@ La v2 est développée en solo par Isabel avec Claude comme collaborateur techni
 ---
  
 ## Décisions
- 
+
+
 | Date | Département | Décision |
 |---|---|---|
-| 18 août | Production | Repartir de la copie GitHub `origin/master` (à jour, inclut les correctifs de Samuel) plutôt que de la copie locale d'Isabel, potentiellement désynchronisée |
-| 18 août | Architecture | v1 sert de modèle de référence pour la Partie 2 (pattern show/hide par step) — la v2 est reconstruite de zéro, pas adaptée sur le code existant |
-| 18 août | Architecture | i18n avec repli configurable par langue autochtone (table `fallbackByLanguage`), pas un repli français universel — reflète la réalité linguistique de chaque nation |
-| 18 août | Contenu | Une seule "étoile modèle" avec récit complet au lancement ; les autres étoiles restent vides par conception, enrichies après la diffusion |
+### Gouvernance
 | 18 août | Gouvernance | Projet fait *avec et pour* les femmes autochtones, pas *sur elles* — contenu et données sous gouvernance des artistes/Déline, pas traité comme un jeu de données neutre |
+| 21 août | Gouvernance | 221 étoiles = preuve de concept avec répartition par nation générique/synthétique (pas de vraie donnée individuelle sans autorisation FAQ) ; à actualiser par l'organisation qui héritera du projet, idéalement FAQ elle-même |
+| 24 août | Gouvernance | Sensibilité accessibilité Web adoptée (lien avec plan EDIA d'Apogée Canada) — pas une conformité formelle visée, mais les décisions architecturales (ARIA, clavier, contraste, reduced-motion) sont intégrées au fil de la construction plutôt que reportées ; consolidation/audit/contrôle visuel A-/A+ prévus au Sprint 6 |
+
+### Production
+| 18 août | Production | Repartir de la copie GitHub `origin/master` (à jour, inclut les correctifs de Samuel) plutôt que de la copie locale d'Isabel, potentiellement désynchronisée |
 | 18 août | Production | Registre + Kanban Notion minimal mis en place cette semaine ; framework "AtelierL&C" généralisé reporté après la diffusion du 4 octobre (documenté à partir du vécu réel, comme MasterCayer et GameCayer) |
 | 18 août | Production | Dépôt FF2EplusADA laissé public (aucune donnée sensible actuellement) ; à réévaluer dès l'arrivée de contenu réel (audio, récits) des femmes autochtones |
-| 19 août | Contenu | Seuls step7, step9, step10 de la v1 sont conservés en v2 ; tous les nouveaux steps de Déline seront en SVG (animations riches) — pas de conversion raster envisagée pour l'instant |
 | 19 août | Production | SVGO (S1B3T2) mis en pause jusqu'à avoir l'ensemble des steps v2 et une décision sur le support mobile |
-| 19 août | Architecture | Convention de nommage SVG (S1B3T1) appliquée seulement aux nouveaux assets v2 — les steps hérités de la v1 restent protégés par le scoping systématique des requêtes (containerX.querySelector), pas par l'unicité des noms |
 | 19 août | Production | Vertical slice validé (S1B4) : timeline générique + registry + i18n fonctionnent de bout en bout sur 3 steps, transitions show→hide→show comprises |
-| 21 août | Gouvernance | 221 étoiles = preuve de concept avec répartition par nation générique/synthétique (pas de vraie donnée individuelle sans autorisation FAQ) ; à actualiser par l'organisation qui héritera du projet, idéalement FAQ elle-même |
+
+### Architecture
+| 18 août | Architecture | v1 sert de modèle de référence pour la Partie 2 (pattern show/hide par step) — la v2 est reconstruite de zéro, pas adaptée sur le code existant |
+| 18 août | Architecture | i18n avec repli configurable par langue autochtone (table `fallbackByLanguage`), pas un repli français universel — reflète la réalité linguistique de chaque nation |
+| 19 août | Architecture | Convention de nommage SVG (S1B3T1) appliquée seulement aux nouveaux assets v2 — les steps hérités de la v1 restent protégés par le scoping systématique des requêtes (containerX.querySelector), pas par l'unicité des noms |
 | 21 août | Architecture | Témoignages des étoiles : texte primaire toujours dans la langue de la nation (via nations.json→langue), traduction secondaire selon la langue d'interface choisie (resolve()) — distinct du reste du site qui suit uniquement la langue globale |
+| 24 août | Architecture | motRevelateur (étoiles) sera éventuellement lié aux 9 valeurs de la Partie 4 — pour l'instant texte libre, vrai rattachement technique à construire au Sprint 4 |
+
+### Contenu
+| 18 août | Contenu | Une seule "étoile modèle" avec récit complet au lancement ; les autres étoiles restent vides par conception, enrichies après la diffusion |
+| 19 août | Contenu | Seuls step7, step9, step10 de la v1 sont conservés en v2 ; tous les nouveaux steps de Déline seront en SVG (animations riches) — pas de conversion raster envisagée pour l'instant |
+| 24 août | Contenu | Référence officielle pour l'orthographe des 13 langues autochtones : infographie déjà produite et validée par Isabel — nations.json en reprend l'orthographe exacte |
+
+
+
 
 
 ## Journal des versions du Registre

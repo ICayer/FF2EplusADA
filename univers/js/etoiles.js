@@ -14,6 +14,7 @@
 // ==================================================
 
 import { calculerDisposition, cheminArc } from "./constellations.js";
+import { initTestimonyModal, showTestimony } from "./testimonyModal.js";
 
 // --- Réglages visuels ---
 // Tout est en coordonnées du viewBox (1000 x 1000), pas en pixels d'écran :
@@ -54,6 +55,7 @@ export async function initUnivers(selecteurConteneur = "#univers-canvas") {
     ordreDecennies: ORDRE_DECENNIES
   });
 
+  initTestimonyModal(selecteurConteneur);
   dessiner({ nations, secteurs, noeuds, liens });
   console.log(`🌌 Univers : ${noeuds.length} étoiles réparties dans ${nations.length} constellations.`);
 }
@@ -115,6 +117,26 @@ function dessiner({ nations, secteurs, noeuds, liens }) {
   // --- Les étoiles ---
   const couleurParNation = Object.fromEntries(nations.map(n => [n.id, n.couleur]));
   const nomParNation = Object.fromEntries(nations.map(n => [n.id, n.nom]));
+  const nationParId = Object.fromEntries(nations.map(n => [n.id, n]));
+
+  function contenuTooltip(d) {
+    const p = d.data.portrait;
+    const nomNation = nomParNation[d.data.nation];
+    const aDuContenu = p.prenom || p.communaute || p.motRevelateur;
+
+    if (!aDuContenu) {
+      return `<strong>${nomNation}</strong><br/>` +
+             `Décennie (approx.) : ${d.data.decennieNaissanceApprox}<br/>` +
+             `<em>Récit à venir</em>`;
+    }
+
+    return [
+      p.prenom ? `<strong>${p.prenom}</strong>` : `<strong>${nomNation}</strong>`,
+      p.dateNaissance || null,
+      p.communaute || null,
+      p.motRevelateur ? `« ${p.motRevelateur} »` : null
+    ].filter(Boolean).join("<br/>");
+  }
 
   svg.append("g")
     .attr("class", "etoiles")
@@ -134,9 +156,7 @@ function dessiner({ nations, secteurs, noeuds, liens }) {
     .on("mouseenter", (event, d) => {
       if (!tooltip) return;
       tooltip.style.display = "block";
-      tooltip.innerHTML =
-        `<strong>${nomParNation[d.data.nation]}</strong><br/>` +
-        `Décennie (approx.) : ${d.data.decennieNaissanceApprox}`;
+      tooltip.innerHTML = contenuTooltip(d);
     })
     .on("mousemove", (event) => {
       if (!tooltip) return;
@@ -145,5 +165,8 @@ function dessiner({ nations, secteurs, noeuds, liens }) {
     })
     .on("mouseleave", () => {
       if (tooltip) tooltip.style.display = "none";
+    })
+    .on("click", (event, d) => {
+      showTestimony(d.data, nationParId[d.data.nation]);
     });
 }
