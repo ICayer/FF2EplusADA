@@ -51,11 +51,8 @@
   fill: none;
 }
 
-/* Placeholder — sera remplacé par le SVG de Lune de Déline */
-.lune-placeholder {
-  fill: #2a2a35;
-  stroke: #444;
-  stroke-width: 1;
+.lune {
+  pointer-events: none; /* la Lune ne doit jamais intercepter les clics destinés aux étoiles */
 }
 
 .arc-etiquette-path {

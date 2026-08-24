@@ -28,6 +28,12 @@ const RAYON_MAX_ETOILES = 430; // ni trop des étiquettes
 
 const ORDRE_DECENNIES = ['1950s','1960s','1970s','1980s','1990s','2000s','2010s','2020s'];
 
+// Coordonnées du centre de la Lune DANS le fichier lune.svg extrait
+// (calculées le 24 août à partir de step10_lune_etoile.svg — voir Registre).
+// Si lune.svg est un jour remplacé par un nouvel export, ces deux valeurs
+// devront être recalculées en même temps.
+const LUNE_CENTRE_SOURCE = { x: 238.07, y: 60.60 };
+
 let universContainer = null;
 
 /**
@@ -56,11 +62,11 @@ export async function initUnivers(selecteurConteneur = "#univers-canvas") {
   });
 
   initTestimonyModal(selecteurConteneur);
-  dessiner({ nations, secteurs, noeuds, liens });
+  await dessiner({ nations, secteurs, noeuds, liens });
   console.log(`🌌 Univers : ${noeuds.length} étoiles réparties dans ${nations.length} constellations.`);
 }
 
-function dessiner({ nations, secteurs, noeuds, liens }) {
+async function dessiner({ nations, secteurs, noeuds, liens }) {
   // Scoping systématique : toutes les requêtes passent par universContainer,
   // jamais par document — convention non négociable du Playbook (§2.4).
   const svg = d3.select(universContainer)
@@ -70,15 +76,25 @@ function dessiner({ nations, secteurs, noeuds, liens }) {
 
   const tooltip = universContainer.querySelector("#univers-tooltip");
 
-  // --- Lune (placeholder : à remplacer par le SVG de Déline) ---
-  svg.append("circle")
-    .attr("class", "lune-placeholder")
-    .attr("cx", CENTRE.x)
-    .attr("cy", CENTRE.y)
-    .attr("r", RAYON_LUNE);
+  // --- Lune (extraite de step10_lune_etoile.svg, calque "PleineLune" — voir Registre) ---
+  const luneMarkup = await d3.text("./svg/lune.svg");
+  const luneParsee = new DOMParser().parseFromString(luneMarkup, "image/svg+xml");
+  const groupeLuneSource = luneParsee.querySelector("g#lune");
+
+  const groupeLune = svg.append("g").attr("class", "lune").style("opacity", 0);
+  // On importe le contenu réel (les 256 paths) tel quel — pas de <foreignObject>,
+  // pas de <use> avec un fichier externe séparé : le SVG est directement inséré
+  // dans le DOM, donc le style et les animations GSAP s'appliquent normalement.
+  groupeLune.node().appendChild(document.importNode(groupeLuneSource, true));
+
+  const echelle = (RAYON_LUNE * 2) / 55.64; // 55.64 = largeur du bbox source mesurée
+  groupeLune.attr(
+    "transform",
+    `translate(${CENTRE.x - echelle * LUNE_CENTRE_SOURCE.x}, ${CENTRE.y - echelle * LUNE_CENTRE_SOURCE.y}) scale(${echelle})`
+  );
 
   // --- Arcs-étiquettes : nomment chaque nation ET servent de légende ---
-  const groupeEtiquettes = svg.append("g").attr("class", "etiquettes");
+  const groupeEtiquettes = svg.append("g").attr("class", "etiquettes").style("opacity", 0);
 
   nations.forEach(n => {
     const sect = secteurs[n.id];
@@ -105,8 +121,8 @@ function dessiner({ nations, secteurs, noeuds, liens }) {
   });
 
   // --- Traits de constellation (dessinés AVANT les étoiles pour passer dessous) ---
-  svg.append("g")
-    .attr("class", "liens")
+  const groupeLiens = svg.append("g").attr("class", "liens").style("opacity", 0);
+  groupeLiens
     .selectAll("line")
     .data(liens)
     .join("line")
@@ -138,8 +154,9 @@ function dessiner({ nations, secteurs, noeuds, liens }) {
     ].filter(Boolean).join("<br/>");
   }
 
-  svg.append("g")
-    .attr("class", "etoiles")
+  const groupeEtoilesEl = svg.append("g").attr("class", "etoiles");
+
+  const selectionEtoiles = groupeEtoilesEl
     .selectAll("circle")
     .data(noeuds)
     .join("circle")
@@ -148,6 +165,7 @@ function dessiner({ nations, secteurs, noeuds, liens }) {
     .attr("cy", d => d.y)
     .attr("r", d => d.data.estModele ? 7 : 3.5)
     .attr("fill", d => couleurParNation[d.data.nation])
+    .style("opacity", 0) // révélées par la timeline d'entrée, pas instantanément
     // Repère de DÉVELOPPEMENT seulement : marque l'étoile modèle pour la retrouver
     // pendant les tests. La distinction visuelle destinée au public reste à
     // valider avec Déline et les artistes (S2B1T3).
@@ -169,4 +187,22 @@ function dessiner({ nations, secteurs, noeuds, liens }) {
     .on("click", (event, d) => {
       showTestimony(d.data, nationParId[d.data.nation]);
     });
+
+  // --- Entrée en scène progressive : la voie lactée seule d'abord, puis la
+  // visualisation apparaît par couches (Lune → étiquettes → liens → étoiles),
+  // jamais tout d'un coup. Respecte prefers-reduced-motion (voir style.css). ---
+  const reduireAnimation = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const dureeBase = reduireAnimation ? 0.01 : 1;
+
+  const timelineEntree = gsap.timeline({ delay: reduireAnimation ? 0 : 0.4 });
+  timelineEntree
+    .to(groupeLune.node(), { opacity: 1, duration: dureeBase * 1.8, ease: "power2.out" })
+    .to(groupeEtiquettes.node(), { opacity: 1, duration: dureeBase * 1.2, ease: "power1.out" }, "-=0.8")
+    .to(groupeLiens.node(), { opacity: 1, duration: dureeBase * 1, ease: "power1.out" }, "-=0.4")
+    .to(selectionEtoiles.nodes(), {
+      opacity: 1,
+      duration: dureeBase * 1.2,
+      stagger: reduireAnimation ? 0 : { amount: 1.6, from: "random" },
+      ease: "power1.out"
+    }, "-=0.3");
 }

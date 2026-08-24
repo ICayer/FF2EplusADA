@@ -5,14 +5,40 @@
   <title>scrollyFFADA2S — test Tranche A</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://unpkg.com/flubber@0.3.0"></script>
+  <style>
+    #bouton-explorer-etoiles {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 0.9rem 2.2rem;
+      font-family: sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      color: #111;
+      background-color: #eadd42; /* même jaune que les étoiles de step11 */
+      border-radius: 4px;
+      text-decoration: none;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1.2s ease;
+      z-index: 2000;
+    }
+    #bouton-explorer-etoiles.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
 </head>
 <body style="margin:0;">
   <div id="graphic" style="position:relative; width:100%; height:100vh; overflow:hidden; background:#111;"></div>
   <div id="texteStep" style="position:fixed; bottom:4rem; left:2rem; max-width:400px; color:white; font-family:sans-serif;"></div>
 
+  <!-- Sobre par choix : pas d'animation d'entrée tapageuse, cohérent avec la demande "bouton sobre" -->
+  <a id="bouton-explorer-etoiles" href="../univers/index.html">Explorer les étoiles</a>
+
   <!-- Curseur TEMPORAIRE pour tester la mécanique — sera remplacé par le vrai composant visuel de timeline (rail 80/20) -->
-  <input type="range" id="curseurTest" min="0" max="0" value="0"
-       style="position:fixed; bottom:0; left:0; width:100%; z-index:9999;">
+  <input type="range" id="curseurTest" min="0" max="0" value="0" style="position:fixed; bottom:0; left:0; width:100%; z-index:9999;">
 
   <script type="module" src="./js/script.js"></script>
 </body>

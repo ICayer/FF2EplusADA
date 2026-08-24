@@ -19,5 +19,12 @@
       "fr": "Les femmes, les filles et les personnes bispirituelles sont gardien·nes de la mémoire, de la culture, créateur·trice et solidaire.",
       "en": null
     }
+  },
+  "seuil-univers": {
+    "titre": { "fr": "La mémoire", "en": null },
+    "texte": {
+      "fr": "[Texte à venir de Déline] Chaque étoile est une vie, une mémoire vivante dans le ciel.",
+      "en": null
+    }
   }
 }
