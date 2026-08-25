@@ -61,6 +61,7 @@ La v2 est développée en solo par Isabel avec Claude comme collaborateur techni
 | 19 août | Architecture | Convention de nommage SVG (S1B3T1) appliquée seulement aux nouveaux assets v2 — les steps hérités de la v1 restent protégés par le scoping systématique des requêtes (containerX.querySelector), pas par l'unicité des noms |
 | 21 août | Architecture | Témoignages des étoiles : texte primaire toujours dans la langue de la nation (via nations.json→langue), traduction secondaire selon la langue d'interface choisie (resolve()) — distinct du reste du site qui suit uniquement la langue globale |
 | 24 août | Architecture | motRevelateur (étoiles) sera éventuellement lié aux 9 valeurs de la Partie 4 — pour l'instant texte libre, vrai rattachement technique à construire au Sprint 4 |
+| 24 août | Architecture | Les transitions entre parties ne se déclenchent jamais automatiquement (temps/interactions ne font que révéler un bouton) — la personne doit toujours poser un geste explicite pour avancer |
 
 ### Contenu
 | 18 août | Contenu | Une seule "étoile modèle" avec récit complet au lancement ; les autres étoiles restent vides par conception, enrichies après la diffusion |
