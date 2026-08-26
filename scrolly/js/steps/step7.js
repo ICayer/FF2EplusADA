@@ -155,10 +155,9 @@ export function hideStep7({ soft = false } = {}) {
           allEls.forEach(sel => {
             const el = step7Container.querySelector(sel);
             if (el) {
-              gsap.set(el, { 
-                opacity: 0, 
-                visibility: "hidden",
-                clearProps: "all" 
+              gsap.set(el, {
+                opacity: 0,
+                visibility: "hidden"
               });
             }
           });

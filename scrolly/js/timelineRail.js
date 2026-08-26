@@ -108,8 +108,11 @@ function construireRail() {
     return el;
   });
 
-  curseurEl = document.createElement("div");
+  curseurEl = document.createElement("img");
   curseurEl.className = "curseur";
+  curseurEl.src = "./svg/timeline/plume.svg";
+  curseurEl.alt = "";
+  curseurEl.setAttribute("aria-hidden", "true");
   railEl.appendChild(curseurEl);
 
   railEl.addEventListener("click", (e) => {

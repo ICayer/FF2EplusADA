@@ -131,12 +131,9 @@
   position: absolute;
   top: 50%;
   left: 0%;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--color-accent);
-  border: 2px solid #111;
-  transform: translate(-50%, -50%);
+  width: 45px; /* placeholder — Isabel ajustera à l'œil */
+  height: auto;
+  transform: translate(-85.9%, -5.7%);
   transition: left 0.3s ease;
   pointer-events: none;
 }

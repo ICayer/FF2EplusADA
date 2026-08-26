@@ -112,6 +112,11 @@ gsap.set(circles, { opacity: 0, fill: "#c9cbc3" });
 // ✅ clearProps laisse le style CSS d'origine reprendre le dessus automatiquement
 gsap.set(circles, { clearProps: "opacity,fill" });
 ```
+**Piège plus large découvert le 26 août (step7, step10) :** `clearProps: "all"` ne nettoie pas seulement les propriétés que GSAP a lui-même animées — il vide l'attribut `style` au complet, y compris un style inline écrit à même le SVG source (ex: `fill` d'un export Illustrator) que GSAP n'a jamais touché. Un élément dont la couleur vit en style inline la perd au premier `hide()`, retombe sur le noir par défaut du SVG — invisible tant qu'on ne teste pas un vrai cycle show→hide→show, pas juste un chargement frais.
+
+Ne jamais utiliser `"all"` par réflexe :
+- soit nommer explicitement les propriétés que GSAP a animées (`clearProps: "opacity,visibility"`)
+- soit vérifier si `show()` réinitialise déjà tout ce qui compte au départ de chaque appel — auquel cas `clearProps` en sortie n'est souvent pas nécessaire du tout.
 
 ### 3.2 Un groupe = une intention d'animation
 

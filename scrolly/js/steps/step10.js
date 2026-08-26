@@ -225,10 +225,9 @@ export function hideStep10({ soft = false } = {}) {
           allStaticEls.forEach(sel => {
             const el = step10Container.querySelector(sel);
             if (el) {
-              gsap.set(el, { 
-                opacity: 0, 
-                visibility: "hidden",
-                clearProps: "all" 
+              gsap.set(el, {
+                opacity: 0,
+                visibility: "hidden"
               });
             }
           });
@@ -239,20 +238,18 @@ export function hideStep10({ soft = false } = {}) {
             const etoileFin = step10Container.querySelector(`#etoileFin${i}`);
             
             if (etoileDebut) {
-              gsap.set(etoileDebut, { 
-                opacity: 0, 
+              gsap.set(etoileDebut, {
+                opacity: 0,
                 visibility: "hidden",
-                x: 0, 
-                y: 0,
-                clearProps: "all" 
+                x: 0,
+                y: 0
               });
             }
-            
+
             if (etoileFin) {
-              gsap.set(etoileFin, { 
-                opacity: 0, 
-                visibility: "hidden",
-                clearProps: "all" 
+              gsap.set(etoileFin, {
+                opacity: 0,
+                visibility: "hidden"
               });
             }
           }
