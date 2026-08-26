@@ -21,3 +21,17 @@ body {
   background-color: var(--color-bg);
   line-height: 1.6;
 }
+
+@font-face {
+  font-family: "Agoradp_15";
+  src: url("../../assets/fonts/Agoradp_15-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+:root {
+  --h-barre-haut: 64px;
+  --h-zone-timeline: clamp(110px, 13vh, 150px);
+  --pad-timeline-haut: 24px;
+  --echelle-texte: 1;
+}

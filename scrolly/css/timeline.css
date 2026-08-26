@@ -1,0 +1,265 @@
+/* ==================================================
+   scrolly/css/timeline.css
+   Rail de navigation temporelle (bas de scène) + bloc-titre de scène
+
+   Rôle : Styles de la zone timeline (rail, curseur, contrôles fusionnés,
+   légendes d'orientation, repères Univers/Valeurs) et du bloc-titre fixe
+   en haut-gauche de la scène (#titre-scene), distinct de #texteStep.
+   Dépend de : shared/css/variables.css (tokens --h-zone-timeline,
+   --pad-timeline-haut, police Agoradp_15)
+   Utilisé par : scrolly/index.html
+
+   FF2EplusADA (scrollyFFADA2S v2)
+   Isabel Cayer · Atelier Love & Code · 2026
+   ================================================== */
+
+/* --- Zone scène (bande entre en-tête et timeline) --- */
+.zone-scene {
+  position: fixed;
+  top: var(--h-barre-haut);
+  left: 0;
+  width: 100%;
+  height: calc(100vh - var(--h-barre-haut) - var(--h-zone-timeline));
+  overflow: hidden;
+  background: #111;
+}
+
+/* Les <svg> sources (step7/9/10) n'ont ni width ni height sur la balise
+   racine — seulement un viewBox — donc sans cette règle ils retombent sur
+   la taille par défaut du navigateur pour un élément remplacé sans
+   dimension intrinsèque, plutôt que de remplir leur conteneur à 100%
+   (#stepXSVG, déjà en width/height:100% via loadSVG). C'est ça qui rognait
+   le bas du SVG une fois .zone-scene raccourcie — pas des attributs px
+   figés comme suspecté au départ (voir Registre/synthèse S3B4). */
+#graphic svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* --- Zone timeline (bas, centrée) --- */
+.zone-timeline {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--h-zone-timeline);
+  padding: var(--pad-timeline-haut) 40px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0));
+  z-index: 2000; /* > 1500 (loadSVG) — convention Playbook §3.4 */
+}
+
+.zone-rail {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+}
+
+/* --- Contrôles fusionnés dans la rangée du rail (pas de rangée dédiée) --- */
+.controles-gauche {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.controles-gauche button {
+  height: 34px;
+  min-width: 34px;
+  padding: 0 10px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.controles-gauche button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.controles-gauche button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.controles-gauche button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* --- Rail --- */
+.rail-wrapper {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.rail {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.trait-rupture {
+  position: absolute;
+  left: 80%;
+  top: 50%;
+  width: 2px;
+  height: 22px;
+  background: var(--color-primary);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.curseur {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  border: 2px solid #111;
+  transform: translate(-50%, -50%);
+  transition: left 0.3s ease;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .curseur {
+    transition: none;
+  }
+}
+
+/* --- Légendes d'orientation — visibles seulement au step A (premier "avant") --- */
+.legende-orientation {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  transform: translateX(-50%);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #fff;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.legende-orientation.cachee {
+  opacity: 0;
+}
+
+.legende-orientation.visible {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .legende-orientation {
+    transition: none;
+  }
+}
+
+/* --- Repères Univers (95%) / Valeurs (100%) — non cliquables, purement visuels --- */
+.repere-univers,
+.repere-valeurs {
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.repere-univers {
+  left: 95%;
+  background: #eadd42;
+}
+
+.repere-valeurs {
+  left: 100%;
+  background: #4a90d9;
+}
+
+/* --- Bloc-titre de scène (haut-gauche de #graphic, distinct de #texteStep) --- */
+.titre-scene {
+  position: absolute;
+  top: 28px;
+  left: 32px;
+  max-width: 420px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 14px 20px;
+  border-radius: 6px;
+  z-index: 1600; /* > 1500 (loadSVG) — convention Playbook §3.4 */
+  pointer-events: none;
+}
+
+.titre-scene .eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 4px;
+}
+
+.titre-scene h2 {
+  font-family: "Agoradp_15", sans-serif;
+  font-size: calc(26px * var(--echelle-texte));
+  font-weight: 400;
+  color: #fff;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.titre-scene h2.transition-sortie {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .titre-scene h2 {
+    transition: none;
+  }
+}
+
+/* --- Texte narratif (#texteStep) — déplacé du style inline (S3B3), suit
+   --echelle-texte comme le titre de scène --- */
+.texte-step-narratif {
+  position: fixed;
+  top: calc(var(--h-barre-haut) + (100vh - var(--h-barre-haut) - var(--h-zone-timeline)) / 2);
+  left: 32px;
+  transform: translateY(-50%);
+  max-width: 400px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 16px 20px;
+  border-radius: 6px;
+  color: white;
+  font-family: sans-serif;
+  font-size: calc(1rem * var(--echelle-texte));
+}
+
+.texte-step-narratif h2 {
+  font-size: 1.5em;
+}
+
+.texte-step-narratif p {
+  font-size: 1em;
+}

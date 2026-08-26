@@ -47,6 +47,7 @@ La v2 est développée en solo par Isabel avec Claude comme collaborateur techni
 | 21 août | Gouvernance | 221 étoiles = preuve de concept avec répartition par nation générique/synthétique (pas de vraie donnée individuelle sans autorisation FAQ) ; à actualiser par l'organisation qui héritera du projet, idéalement FAQ elle-même |
 | 24 août | Gouvernance | Sensibilité accessibilité Web adoptée (lien avec plan EDIA d'Apogée Canada) — pas une conformité formelle visée, mais les décisions architecturales (ARIA, clavier, contraste, reduced-motion) sont intégrées au fil de la construction plutôt que reportées ; consolidation/audit/contrôle visuel A-/A+ prévus au Sprint 6 |
 | 24 août | Gouvernance | Point ouvert soulevé par Isabel : la répartition synthétique actuelle (~20 étoiles/nation) risque de donner une fausse impression de proportion réelle aux communautés qui visiteront le site, particulièrement blessant pour une nation avec peu de cas réels documentés. À trancher avec Déline/les artistes avant d'enrichir univers/ de vrai contenu — options à explorer : distribution proportionnelle une fois les vraies données FAQ obtenues, avertissement visible dans l'interface, ou neutraliser la couleur par nation tant que la vraie proportion n'est pas connue |
+| 25 août | Gouvernance | Point ouvert soulevé par Isabel : les 9 valeurs (Partage, Force, etc.) pourraient être vécues/interprétées différemment en contexte autochtone qu'allochtone — prévoir un texte descriptif au step "Liées aux valeurs" pour éviter une lecture univoque. Contenu à rédiger avec Déline/les artistes, pas par Claude — Sprint 4 |
 
 ### Production
 | 18 août | Production | Repartir de la copie GitHub `origin/master` (à jour, inclut les correctifs de Samuel) plutôt que de la copie locale d'Isabel, potentiellement désynchronisée |
@@ -62,11 +63,19 @@ La v2 est développée en solo par Isabel avec Claude comme collaborateur techni
 | 21 août | Architecture | Témoignages des étoiles : texte primaire toujours dans la langue de la nation (via nations.json→langue), traduction secondaire selon la langue d'interface choisie (resolve()) — distinct du reste du site qui suit uniquement la langue globale |
 | 24 août | Architecture | motRevelateur (étoiles) sera éventuellement lié aux 9 valeurs de la Partie 4 — pour l'instant texte libre, vrai rattachement technique à construire au Sprint 4 |
 | 24 août | Architecture | Les transitions entre parties ne se déclenchent jamais automatiquement (temps/interactions ne font que révéler un bouton) — la personne doit toujours poser un geste explicite pour avancer |
+| 26 août | Architecture |	Timeline positionnée en bas, centrée, budget clamp(110px, 13vh, 150px) — libéré en déplaçant le titre de step vers un bloc fixe en haut-gauche de la scène (fondu croisé) plutôt qu'une étiquette qui suit le curseur
+| 26 août | Architecture |	Contrôles play/recule/avance/retour fusionnés dans la rangée du rail, alignés à gauche (pattern "de la classe au territoire") — pas de rangée dédiée
+| 26 août | Architecture |	Légendes d'orientation (Colonisation/Mémoire/Aujourd'hui) minuscules, positionnées directement sur leurs repères du rail, visibles seulement au step A
+| 26 août | Architecture |	Repères jaune (Univers, 95%) et bleu (Valeurs, 100%) non cliquables, purement visuels — accès réel via bouton "Explorer les étoiles" (step11.js, déjà codé) et futur bouton après 4 clics sur étoiles (univers)
+| 26 août | Architecture |	Position des steps sur le rail calculée par formule selon epoque (avant : index×80/n ; rupture : fixe 80% ; après : 80+(index+1)×15/(n+1)) — jamais codée en dur, cohérent avec le moteur générique
+| 26 août | Architecture |	Clic direct sur le rail = snap au step le plus proche (pas de glissement libre)
+| 26 août | Architecture | plume.svg (curseur de la timeline, calques plume/perle_noire1-3) déposé dans scrolly/svg/timeline/ — nouveau sous-dossier parallèle aux dossiers par step, pour distinguer le SVG de chrome d'interface (utilisé à travers les 9 steps) du SVG de contenu narratif (propre à un step). Exception délibérée à la convention de nommage zone-élément-variante (§2.3) : les id (plume, perle_noire1/2/3) restent tels quels plutôt que renommés, parce que le script de Déline y fait déjà référence nommément — renommer casserait cette correspondance pour un gain de cohérence mineur. |
 
-### Contenu
+### Contenu / Design
 | 18 août | Contenu | Une seule "étoile modèle" avec récit complet au lancement ; les autres étoiles restent vides par conception, enrichies après la diffusion |
 | 19 août | Contenu | Seuls step7, step9, step10 de la v1 sont conservés en v2 ; tous les nouveaux steps de Déline seront en SVG (animations riches) — pas de conversion raster envisagée pour l'instant |
 | 24 août | Contenu | Référence officielle pour l'orthographe des 13 langues autochtones : infographie déjà produite et validée par Isabel — nations.json en reprend l'orthographe exacte |
+| 26 août |	Contenu/Design | Bloc-titre de scène : fond opacité 0,7 (confirmé nécessaire — têtes des personnages de step7 remontent jusqu'en haut-gauche), police Agoradp_15, fondu croisé ~400ms (200ms sortie + 200ms entrée) à ajuster à l'œil et avec Déline — le projet privilégie la lenteur
 
 
 

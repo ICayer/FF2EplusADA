@@ -1,0 +1,135 @@
+/* ==================================================
+   shared/css/headerControls.css
+   Zone d'en-tête partagée — sélecteur de langue + taille de texte
+
+   Rôle : Styles des contrôles construits par shared/js/headerControls.js
+   (bouton langue + panneau, contrôle A-/A/A+). Utilise les tokens de
+   variables.css (--color-border, --color-text, --color-accent) — aucune
+   couleur codée en dur pour les états actif/hover.
+   Dépend de : shared/css/variables.css
+   Utilisé par : scrolly/index.html (univers/, valeurs/, landing à venir)
+
+   FF2EplusADA (scrollyFFADA2S v2)
+   Isabel Cayer · Atelier Love & Code · 2026
+   ================================================== */
+
+.entete-controles {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 2500; /* > 1500 (loadSVG) — convention Playbook §3.4 */
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: var(--font-body);
+}
+
+/* --- Bloc langue --- */
+.bloc-langue {
+  position: relative;
+}
+
+.bouton-langue {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--color-text);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.bouton-langue:hover {
+  border-color: var(--color-accent);
+}
+
+.bouton-langue:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.panneau-langue {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(320px, 90vw);
+  max-height: 70vh;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 6px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+}
+
+.panneau-langue.cachee {
+  display: none;
+}
+
+.langue-item {
+  padding: 8px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text);
+  font-size: 13px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.langue-item:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.langue-item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.langue-item.active {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* --- Contrôle A-/A/A+ --- */
+.controle-taille-texte {
+  display: flex;
+  gap: 4px;
+}
+
+.controle-taille-texte button {
+  height: 34px;
+  min-width: 34px;
+  padding: 0 8px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--color-text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.controle-taille-texte button:hover {
+  border-color: var(--color-accent);
+}
+
+.controle-taille-texte button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.controle-taille-texte button.active {
+  background: var(--color-accent);
+  color: #111;
+  border-color: var(--color-accent);
+}

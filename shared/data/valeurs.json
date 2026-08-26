@@ -1,0 +1,47 @@
+[
+  {
+    "id": "partage",
+    "nom": { "fr": "Partage", "en": "Sharing", "innu-aimun": "Matenueun" },
+    "audio": { "innu-aimun": null }
+  },
+  {
+    "id": "force",
+    "nom": { "fr": "Force", "en": "Strength", "innu-aimun": "Shutshiun" },
+    "audio": { "innu-aimun": null }
+  },
+  {
+    "id": "entraide",
+    "nom": { "fr": "Entraide", "en": "Mutual aid", "innu-aimun": "Uauitshitun" },
+    "audio": { "innu-aimun": null }
+  },
+  {
+    "id": "vie",
+    "nom": { "fr": "Vie", "en": "Life", "innu-aimun": "Inniun" },
+    "audio": { "innu-aimun": null }
+  },
+  {
+    "id": "rire",
+    "nom": { "fr": "Rire", "en": "Laugh", "innu-aimun": "Papun" },
+    "audio": { "innu-aimun": null }
+  },
+  {
+    "id": "espoir",
+    "nom": { "fr": "Espoir", "en": "Hope", "innu-aimun": "Pakushenitamun" },
+    "audio": { "innu-aimun": null }
+  },
+  {
+    "id": "amour-de-soi",
+    "nom": { "fr": "Amour de soi", "en": "Self-love", "innu-aimun": "Shatshitun" },
+    "audio": { "innu-aimun": null }
+  },
+  {
+    "id": "bienveillance",
+    "nom": { "fr": "Bienveillance", "en": "Kindness", "innu-aimun": "Tshisheuatishitun" },
+    "audio": { "innu-aimun": null }
+  },
+  {
+    "id": "confiance",
+    "nom": { "fr": "Confiance", "en": "Trust", "innu-aimun": "Shutshenimeu" },
+    "audio": { "innu-aimun": null }
+  }
+]
