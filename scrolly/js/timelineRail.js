@@ -4,14 +4,14 @@
 //
 // Rôle : Construire le DOM du rail à partir de getOrder() (timeline.js),
 // gérer le positionnement du curseur, le clic direct (snap au step le
-// plus proche), les boutons de navigation (retour/recule/play/avance),
-// l'affichage conditionnel des légendes d'orientation, et la mise à jour
-// du bloc-titre en haut-gauche de la scène (#titre-scene). allerAuStep()
-// est la SEULE fonction que le reste du code doit appeler pour naviguer —
-// jamais goToStep() de timeline.js directement depuis l'extérieur de ce
-// module, pour garder le curseur/titre/légendes synchronisés avec l'état
-// réel.
-// Dépend de : scrolly/js/timeline.js
+// plus proche), les boutons de navigation (recule/avance SEULEMENT —
+// retour et lecture automatique retirés, trop de contrôles pour le
+// public cible, voir Registre persona), l'affichage conditionnel des
+// légendes d'orientation, et la mise à jour du bloc-titre en haut-gauche
+// de la scène (#titre-scene). allerAuStep() est la SEULE fonction que le
+// reste du code doit appeler pour naviguer — jamais goToStep() de
+// timeline.js directement depuis l'extérieur de ce module.
+// Dépend de : scrolly/js/timeline.js, scrolly/js/steps/avantColonisation.js
 // Utilisé par : scrolly/js/script.js
 //
 // FF2EplusADA (scrollyFFADA2S v2)
@@ -19,24 +19,21 @@
 // ==================================================
 
 import { goToStep, getOrder } from "./timeline.js";
+import { masquerSceneComplete } from "./steps/avantColonisation.js";
 
-const DUREE_AUTOPLAY_MS = 2500;
 const DUREE_FONDU_MS = 200;
 
 let order = [];
 let positions = [];
 let currentIndex = 0;
-let autoplayTimer = null;
 
 let railEl = null;
 let curseurEl = null;
 let titreCompteurEl = null;
 let titreTexteEl = null;
 let legendes = [];
-let btnRetour = null;
 let btnRecule = null;
 let btnAvance = null;
-let btnPlay = null;
 
 function reduitMouvement() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -127,7 +124,6 @@ function construireRail() {
         plusProche = i;
       }
     });
-    arreterAutoplay();
     naviguer(plusProche);
   });
 }
@@ -164,18 +160,16 @@ function mettreAJourTitre(index, texteTitre) {
 }
 
 function mettreAJourBoutons(index) {
-  if (btnRetour) btnRetour.disabled = index === 0;
   if (btnRecule) btnRecule.disabled = index === 0;
   if (btnAvance) btnAvance.disabled = index === order.length - 1;
-  if (btnPlay) btnPlay.disabled = index === order.length - 1 && !autoplayTimer;
 }
 
-// Navigation interne (clic rail, boutons, autoplay) : passe par le pont
+// Navigation interne (clic rail, boutons) : passe par le pont
 // window.__scrollyAllerEtAfficher quand il existe (posé par script.js) pour
 // que #texteStep reste synchronisé avec le rail/titre — sinon (avant que
 // script.js ait posé le pont, ex. pendant la construction initiale) on
 // retombe sur allerAuStep seul. Dette technique mineure assumée pour cette
-// itération (voir CORRECTION 2, docs/REGISTRE.md 26 août).
+// itération (voir Registre, 26 août).
 function naviguer(index) {
   if (index < 0 || index >= order.length) return;
   if (window.__scrollyAllerEtAfficher) {
@@ -185,64 +179,15 @@ function naviguer(index) {
   }
 }
 
-function demarrerAutoplay() {
-  if (currentIndex >= order.length - 1) return;
-  if (btnPlay) {
-    btnPlay.textContent = "⏸";
-    btnPlay.setAttribute("aria-label", "Mettre en pause");
-  }
-  autoplayTimer = setInterval(() => {
-    if (currentIndex >= order.length - 1) {
-      arreterAutoplay();
-      return;
-    }
-    naviguer(currentIndex + 1);
-  }, DUREE_AUTOPLAY_MS);
-}
-
-function arreterAutoplay() {
-  if (autoplayTimer) {
-    clearInterval(autoplayTimer);
-    autoplayTimer = null;
-  }
-  if (btnPlay) {
-    btnPlay.textContent = "▶";
-    btnPlay.setAttribute("aria-label", "Lecture automatique");
-  }
-}
-
 function brancherControles() {
-  btnRetour = document.getElementById("btn-retour");
   btnRecule = document.getElementById("btn-recule");
   btnAvance = document.getElementById("btn-avance");
-  btnPlay = document.getElementById("btn-play");
 
-  if (btnRetour) {
-    btnRetour.addEventListener("click", () => {
-      arreterAutoplay();
-      naviguer(0);
-    });
-  }
   if (btnRecule) {
-    btnRecule.addEventListener("click", () => {
-      arreterAutoplay();
-      naviguer(currentIndex - 1);
-    });
+    btnRecule.addEventListener("click", () => naviguer(currentIndex - 1));
   }
   if (btnAvance) {
-    btnAvance.addEventListener("click", () => {
-      arreterAutoplay();
-      naviguer(currentIndex + 1);
-    });
-  }
-  if (btnPlay) {
-    btnPlay.addEventListener("click", () => {
-      if (autoplayTimer) {
-        arreterAutoplay();
-      } else {
-        demarrerAutoplay();
-      }
-    });
+    btnAvance.addEventListener("click", () => naviguer(currentIndex + 1));
   }
 }
 
@@ -250,7 +195,24 @@ function brancherControles() {
 export function allerAuStep(index, texteTitre) {
   if (index < 0 || index >= order.length) return;
   currentIndex = index;
+  const epoqueActuelle = order[index]?.epoque;
+  document.body.dataset.theme = (epoqueActuelle === "apres") ? "" : "clair";
+
   goToStep(index);
+
+  if (epoqueActuelle === "apres") {
+    // Nettoyage APRÈS goToStep(), pas avant : goToStep() vient d'appeler
+    // le hide() du step qu'on quitte, qui peut réappliquer un état interne
+    // (ex. hideRuptureColoniale remet la phrase au texte de C, correct
+    // pour un recul E→D) — un nettoyage fait plus tôt serait aussitôt
+    // écrasé. On quitte tout le domaine avant-colonisation : cacher son
+    // conteneur au complet (calques internes ET overlays HTML).
+    masquerSceneComplete();
+    document.getElementById("phrase-progressive")?.classList.remove("aligne-gauche", "aligne-centre");
+    document.getElementById("sous-titre-rupture")?.classList.remove("visible");
+    document.getElementById("carte-valeur")?.classList.remove("visible");
+  }
+
   positionnerCurseur(index);
   mettreAJourLegendes(index);
   mettreAJourTitre(index, texteTitre);
@@ -269,10 +231,7 @@ export function initTimelineRail(railContainer, titreContainer) {
   brancherControles();
 
   // Pas d'appel à allerAuStep(0) ici : script.js appelle allerEtAfficher(0)
-  // juste après avoir reçu cette API, et LUI seul connaît le vrai texte du
-  // titre (via steps.json) — un appel ici afficherait un titre vide pour
-  // une fraction de seconde avant d'être écrasé par le bon texte. Éviter
-  // le double appel plutôt que de le laisser en redondance silencieuse.
+  // juste après avoir reçu cette API — voir script.js pour la raison.
 
   return { allerAuStep };
 }

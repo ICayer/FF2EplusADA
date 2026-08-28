@@ -1,4 +1,9 @@
 [
+  { "id": "nuit-des-temps",       "epoque": "avant" },
+  { "id": "lien-communaute",      "epoque": "avant" },
+  { "id": "lien-territoire",      "epoque": "avant" },
+  { "id": "lien-valeurs",         "epoque": "avant" },
+  { "id": "rupture-coloniale",    "epoque": "rupture" },
   { "id": "hommage-victimes",     "epoque": "apres" },
   { "id": "transformation-coeur", "epoque": "apres" },
   { "id": "communaute-etoiles",   "epoque": "apres" },

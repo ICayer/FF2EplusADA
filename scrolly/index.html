@@ -40,6 +40,13 @@
       <div class="eyebrow" id="titre-compteur"></div>
       <h2 id="titre-texte" aria-live="polite"></h2>
     </div>
+    <div id="phrase-progressive" class="phrase-progressive"></div>
+    <div id="sous-titre-rupture" class="sous-titre-rupture"></div>
+    <div id="carte-valeur" class="carte-valeur">
+      <div class="carte-valeur-autochtone"></div>
+      <div class="carte-valeur-traduction"></div>
+      <div class="carte-valeur-definition"></div>
+    </div>
   </div>
   <div id="texteStep" class="texte-step-narratif"></div>
 
@@ -49,10 +56,8 @@
   <div id="zone-timeline" class="zone-timeline">
     <div class="zone-rail">
       <div class="controles-gauche">
-        <button id="btn-retour" aria-label="Retour au début">⏮</button>
         <button id="btn-recule" aria-label="Step précédent">◀</button>
-        <button id="btn-play" aria-label="Lecture automatique">▶</button>
-        <button id="btn-avance" aria-label="Step suivant">▶▶</button>
+        <button id="btn-avance" aria-label="Step suivant">▶</button>
       </div>
       <div class="rail-wrapper">
         <div id="rail" class="rail"><!-- construit dynamiquement par timelineRail.js --></div>

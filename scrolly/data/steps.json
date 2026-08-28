@@ -1,4 +1,19 @@
 {
+  "nuit-des-temps": {
+    "nomStep": { "fr": "Depuis la nuit des temps", "en": null }
+  },
+  "lien-communaute": {
+    "nomStep": { "fr": "Lié·es à leur communauté", "en": null }
+  },
+  "lien-territoire": {
+    "nomStep": { "fr": "Lié·es à leur communauté et à leur territoire", "en": null }
+  },
+  "lien-valeurs": {
+    "nomStep": { "fr": "Lié·es à leurs valeurs", "en": null }
+  },
+  "rupture-coloniale": {
+    "nomStep": { "fr": "Déconnexion du territoire", "en": null }
+  },
   "hommage-victimes": {
     "nomStep": { "fr": "Hommage aux victimes", "en": null },
     "titre": { "fr": "Intention", "en": null },

@@ -3,10 +3,15 @@
    Rail de navigation temporelle (bas de scène) + bloc-titre de scène
 
    Rôle : Styles de la zone timeline (rail, curseur, contrôles fusionnés,
-   légendes d'orientation, repères Univers/Valeurs) et du bloc-titre fixe
-   en haut-gauche de la scène (#titre-scene), distinct de #texteStep.
-   Dépend de : shared/css/variables.css (tokens --h-zone-timeline,
-   --pad-timeline-haut, police Agoradp_15)
+   légendes d'orientation, repères Univers/Valeurs), du bloc-titre fixe
+   en haut-gauche de la scène (#titre-scene, distinct de #texteStep), et
+   des éléments propres à la séquence avant-colonisation (phrase
+   progressive, sous-titre de rupture, carte de valeur). Toutes les
+   couleurs de scène passent par les jetons de thème de variables.css
+   (--color-scene-*, --color-rail-piste, etc.) — jamais de couleur codée
+   en dur ici, le thème clair/sombre bascule automatiquement selon
+   l'epoque du step actif (voir timelineRail.js).
+   Dépend de : shared/css/variables.css
    Utilisé par : scrolly/index.html
 
    FF2EplusADA (scrollyFFADA2S v2)
@@ -21,16 +26,12 @@
   width: 100%;
   height: calc(100vh - var(--h-barre-haut) - var(--h-zone-timeline));
   overflow: hidden;
-  background: #111;
+  background: var(--color-scene-bg);
 }
 
-/* Les <svg> sources (step7/9/10) n'ont ni width ni height sur la balise
-   racine — seulement un viewBox — donc sans cette règle ils retombent sur
-   la taille par défaut du navigateur pour un élément remplacé sans
-   dimension intrinsèque, plutôt que de remplir leur conteneur à 100%
-   (#stepXSVG, déjà en width/height:100% via loadSVG). C'est ça qui rognait
-   le bas du SVG une fois .zone-scene raccourcie — pas des attributs px
-   figés comme suspecté au départ (voir Registre/synthèse S3B4). */
+/* Les <svg> sources n'ont ni width ni height sur la balise racine —
+   seulement un viewBox — donc sans cette règle ils retombent sur la
+   taille par défaut du navigateur plutôt que de remplir leur conteneur. */
 #graphic svg {
   width: 100%;
   height: 100%;
@@ -48,7 +49,8 @@
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0));
+  background: linear-gradient(to top, var(--color-scene-bg) 0%, transparent 100%);
+  opacity: 0.9;
   z-index: 2000; /* > 1500 (loadSVG) — convention Playbook §3.4 */
 }
 
@@ -73,7 +75,7 @@
   padding: 0 10px;
   border-radius: 4px;
   border: 1px solid var(--color-border);
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--color-controle-bg);
   color: var(--color-text);
   font-size: 14px;
   line-height: 1;
@@ -85,7 +87,7 @@
 }
 
 .controles-gauche button:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--color-controle-bg-hover);
 }
 
 .controles-gauche button:focus-visible {
@@ -111,7 +113,7 @@
   position: relative;
   width: 100%;
   height: 4px;
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--color-rail-piste);
   border-radius: 2px;
   cursor: pointer;
 }
@@ -134,6 +136,7 @@
   width: 45px; /* placeholder — Isabel ajustera à l'œil */
   height: auto;
   transform: translate(-85.9%, -5.7%);
+  filter: var(--filtre-curseur);
   transition: left 0.3s ease;
   pointer-events: none;
 }
@@ -152,7 +155,7 @@
   font-size: 10px;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--color-scene-texte);
   white-space: nowrap;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -173,7 +176,9 @@
   }
 }
 
-/* --- Repères Univers (95%) / Valeurs (100%) — non cliquables, purement visuels --- */
+/* --- Repères Univers (95%) / Valeurs (100%) — non cliquables, purement
+   visuels. Couleurs fixes (pas thémées) : jaune/bleu lisibles sur les
+   deux fonds. --- */
 .repere-univers,
 .repere-valeurs {
   position: absolute;
@@ -201,7 +206,7 @@
   top: 28px;
   left: 32px;
   max-width: 420px;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--color-carte-bg);
   padding: 14px 20px;
   border-radius: 6px;
   z-index: 1600; /* > 1500 (loadSVG) — convention Playbook §3.4 */
@@ -212,7 +217,7 @@
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--color-scene-texte-att);
   margin-bottom: 4px;
 }
 
@@ -220,7 +225,7 @@
   font-family: "Agoradp_15", sans-serif;
   font-size: calc(26px * var(--echelle-texte));
   font-weight: 400;
-  color: #fff;
+  color: var(--color-scene-texte);
   opacity: 1;
   transform: translateY(0);
   transition: opacity 0.4s ease, transform 0.4s ease;
@@ -237,8 +242,8 @@
   }
 }
 
-/* --- Texte narratif (#texteStep) — déplacé du style inline (S3B3), suit
-   --echelle-texte comme le titre de scène --- */
+/* --- Texte narratif (#texteStep) — uniquement steps F-I (fond noir),
+   reste donc en couleurs fixes, pas besoin des jetons de thème --- */
 .texte-step-narratif {
   position: fixed;
   top: calc(var(--h-barre-haut) + (100vh - var(--h-barre-haut) - var(--h-zone-timeline)) / 2);
@@ -259,4 +264,80 @@
 
 .texte-step-narratif p {
   font-size: 1em;
+}
+
+/* --- Phrase progressive (B/C/E) — repositionnée dynamiquement en JS par
+   rapport à la position réelle de #spirale, voir avantColonisation.js --- */
+.phrase-progressive {
+  position: absolute;
+  color: var(--color-scene-texte);
+  font-family: "Agoradp_15", sans-serif;
+  font-size: calc(28px * var(--echelle-texte));
+  line-height: 1.3;
+  white-space: pre-line;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.phrase-progressive.aligne-gauche,
+.phrase-progressive.aligne-centre {
+  opacity: 1;
+}
+
+/* --- Sous-titre de rupture (E uniquement, "Spirale de la violence") --- */
+.sous-titre-rupture {
+  position: absolute;
+  top: calc(28px + 70px); /* juste sous .titre-scene, ajuster à l'œil */
+  left: 32px;
+  color: var(--color-scene-texte-att);
+  font-family: "Agoradp_15", sans-serif;
+  font-size: calc(16px * var(--echelle-texte));
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.sous-titre-rupture.visible {
+  opacity: 1;
+}
+
+/* --- Carte de valeur (D) — position fixe, jamais suivant le curseur
+   (voir Registre : persona femme aînée, faible exigence de précision
+   motrice) --- */
+.carte-valeur {
+  position: absolute;
+  top: 50%;
+  right: 40px;
+  transform: translateY(-50%);
+  max-width: 260px;
+  background: var(--color-controle-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  color: var(--color-scene-texte);
+}
+
+.carte-valeur.visible {
+  opacity: 1;
+}
+
+.carte-valeur-autochtone {
+  font-family: "Agoradp_15", sans-serif;
+  font-size: calc(24px * var(--echelle-texte));
+  margin-bottom: 4px;
+}
+
+.carte-valeur-traduction {
+  font-size: calc(14px * var(--echelle-texte));
+  color: var(--color-scene-texte-att);
+  margin-bottom: 10px;
+}
+
+.carte-valeur-definition {
+  font-size: calc(13px * var(--echelle-texte));
+  line-height: 1.4;
 }

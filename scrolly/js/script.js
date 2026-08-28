@@ -18,7 +18,7 @@ import { initTimelineRail } from "./timelineRail.js";
 
 async function afficherTexte(steps, stepId) {
   const contenu = steps[stepId];
-  document.getElementById("texteStep").innerHTML = contenu
+  document.getElementById("texteStep").innerHTML = (contenu && contenu.titre)
     ? `<h2>${resolve(contenu.titre)}</h2><p>${resolve(contenu.texte)}</p>`
     : "";
 }

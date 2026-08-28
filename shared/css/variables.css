@@ -34,4 +34,24 @@ body {
   --h-zone-timeline: clamp(110px, 13vh, 150px);
   --pad-timeline-haut: 24px;
   --echelle-texte: 1;
+
+  --color-scene-bg: #111;
+  --color-scene-texte: #fff;
+  --color-scene-texte-att: rgba(255, 255, 255, 0.8);
+  --color-carte-bg: rgba(0, 0, 0, 0.7);
+  --color-rail-piste: rgba(255, 255, 255, 0.25);
+  --color-controle-bg: rgba(255, 255, 255, 0.06);
+  --color-controle-bg-hover: rgba(255, 255, 255, 0.15);
+  --filtre-curseur: none;
+}
+
+[data-theme="clair"] {
+  --color-scene-bg: #fff;
+  --color-scene-texte: #1a1a1a;
+  --color-scene-texte-att: rgba(26, 26, 26, 0.75);
+  --color-carte-bg: rgba(255, 255, 255, 0.85);
+  --color-rail-piste: rgba(0, 0, 0, 0.2);
+  --color-controle-bg: rgba(0, 0, 0, 0.05);
+  --color-controle-bg-hover: rgba(0, 0, 0, 0.12);
+  --filtre-curseur: none; /* plume.svg reste noir nativement, c'est voulu */
 }

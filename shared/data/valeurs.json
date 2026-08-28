@@ -2,46 +2,55 @@
   {
     "id": "partage",
     "nom": { "fr": "Partage", "en": "Sharing", "innu-aimun": "Matenueun" },
+    "definition": { "fr": "[Texte à venir des artistes]", "en": null },
     "audio": { "innu-aimun": null }
   },
   {
     "id": "force",
     "nom": { "fr": "Force", "en": "Strength", "innu-aimun": "Shutshiun" },
+    "definition": { "fr": "[Texte à venir des artistes]", "en": null },
     "audio": { "innu-aimun": null }
   },
   {
     "id": "entraide",
     "nom": { "fr": "Entraide", "en": "Mutual aid", "innu-aimun": "Uauitshitun" },
+    "definition": { "fr": "[Texte à venir des artistes]", "en": null },
     "audio": { "innu-aimun": null }
   },
   {
     "id": "vie",
     "nom": { "fr": "Vie", "en": "Life", "innu-aimun": "Inniun" },
+    "definition": { "fr": "[Texte à venir des artistes]", "en": null },
     "audio": { "innu-aimun": null }
   },
   {
     "id": "rire",
     "nom": { "fr": "Rire", "en": "Laugh", "innu-aimun": "Papun" },
+    "definition": { "fr": "[Texte à venir des artistes]", "en": null },
     "audio": { "innu-aimun": null }
   },
   {
     "id": "espoir",
     "nom": { "fr": "Espoir", "en": "Hope", "innu-aimun": "Pakushenitamun" },
+    "definition": { "fr": "[Texte à venir des artistes]", "en": null },
     "audio": { "innu-aimun": null }
   },
   {
     "id": "amour-de-soi",
     "nom": { "fr": "Amour de soi", "en": "Self-love", "innu-aimun": "Shatshitun" },
+    "definition": { "fr": "[Texte à venir des artistes]", "en": null },
     "audio": { "innu-aimun": null }
   },
   {
     "id": "bienveillance",
     "nom": { "fr": "Bienveillance", "en": "Kindness", "innu-aimun": "Tshisheuatishitun" },
+    "definition": { "fr": "[Texte à venir des artistes]", "en": null },
     "audio": { "innu-aimun": null }
   },
   {
     "id": "confiance",
     "nom": { "fr": "Confiance", "en": "Trust", "innu-aimun": "Shutshenimeu" },
+    "definition": { "fr": "[Texte à venir des artistes]", "en": null },
     "audio": { "innu-aimun": null }
   }
 ]
