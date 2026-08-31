@@ -1,0 +1,119 @@
+/* ==================================================
+   shared/css/railParcours.css
+   Rail de navigation à 12 boutons (bas d'écran)
+
+   Rôle : Styles du rail construit par shared/js/railParcours.js — pastille
+   ronde par étape, états actif / verrouillé / page-actuelle, bulle
+   "Pas encore débloqué". Suit le basculement clair/sombre via les jetons
+   de variables.css (--color-scene-bg, --color-border, --color-primary) —
+   aucune couleur de thème codée en dur. Placeholder visuel des pastilles :
+   /shared/svg/spirale.webp (chemin ABSOLU — ce composant sert des pages à
+   des profondeurs de dossier différentes).
+   Dépend de : shared/css/variables.css
+   Utilisé par : scrolly/index.html (univers/, valeurs/, landing à venir)
+
+   FF2EplusADA (scrollyFFADA2S v2)
+   Isabel Cayer · Atelier Love & Code · 2026
+   ================================================== */
+
+.rail-parcours {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 14px 24px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(to top, var(--color-scene-bg) 0%, transparent 100%);
+  z-index: 2000;
+}
+
+.etape-bouton {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  /* Placeholder — vraies illustrations de Déline à venir. Chemin absolu
+     défini ici une seule fois plutôt qu'en style inline par bouton. */
+  background-image: url("/shared/svg/spirale.webp");
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, filter 0.2s ease, opacity 0.2s ease;
+}
+
+.etape-bouton:hover,
+.etape-bouton:focus-visible {
+  transform: scale(1.12);
+  outline: none;
+}
+
+.etape-bouton.actif {
+  border-color: var(--color-primary);
+  /* Équivalent fixe de color-mix(in srgb, var(--color-primary) 25%, transparent) :
+     --color-primary vaut #a02421 et ne change pas selon le thème, donc la
+     valeur rgba() ne diverge jamais. Choix signalé dans la synthèse. */
+  box-shadow: 0 0 0 3px rgba(160, 36, 33, 0.25);
+}
+
+.etape-bouton.verrouille {
+  filter: grayscale(1) brightness(1.3);
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.etape-bouton.verrouille::after {
+  content: "🔒";
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  font-size: 13px;
+  background: #fff;
+  border-radius: 50%;
+  padding: 1px;
+}
+
+.etape-bouton.page-actuelle {
+  border-width: 3px;
+}
+
+.numero {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: #222;
+}
+
+.bulle-verrouillee {
+  position: absolute;
+  bottom: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222;
+  color: #fff;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.bulle-verrouillee.visible {
+  opacity: 1;
+}

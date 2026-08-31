@@ -20,6 +20,7 @@
 
 import { loadSVG } from "../../../shared/js/utils.js";
 import { resolve } from "../../../shared/js/i18n.js";
+import { reduitMouvement } from "../../../shared/js/navigationEtat.js";
 
 let container = null;
 let timelineActuelle = null; // une seule à la fois, kill() au début de chaque show
@@ -63,6 +64,12 @@ async function assurerContainer() {
     }
   }
 
+  // Tue un éventuel fondu de sortie encore en cours (masquerSceneComplete()
+  // avec prefers-reduced-motion off) : sans ça, un aller-retour rapide
+  // E→F→E laisse le tween d'opacité reprendre le dessus juste après ce
+  // gsap.set et son onComplete finit par remettre display:none sur une
+  // scène qu'on vient pourtant de rouvrir.
+  gsap.killTweensOf(container);
   gsap.set(container, { opacity: 1, display: "block", pointerEvents: "auto" });
   return container;
 }
@@ -179,7 +186,24 @@ function cacherCarteValeur() {
 // aucune réanimation.
 export function masquerSceneComplete() {
   if (!container) return;
-  gsap.set(container, { opacity: 0, display: "none", pointerEvents: "none" });
+
+  if (reduitMouvement()) {
+    gsap.set(container, { opacity: 0, display: "none", pointerEvents: "none" });
+    return;
+  }
+
+  // pointerEvents retiré immédiatement (pas besoin d'attendre la fin du
+  // fondu pour que la scène cesse d'intercepter les clics), display
+  // retiré seulement à la fin (impossible à animer, doit attendre que
+  // l'opacité soit vraiment à 0 sinon la scène disparaît d'un coup avant
+  // la fin visuelle du fondu).
+  gsap.set(container, { pointerEvents: "none" });
+  gsap.to(container, {
+    opacity: 0,
+    duration: 1,
+    ease: "power1.out",
+    onComplete: () => gsap.set(container, { display: "none" }),
+  });
 }
 
 // --- A — Depuis la nuit des temps ---

@@ -17,12 +17,15 @@
 // détaillée — 9 paths, aucune nuance) — à remplacer une fois le bloc de
 // retraitement d'images complété (voir Registre, 24 août).
 //
-// Dépend de : d3 (global, CDN), gsap (global, CDN)
+// Dépend de : d3 (global, CDN), gsap (global, CDN),
+// shared/js/progression.js (deverrouiller "valeurs" à la condition de sortie)
 // Utilisé par : univers/js/etoiles.js
 //
 // FF2EplusADA (scrollyFFADA2S v2)
 // Isabel Cayer · Atelier Love & Code · 2026
 // ==================================================
+
+import { initProgression, deverrouiller } from "../../shared/js/progression.js";
 
 // Seuils de la condition de sortie — valeurs de départ, faciles à ajuster,
 // à valider avec Déline une fois le rythme réel de la partie 3 mieux connu.
@@ -66,11 +69,16 @@ export function initConditionSortie(callback) {
   };
 }
 
-function declencher(source, callback) {
+async function declencher(source, callback) {
   if (transitionDejaDeclenchee) return;
   transitionDejaDeclenchee = true;
   if (minuteurId) clearTimeout(minuteurId);
   console.log(`🌕 Condition de sortie atteinte (${source}) — lancement de la transition vers les valeurs`);
+  // Déverrouille AVANT callback() : callback() révèle le bouton "Explorer
+  // les valeurs" (défini dans etoiles.js), donc au moment où la personne
+  // peut cliquer dessus, "valeurs" est déjà débloqué dans progression.js.
+  await initProgression();
+  deverrouiller("valeurs");
   callback();
 }
 

@@ -8,7 +8,13 @@
   <link rel="stylesheet" href="../shared/css/variables.css">
   <link rel="stylesheet" href="./css/timeline.css">
   <link rel="stylesheet" href="../shared/css/headerControls.css">
+  <link rel="stylesheet" href="../shared/css/railParcours.css">
   <style>
+    /* Rail hérité (timelineRail.js) masqué visuellement mais gardé dans le
+       DOM et toujours construit normalement — filet de sécurité. Retour en
+       arrière = retirer cette seule ligne. */
+    #zone-timeline { display: none; }
+
     #bouton-explorer-etoiles {
       position: fixed;
       top: 50%;
@@ -64,6 +70,8 @@
       </div>
     </div>
   </div>
+
+  <div id="rail-parcours" class="rail-parcours"><!-- construit dynamiquement par shared/js/railParcours.js --></div>
 
   <script type="module" src="./js/script.js"></script>
   <script type="module">

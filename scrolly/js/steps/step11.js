@@ -14,7 +14,9 @@
 // step précédent et on reconstruit indépendamment dans son propre conteneur,
 // avec des fondus doux pour la transition — pas de dépendance au DOM live de
 // step10.js, qui reste intact et non modifié.
-// Dépend de : shared/js/utils.js (loadSVG)
+// Dépend de : shared/js/utils.js (loadSVG), shared/js/progression.js
+// (deverrouiller "univers" au moment de la récompense), shared/js/railParcours.js
+// (rafraichirVerrous — le rail est visible sur cette page)
 // Utilisé par : scrolly/js/stepsRegistry.js
 //
 // FF2EplusADA (scrollyFFADA2S v2)
@@ -22,6 +24,8 @@
 // ==================================================
 
 import { loadSVG } from "../../../shared/js/utils.js";
+import { initProgression, deverrouiller } from "../../../shared/js/progression.js";
+import { rafraichirVerrous } from "../../../shared/js/railParcours.js";
 
 let step11Container = null;
 let step11Timeline = null;
@@ -166,12 +170,16 @@ export async function showStep11() {
     onStart: () => console.log(`✨ ${NB_ETOILES_TOTAL} étoiles apparaissent`)
   }, "-=0.5");
 
-  step11Timeline.call(() => {
+  step11Timeline.call(async () => {
     const bouton = document.getElementById("bouton-explorer-etoiles");
     if (bouton) {
       bouton.classList.add("visible");
       console.log('🔘 Bouton "Explorer les étoiles" révélé');
     }
+    await initProgression();
+    deverrouiller("univers");
+    rafraichirVerrous();
+    console.log('🔓 Étape "univers" débloquée dans le parcours');
   });
 
   console.log("▶️ Timeline step11 démarrée");

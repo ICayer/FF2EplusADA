@@ -27,6 +27,16 @@
   height: calc(100vh - var(--h-barre-haut) - var(--h-zone-timeline));
   overflow: hidden;
   background: var(--color-scene-bg);
+  /* Le changement de --color-scene-bg (posé par appliquerTheme() au passage
+     E→F) devient un fondu visuel — même durée que masquerSceneComplete()
+     pour que le fond et la scène s'estompent d'un seul mouvement. */
+  transition: background-color 1s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zone-scene {
+    transition: none;
+  }
 }
 
 /* Les <svg> sources n'ont ni width ni height sur la balise racine —
