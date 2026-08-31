@@ -11,7 +11,8 @@
 // de la scène (#titre-scene). allerAuStep() est la SEULE fonction que le
 // reste du code doit appeler pour naviguer — jamais goToStep() de
 // timeline.js directement depuis l'extérieur de ce module.
-// Dépend de : scrolly/js/timeline.js, scrolly/js/steps/avantColonisation.js
+// Dépend de : scrolly/js/timeline.js, scrolly/js/steps/avantColonisation.js,
+// shared/js/navigationEtat.js (logique générique thème + bloc-titre)
 // Utilisé par : scrolly/js/script.js
 //
 // FF2EplusADA (scrollyFFADA2S v2)
@@ -20,6 +21,7 @@
 
 import { goToStep, getOrder } from "./timeline.js";
 import { masquerSceneComplete } from "./steps/avantColonisation.js";
+import { appliquerTheme, reduitMouvement as reduitMouvementPartage, mettreAJourTitreScene } from "../../shared/js/navigationEtat.js";
 
 const DUREE_FONDU_MS = 200;
 
@@ -34,10 +36,6 @@ let titreTexteEl = null;
 let legendes = [];
 let btnRecule = null;
 let btnAvance = null;
-
-function reduitMouvement() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
 
 // Groupe order par epoque (dans l'ordre d'apparition) et calcule la position
 // (%) de chaque step selon la formule du Registre — jamais de valeur codée
@@ -129,7 +127,7 @@ function construireRail() {
 }
 
 function positionnerCurseur(index) {
-  curseurEl.style.transition = reduitMouvement() ? "none" : "";
+  curseurEl.style.transition = reduitMouvementPartage() ? "none" : "";
   curseurEl.style.left = `${positions[index]}%`;
 }
 
@@ -139,24 +137,6 @@ function mettreAJourLegendes(index) {
     el.classList.toggle("cachee", !visible);
     el.classList.toggle("visible", visible);
   });
-}
-
-function mettreAJourTitre(index, texteTitre) {
-  const majTexte = () => {
-    titreCompteurEl.textContent = `${index + 1} / ${order.length}`;
-    titreTexteEl.textContent = texteTitre || "";
-  };
-
-  if (reduitMouvement()) {
-    majTexte();
-    return;
-  }
-
-  titreTexteEl.classList.add("transition-sortie");
-  setTimeout(() => {
-    majTexte();
-    titreTexteEl.classList.remove("transition-sortie");
-  }, DUREE_FONDU_MS);
 }
 
 function mettreAJourBoutons(index) {
@@ -196,7 +176,7 @@ export function allerAuStep(index, texteTitre) {
   if (index < 0 || index >= order.length) return;
   currentIndex = index;
   const epoqueActuelle = order[index]?.epoque;
-  document.body.dataset.theme = (epoqueActuelle === "apres") ? "" : "clair";
+  appliquerTheme(epoqueActuelle);
 
   goToStep(index);
 
@@ -215,7 +195,7 @@ export function allerAuStep(index, texteTitre) {
 
   positionnerCurseur(index);
   mettreAJourLegendes(index);
-  mettreAJourTitre(index, texteTitre);
+  mettreAJourTitreScene(titreCompteurEl, titreTexteEl, index, order.length, texteTitre, DUREE_FONDU_MS);
   mettreAJourBoutons(index);
 }
 

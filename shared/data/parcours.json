@@ -1,0 +1,14 @@
+[
+  { "id": "accueil", "page": "index.html" },
+  { "id": "nuit-des-temps", "page": "scrolly/index.html", "epoque": "avant" },
+  { "id": "lien-communaute", "page": "scrolly/index.html", "epoque": "avant" },
+  { "id": "lien-territoire", "page": "scrolly/index.html", "epoque": "avant" },
+  { "id": "lien-valeurs", "page": "scrolly/index.html", "epoque": "avant" },
+  { "id": "rupture-coloniale", "page": "scrolly/index.html", "epoque": "rupture" },
+  { "id": "hommage-victimes", "page": "scrolly/index.html", "epoque": "apres" },
+  { "id": "transformation-coeur", "page": "scrolly/index.html", "epoque": "apres" },
+  { "id": "communaute-etoiles", "page": "scrolly/index.html", "epoque": "apres" },
+  { "id": "seuil-univers", "page": "scrolly/index.html", "epoque": "apres" },
+  { "id": "univers", "page": "univers/index.html" },
+  { "id": "valeurs", "page": "valeurs/index.html" }
+]
