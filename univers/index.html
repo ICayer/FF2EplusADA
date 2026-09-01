@@ -24,11 +24,14 @@
   <div id="rail-parcours" class="rail-parcours"></div>
 
   <script type="module">
+    import { initI18n } from "../shared/js/i18n.js";
+    import { langueSauvegardee } from "../shared/js/preferences.js";
     import { initUnivers } from "./js/etoiles.js";
     import { initHeaderControls } from "../shared/js/headerControls.js";
     import { initProgression } from "../shared/js/progression.js";
     import { construireRailParcours } from "../shared/js/railParcours.js";
 
+    await initI18n(langueSauvegardee() || 'fr');
     initUnivers("#univers-canvas");
     initHeaderControls(document.getElementById("entete-controles"));
 

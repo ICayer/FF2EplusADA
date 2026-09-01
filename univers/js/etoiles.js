@@ -6,7 +6,7 @@
 // puis dessiner le tout (Lune, étoiles, traits, arcs-étiquettes). Gère aussi
 // le survol ; le clic vers le récit complet arrive en S2B3T1 (testimonyModal.js).
 // Dépend de : univers/js/constellations.js, univers/data/etoiles.json,
-//             univers/data/nations.json, shared/js/i18n.js (initI18n/t),
+//             univers/data/nations.json, shared/js/i18n.js (t),
 //             d3 (global, CDN)
 // Utilisé par : univers/index.html
 //
@@ -17,8 +17,7 @@
 import { calculerDisposition, cheminArc } from "./constellations.js";
 import { initTestimonyModal, showTestimony } from "./testimonyModal.js";
 import { initConditionSortie, lancerTransitionValeurs } from "./transitionValeurs.js";
-import { initI18n, t } from "../../shared/js/i18n.js";
-import { langueSauvegardee } from "../../shared/js/preferences.js";
+import { t } from "../../shared/js/i18n.js";
 
 // --- Réglages visuels ---
 // Tout est en coordonnées du viewBox (1000 x 1000), pas en pixels d'écran :
@@ -46,12 +45,10 @@ let signalerInteractionFn = null; // référence mise à jour après initConditi
  * @param {string} selecteurConteneur - ex. "#univers-canvas"
  */
 export async function initUnivers(selecteurConteneur = "#univers-canvas") {
-  // initI18n() était absent d'univers/ : sans lui, le repli par nation
-  // (fallbackByLanguage) n'est jamais chargé si une langue autochtone est
-  // choisie. À appeler une fois, avant tout le reste. Langue = préférence
-  // sauvegardée (persiste entre les pages) sinon 'fr'.
-  await initI18n(langueSauvegardee() || 'fr');
-
+  // initI18n() est appelé par le bootstrap de univers/index.html, AVANT
+  // initHeaderControls() et cette fonction — pas ici (sinon course : l'UI
+  // de l'en-tête se construirait avant que la langue sauvegardée soit
+  // appliquée). getLanguage()/t() reflètent déjà la bonne langue ici.
   universContainer = document.querySelector(selecteurConteneur);
   if (!universContainer) {
     console.error(`❌ Conteneur introuvable : ${selecteurConteneur}`);

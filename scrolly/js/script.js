@@ -15,12 +15,11 @@
 // Isabel Cayer · Atelier Love & Code · 2026
 // ==================================================
 
-import { initI18n, resolve } from "../../shared/js/i18n.js";
+import { resolve } from "../../shared/js/i18n.js";
 import { initTimeline, getOrder } from "./timeline.js";
 import { initTimelineRail } from "./timelineRail.js";
 import { initProgression, deverrouiller } from "../../shared/js/progression.js";
 import { construireRailParcours, definirEtapeActive, rafraichirVerrous } from "../../shared/js/railParcours.js";
-import { langueSauvegardee } from "../../shared/js/preferences.js";
 
 const PAGE_COURANTE = "scrolly/index.html";
 
@@ -32,7 +31,6 @@ async function afficherTexte(steps, stepId) {
 }
 
 async function init() {
-  await initI18n(langueSauvegardee() || 'fr');
   await initTimeline();
   await initProgression();
 
@@ -109,4 +107,4 @@ async function init() {
   allerEtAfficher(0);
 }
 
-init();
+export { init };

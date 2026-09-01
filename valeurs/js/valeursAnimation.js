@@ -14,7 +14,7 @@
 // suivi de son bouton de valeur avec étiquette bilingue au survol/focus
 // et lecture audio (innu-aimun) au clic / Entrée / Espace.
 // Dépend de : shared/js/utils.js (loadSVG), shared/js/i18n.js
-// (initI18n/resolve/getLanguage), univers/data/nations.json,
+// (resolve/getLanguage), univers/data/nations.json,
 // shared/data/valeurs.json, valeurs/audio/${langue}/*.mp3,
 // gsap (global, CDN)
 // Utilisé par : valeurs/index.html
@@ -24,8 +24,7 @@
 // ==================================================
 
 import { loadSVG } from "../../shared/js/utils.js";
-import { initI18n, resolve, getLanguage } from "../../shared/js/i18n.js";
-import { langueSauvegardee } from "../../shared/js/preferences.js";
+import { resolve, getLanguage } from "../../shared/js/i18n.js";
 
 let container = null;
 let audioActif = null; // un seul audio à la fois — une nouvelle lecture arrête la précédente
@@ -392,11 +391,10 @@ function animerGroupePerlesEnVague(groupeEl, timeline, positionRelative) {
 // selecteurGraphic : gardé pour rester cohérent avec initUnivers("#univers-canvas")
 // — non utilisé ici (loadSVG cible déjà "graphic" par défaut).
 export async function initValeurs(selecteurGraphic) {
-  // Cohérent avec le reste du projet (chaque page appelle initI18n() une
-  // fois). Langue = préférence sauvegardée (persiste entre les pages)
-  // sinon 'fr' — pour que le 1er rendu soit déjà dans la bonne langue.
-  await initI18n(langueSauvegardee() || 'fr');
-
+  // initI18n() est appelé par le bootstrap de valeurs/index.html, AVANT
+  // initHeaderControls() et cette fonction — pas ici (sinon course de
+  // vitesse : l'en-tête se construirait avant l'application de la langue
+  // sauvegardée). getLanguage()/resolve() reflètent déjà la bonne langue.
   const c = await assurerContainer();
   if (!c) return;
 

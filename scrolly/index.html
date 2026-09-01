@@ -73,10 +73,15 @@
 
   <div id="rail-parcours" class="rail-parcours"><!-- construit dynamiquement par shared/js/railParcours.js --></div>
 
-  <script type="module" src="./js/script.js"></script>
   <script type="module">
+    import { initI18n } from "../shared/js/i18n.js";
+    import { langueSauvegardee } from "../shared/js/preferences.js";
     import { initHeaderControls } from "../shared/js/headerControls.js";
+    import { init } from "./js/script.js";
+
+    await initI18n(langueSauvegardee() || 'fr');
     initHeaderControls(document.getElementById("entete-controles"));
+    init();
   </script>
 </body>
 </html>

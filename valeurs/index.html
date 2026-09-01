@@ -18,11 +18,14 @@
   <div id="rail-parcours" class="rail-parcours"></div>
 
   <script type="module">
+    import { initI18n } from "../shared/js/i18n.js";
+    import { langueSauvegardee } from "../shared/js/preferences.js";
     import { initValeurs } from "./js/valeursAnimation.js";
     import { initHeaderControls } from "../shared/js/headerControls.js";
     import { initProgression } from "../shared/js/progression.js";
     import { construireRailParcours } from "../shared/js/railParcours.js";
 
+    await initI18n(langueSauvegardee() || 'fr');
     initValeurs("#graphic");
     initHeaderControls(document.getElementById("entete-controles"));
 
