@@ -9,11 +9,12 @@
 // symétrique du fondu de sortie fait par univers/ avant la navigation —
 // la coupure de page se produit entre deux écrans blancs. Les couleurs
 // des 5 groupes sont tirées au hasard parmi les nations à chaque
-// chargement (le collier change à chaque visite).
-// Les 9 swirls + boutons de valeur, déjà présents dans le SVG, restent
-// masqués — ils seront mis en scène dans une tâche séparée (S4B3T1).
-// Dépend de : shared/js/utils.js (loadSVG), univers/data/nations.json,
-// gsap (global, CDN)
+// chargement (le collier change à chaque visite). Enfin les 9 swirls
+// apparaissent un à un (révélation circulaire, sens alterné), chacun
+// suivi de son bouton de valeur avec étiquette bilingue au survol/focus.
+// Dépend de : shared/js/utils.js (loadSVG), shared/js/i18n.js
+// (initI18n/resolve/getLanguage), univers/data/nations.json,
+// shared/data/valeurs.json, gsap (global, CDN)
 // Utilisé par : valeurs/index.html
 //
 // FF2EplusADA (scrollyFFADA2S v2)
@@ -21,6 +22,7 @@
 // ==================================================
 
 import { loadSVG } from "../../shared/js/utils.js";
+import { initI18n, resolve, getLanguage } from "../../shared/js/i18n.js";
 
 let container = null;
 
@@ -97,12 +99,16 @@ async function assurerContainer() {
       }
     }
 
-    // Hors périmètre S4B2 : les 9 swirls et les 9 boutons de valeur sont
-    // déjà dans valeurs.svg (préparés en S4B1T3). Les garder masqués tant
-    // que S4B3T1 ne les met pas en scène, sinon ils s'afficheraient bruts.
+    // Swirls et boutons : les groupes #swirls/#boutons eux-mêmes restent
+    // opacity:1/display:block (déjà mesurés dans le recentrage ci-dessus,
+    // doivent le rester) — chaque swirlN/boutonN individuel démarre
+    // invisible, révélé un à un par initValeurs().
     ["#swirls", "#boutons"].forEach((sel) => {
-      const el = container.querySelector(sel);
-      if (el) gsap.set(el, { opacity: 0, display: "none" });
+      const groupe = container.querySelector(sel);
+      if (groupe) {
+        gsap.set(groupe, { opacity: 1, display: "block" });
+        Array.from(groupe.children).forEach((enfant) => gsap.set(enfant, { opacity: 0 }));
+      }
     });
   }
 
@@ -128,6 +134,117 @@ function appliquerCouleursPerles(c, couleurs) {
   }
 }
 
+let valeurs = [];
+async function chargerValeurs() {
+  if (valeurs.length === 0) {
+    valeurs = await fetch("/shared/data/valeurs.json").then((r) => r.json());
+  }
+  return valeurs;
+}
+
+// Révélation circulaire d'un swirl via masque CSS conic-gradient animé —
+// `sens` vaut 1 (horaire) ou -1 (antihoraire). Ajoute une étape à
+// `timeline` sans position explicite (séquentiel — s'enchaîne après la
+// précédente).
+// ⚠️ Technique jamais utilisée ailleurs dans ce projet et NON vérifiée en
+// navigateur au moment d'écrire (pas d'environnement navigateur ici).
+// Dégradation gracieuse voulue : le <g> parent est remis à opacity:1 dès
+// le début, donc si le navigateur ignore mask-image sur un <image> SVG,
+// le swirl apparaît simplement d'un coup (= le filet de secours "fondu
+// simple") au lieu de balayer. Voir la synthèse.
+function revelerCercleSwirl(imageEl, sens, timeline) {
+  const props = { angle: 0 };
+
+  const gradient = (a) =>
+    sens > 0
+      ? `conic-gradient(black 0deg, black ${a}deg, transparent ${a}deg, transparent 360deg)`
+      : `conic-gradient(transparent 0deg, transparent ${360 - a}deg, black ${360 - a}deg, black 360deg)`;
+
+  timeline.call(() => {
+    // Le <g id="swirlN"> parent est à opacity:0 (assurerContainer) — le
+    // rendre visible ; c'est le masque, démarré à 0°, qui tient l'image
+    // invisible jusqu'à la fin du balayage.
+    const groupe = imageEl.parentNode;
+    if (groupe) gsap.set(groupe, { opacity: 1 });
+    imageEl.style.webkitMaskRepeat = imageEl.style.maskRepeat = "no-repeat";
+    imageEl.style.webkitMaskPosition = imageEl.style.maskPosition = "center";
+    imageEl.style.webkitMaskImage = imageEl.style.maskImage = gradient(0);
+  });
+
+  timeline.to(props, {
+    angle: 360,
+    duration: 1.3,
+    ease: "power1.inOut",
+    onUpdate: () => {
+      imageEl.style.webkitMaskImage = imageEl.style.maskImage = gradient(props.angle);
+    },
+  });
+}
+
+// Crée et attache l'étiquette bilingue d'un bouton (mot autochtone selon
+// getLanguage() + repli innu-aimun, traduction fr/en via resolve()),
+// visible au survol/focus. Rend le bouton focusable au clavier. Séparée
+// de revelerBouton() pour que la branche prefers-reduced-motion puisse
+// l'appeler directement, sans passer par une timeline.
+function attacherEtiquetteBouton(boutonEl, valeur) {
+  const rect = boutonEl.querySelector("rect");
+  const x = parseFloat(rect.getAttribute("x")) + parseFloat(rect.getAttribute("width")) / 2;
+  const y = parseFloat(rect.getAttribute("y"));
+
+  const langueActive = getLanguage();
+  const langueAutochtone = (langueActive === "fr" || langueActive === "en") ? null : langueActive;
+  const motAutochtone = (langueAutochtone && valeur.nom[langueAutochtone]) || valeur.nom["innu-aimun"];
+  const motSecondaire = resolve({ fr: valeur.nom.fr, en: valeur.nom.en });
+
+  const NS_SVG = "http://www.w3.org/2000/svg";
+  const texte = document.createElementNS(NS_SVG, "text");
+  texte.setAttribute("text-anchor", "middle");
+  texte.setAttribute("font-family", "Agoradp_15, sans-serif");
+  texte.style.opacity = "0";
+  texte.style.pointerEvents = "none";
+  texte.style.transition = "opacity 0.2s ease";
+
+  const ligneAutochtone = document.createElementNS(NS_SVG, "tspan");
+  ligneAutochtone.setAttribute("x", x);
+  ligneAutochtone.setAttribute("y", y - 45);
+  ligneAutochtone.setAttribute("font-size", "30");
+  ligneAutochtone.textContent = motAutochtone;
+
+  const ligneSecondaire = document.createElementNS(NS_SVG, "tspan");
+  ligneSecondaire.setAttribute("x", x);
+  ligneSecondaire.setAttribute("y", y - 15);
+  ligneSecondaire.setAttribute("font-size", "20");
+  ligneSecondaire.setAttribute("fill", "#666");
+  ligneSecondaire.textContent = motSecondaire;
+
+  texte.appendChild(ligneAutochtone);
+  texte.appendChild(ligneSecondaire);
+  boutonEl.appendChild(texte);
+
+  boutonEl.style.cursor = "pointer";
+  boutonEl.setAttribute("tabindex", "0");
+  boutonEl.setAttribute("role", "button");
+  boutonEl.setAttribute("aria-label", `${motAutochtone} — ${motSecondaire}`);
+
+  const montrer = () => { texte.style.opacity = "1"; };
+  const cacher = () => { texte.style.opacity = "0"; };
+  boutonEl.addEventListener("mouseenter", montrer);
+  boutonEl.addEventListener("focus", montrer);
+  boutonEl.addEventListener("mouseleave", cacher);
+  boutonEl.addEventListener("blur", cacher);
+
+  // Pas de lecture audio ici — S4B3T2, tâche séparée. Le bouton est
+  // visuellement prêt et affiche son étiquette, mais un clic ne fait rien
+  // pour l'instant (comportement attendu, pas un oubli).
+}
+
+// Révèle un bouton en fondu puis attache son étiquette. Enchaîné à
+// `timeline` sans position explicite (après le swirl correspondant).
+function revelerBouton(boutonEl, valeur, timeline) {
+  timeline.to(boutonEl, { opacity: 1, duration: 0.4 });
+  timeline.call(() => attacherEtiquetteBouton(boutonEl, valeur));
+}
+
 // Même technique que animerPerlesEnVague() du scrolly (avantColonisation.js) :
 // trier les <path> par getBBox().x croissant et les révéler en vague.
 // Dupliquée ici volontairement — la fonction du scrolly est scopée à sa
@@ -143,6 +260,11 @@ function animerGroupePerlesEnVague(groupeEl, timeline, positionRelative) {
 // selecteurGraphic : gardé pour rester cohérent avec initUnivers("#univers-canvas")
 // — non utilisé ici (loadSVG cible déjà "graphic" par défaut).
 export async function initValeurs(selecteurGraphic) {
+  // Cohérent avec le reste du projet (chaque page appelle initI18n() une
+  // fois). Pas strictement requis aujourd'hui (currentLang = 'fr' par
+  // défaut), mais évite un piège si un sélecteur de langue est ajouté ici.
+  await initI18n('fr');
+
   const c = await assurerContainer();
   if (!c) return;
 
@@ -153,14 +275,25 @@ export async function initValeurs(selecteurGraphic) {
   const groupesPerles = [1, 2, 3, 4, 5].map((i) => c.querySelector(`#perles${i}`));
 
   if (reduitMouvement()) {
-    // État final direct : spirale + couple + toutes les perles visibles,
-    // aucun délai.
+    // État final direct : spirale + couple + perles + swirls + boutons
+    // tous visibles, aucun délai, aucun masque animé.
     const spirale = c.querySelector("#spirale");
     if (spirale) gsap.set(spirale, { opacity: 1 });
     if (couple) gsap.set(couple, { opacity: 1 });
     groupesPerles.forEach((groupe) => {
       if (groupe) gsap.set(groupe.querySelectorAll("path"), { opacity: 1 });
     });
+
+    const listeValeurs = await chargerValeurs();
+    for (let i = 1; i <= 9; i++) {
+      const swirlGroupe = c.querySelector(`#swirl${i}`);
+      const boutonEl = c.querySelector(`#bouton${i}`);
+      if (swirlGroupe) gsap.set(swirlGroupe, { opacity: 1 });
+      if (boutonEl) {
+        gsap.set(boutonEl, { opacity: 1 });
+        if (listeValeurs[i - 1]) attacherEtiquetteBouton(boutonEl, listeValeurs[i - 1]);
+      }
+    }
     return;
   }
 
@@ -186,4 +319,20 @@ export async function initValeurs(selecteurGraphic) {
   // suivant se placerait +=2 après la fin du précédent (effet d'escalier).
   tl.addLabel("perles", "+=2");
   groupesPerles.forEach((groupe) => animerGroupePerlesEnVague(groupe, tl, "perles"));
+
+  const listeValeurs = await chargerValeurs();
+
+  // Pause 1s après la fin de la vague de perles (script technique), avant
+  // le premier swirl.
+  tl.to({}, { duration: 1 });
+
+  for (let i = 1; i <= 9; i++) {
+    const swirlImg = c.querySelector(`#swirl${i} image`);
+    const boutonEl = c.querySelector(`#bouton${i}`);
+    const valeur = listeValeurs[i - 1];
+    const sens = i % 2 === 1 ? 1 : -1; // alterne horaire / antihoraire
+
+    if (swirlImg) revelerCercleSwirl(swirlImg, sens, tl);
+    if (boutonEl && valeur) revelerBouton(boutonEl, valeur, tl);
+  }
 }
