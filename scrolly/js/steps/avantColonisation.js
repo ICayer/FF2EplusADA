@@ -30,6 +30,40 @@ let timelineActuelle = null; // une seule à la fois, kill() au début de chaque
 // vraiment visible/invisible à chaque entrée/sortie.
 const revele = { spirale: false, communaute: false, territoire: false };
 
+const ORDRE_CALQUES = { spirale: 0, communaute: 1, territoire: 2 };
+
+// Garantit que les calques persistants AVANT `jusquExclu` sont révélés —
+// instantanément, sans animation, puisqu'on ne raconte pas ces steps-là
+// en ce moment. Ne touche JAMAIS au calque correspondant à `jusquExclu`
+// lui-même — chaque step garde son propre traitement minuté pour son
+// propre calque. jusquExclu vaut "communaute" | "territoire" | "valeurs"
+// | "barres" (les 2 derniers = garantir jusqu'à territoire inclus).
+function assurerCalquesAvant(jusquExclu) {
+  if (!container) return;
+  const limite = ORDRE_CALQUES[jusquExclu] ?? 3;
+
+  if (limite > 0 && !revele.spirale) {
+    const el = container.querySelector("#spirale");
+    if (el) gsap.set(el, { opacity: 1 });
+    revele.spirale = true;
+  }
+  if (limite > 1 && !revele.communaute) {
+    const el = container.querySelector("#communaute");
+    if (el) gsap.set(el, { opacity: 1 });
+    revele.communaute = true;
+  }
+  if (limite > 2 && !revele.territoire) {
+    const el = container.querySelector("#territoire");
+    if (el) gsap.set(el, { opacity: 1 });
+    for (let i = 1; i <= 5; i++) {
+      const groupePerles = container.querySelector(`#perles${i}`);
+      if (groupePerles) gsap.set(groupePerles.querySelectorAll("path"), { opacity: 1 });
+    }
+    revele.territoire = true;
+    definirPhrase(TEXTE_C, "gauche");
+  }
+}
+
 let valeurs = []; // chargé une fois depuis shared/data/valeurs.json
 let groupeCercles = null;
 
@@ -249,6 +283,7 @@ export async function showLienCommunaute() {
   timelineActuelle = gsap.timeline();
   const c = await assurerContainer();
   if (!c) return;
+  assurerCalquesAvant("communaute");
 
   const communauteEl = c.querySelector("#communaute");
   if (!communauteEl) return;
@@ -276,6 +311,7 @@ export async function showLienTerritoire() {
   timelineActuelle = gsap.timeline();
   const c = await assurerContainer();
   if (!c) return;
+  assurerCalquesAvant("territoire");
 
   const territoireEl = c.querySelector("#territoire");
   if (!territoireEl) return;
@@ -302,6 +338,7 @@ export async function showLienValeurs() {
   timelineActuelle = gsap.timeline();
   const c = await assurerContainer();
   if (!c) return;
+  assurerCalquesAvant("valeurs");
   await chargerValeurs();
 
   const cercles = construireCerclesValeurs();
@@ -324,6 +361,7 @@ export async function showRuptureColoniale() {
   timelineActuelle = gsap.timeline();
   const c = await assurerContainer();
   if (!c) return;
+  assurerCalquesAvant("barres");
 
   definirPhrase(TEXTE_E, "gauche");
 

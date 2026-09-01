@@ -7,15 +7,14 @@
 // "Explorer les valeurs" — mais rien ne s'anime tout seul (décision du 24 août :
 // toujours laisser la personne décider quand poursuivre). C'est le clic sur ce
 // bouton qui déclenche la séquence : les étoiles convergent au centre (la
-// plupart disparaissent, quelques-unes restent pour devenir les perles du
-// collier en Partie 4), la Lune grossit à ~80% de la hauteur visible de l'écran
+// plupart disparaissent, une par nation reste visible — symbole
+// indépendant du collier de Partie 4, PAS les mêmes éléments : le
+// collier de valeurs.svg est peint à la main par Déline (~75-85 perles
+// décoratives), sans lien de données avec les étoiles d'ici), la Lune
+// grossit à ~80% de la hauteur visible de l'écran
 // (mesurée en pixels réels, pas supposée à partir du viewBox — même principe
 // que le centrage de step11.js), le fond blanchit, un fondu-enchaîné révèle la
 // spirale, puis la page navigue vers valeurs/index.html.
-//
-// NOTE : spirale.svg est un asset TEMPORAIRE (vectorisation Adobe Express, peu
-// détaillée — 9 paths, aucune nuance) — à remplacer une fois le bloc de
-// retraitement d'images complété (voir Registre, 24 août).
 //
 // Dépend de : d3 (global, CDN), gsap (global, CDN),
 // shared/js/progression.js (deverrouiller "valeurs" à la condition de sortie)
@@ -31,11 +30,6 @@ import { initProgression, deverrouiller } from "../../shared/js/progression.js";
 // à valider avec Déline une fois le rythme réel de la partie 3 mieux connu.
 const SEUIL_TEMPS_MS = 30000; // 30 secondes
 const SEUIL_INTERACTIONS = 4;  // 4 étoiles explorées (clics, pas juste survol)
-
-// Centre réel du contenu de spirale.svg, mesuré le 24 août — à recalculer si
-// le fichier est remplacé par une version retravaillée.
-const SPIRALE_CENTRE_SOURCE = { x: 3512.6, y: 3630.9 };
-const SPIRALE_LARGEUR_SOURCE = 5877.6;
 
 // Note : le nombre de "perles" n'est plus fixé par une constante — c'est
 // maintenant une étoile par nation représentée (voir plus bas), donc son
@@ -109,7 +103,7 @@ export async function lancerTransitionValeurs({
   const voileBlanc = document.createElement("div");
   voileBlanc.id = "voile-blanc-transition";
   Object.assign(voileBlanc.style, {
-    position: "absolute", inset: "0", background: "#f7f5f0",
+    position: "absolute", inset: "0", background: "#fff",
     opacity: "0", pointerEvents: "none", zIndex: "1"
   });
   canvasEl.appendChild(voileBlanc);
@@ -123,9 +117,10 @@ export async function lancerTransitionValeurs({
   // 1. Les étoiles convergent vers le centre — UNE étoile par nation reste
   // visible (peu importe sa position dans le tableau, on prend la première
   // rencontrée de chaque nation) pour garder la diversité de couleurs plutôt
-  // qu'une tranche arbitraire. Elles deviendront les perles du collier en
-  // Partie 4 (page 21 du script). Réparties en petit cercle provisoire —
-  // la vraie composition du collier reste à faire au Sprint 4.
+  // qu'une tranche arbitraire. Convergence purement symbolique — ces
+  // étoiles ne deviennent PAS le collier de valeurs.svg (fichier séparé,
+  // peint à la main, voir en-tête du fichier). Réparties en petit cercle
+  // provisoire, esthétique seulement.
   const tousLesNoeuds = selectionEtoiles.nodes();
   const nationsVues = new Set();
   const noeudsPerles = [];
@@ -185,40 +180,58 @@ export async function lancerTransitionValeurs({
   // 3. Le fond blanchit pendant que la Lune est au sommet de sa croissance
   tl.to(voileBlanc, { opacity: 1, duration: d(1.5), ease: "power1.inOut" }, "-=1");
 
-  // 4. Fondu-enchaîné : la Lune disparaît, la spirale prend sa place
-  const spiraleMarkup = await d3.text("./svg/spirale.svg");
-  const spiraleParsee = new DOMParser().parseFromString(spiraleMarkup, "image/svg+xml");
-  const groupeSpiraleSource = spiraleParsee.querySelector("g#spirale");
-
-  if (!groupeSpiraleSource) {
-    console.error(
-      '❌ <g id="spirale"> introuvable dans univers/svg/spirale.svg — ' +
-      "as-tu bien déposé la version recadrée (avec le groupe nommé), " +
-      "pas le fichier spiraleValeurs.svg original ?"
-    );
-    return; // on arrête proprement plutôt que de planter plus loin
-  }
-
+  // 4. Fondu-enchaîné : la Lune disparaît, la spirale prend sa place —
+  // même image que scrolly/ et valeurs/ (plus d'asset temporaire).
+  const NS_SVG = "http://www.w3.org/2000/svg";
   const groupeSpirale = svg.append("g").attr("class", "spirale").style("opacity", 0);
-  groupeSpirale.node().appendChild(document.importNode(groupeSpiraleSource, true));
+  const imageSpirale = document.createElementNS(NS_SVG, "image");
+  imageSpirale.setAttribute("width", "1800");
+  imageSpirale.setAttribute("height", "1653");
+  imageSpirale.setAttributeNS("http://www.w3.org/1999/xlink", "href", "./svg/spirale.webp");
+  groupeSpirale.node().appendChild(imageSpirale);
 
-  const echelleSpirale = echelleCible; // même taille cible que la Lune agrandie, point de départ raisonnable
-  const facteurTailleSpirale = (hauteurCiblePx / window.innerHeight) * 1000 / SPIRALE_LARGEUR_SOURCE; // grossier, à ajuster visuellement
+  // Rotation -180° fixe (même orientation que scrolly/valeurs), pivot au
+  // centre de l'image native (900, 826.5 = moitié de 1800×1653) — posée
+  // AVANT toute mesure, pour que la mesure qui suit reflète l'orientation
+  // finale réelle, pas l'image à plat.
+  groupeSpirale.attr("transform", "rotate(180 900 826.5)");
+
+  // Mesurer la hauteur RÉELLEMENT rendue (Playbook §3.3 : jamais présumer
+  // depuis les dimensions natives ni un facteur codé en dur) pour calculer
+  // le facteur nécessaire afin d'atteindre la même hauteur cible que la
+  // Lune agrandie.
+  const rectSpiraleInitial = groupeSpirale.node().getBoundingClientRect();
+  const facteurTailleSpirale = hauteurCiblePx / rectSpiraleInitial.height;
+
+  // Centrer sur `centre` — mesurer le centre réel du groupe (déjà tourné)
+  // via getBBox(), pas présumer depuis les dimensions natives.
+  const bboxSpirale = groupeSpirale.node().getBBox();
+  const centreSpiraleX = bboxSpirale.x + bboxSpirale.width / 2;
+  const centreSpiraleY = bboxSpirale.y + bboxSpirale.height / 2;
+
   groupeSpirale.attr(
     "transform",
-    `translate(${centre.x - facteurTailleSpirale * SPIRALE_CENTRE_SOURCE.x}, ${centre.y - facteurTailleSpirale * SPIRALE_CENTRE_SOURCE.y}) scale(${facteurTailleSpirale})`
+    `translate(${centre.x - facteurTailleSpirale * centreSpiraleX}, ${centre.y - facteurTailleSpirale * centreSpiraleY}) scale(${facteurTailleSpirale}) rotate(180 900 826.5)`
   );
 
   tl.to(groupeLune.node(), { opacity: 0, duration: d(1), ease: "power1.out" }, "-=0.3");
   tl.to(groupeSpirale.node(), { opacity: 1, duration: d(1.2), ease: "power1.in" }, "<");
 
-  // 5. Navigation directe vers valeurs/ — pas de deuxième bouton : la personne
-  // a déjà donné son accord en cliquant sur "Explorer les valeurs" au début.
-  // Courte pause pour laisser voir la spirale avant de quitter la page.
+  // Pause pour vraiment laisser voir la spirale, pas juste l'entrevoir.
+  tl.to({}, { duration: d(3) });
+
+  // 5. Fondu de SORTIE avant de quitter la page : la spirale s'efface vers
+  // le voile blanc déjà en place. La coupure de page (rechargement,
+  // inévitable avec notre architecture 2 pages) se produit donc sur un
+  // écran blanc uni des deux côtés — valeurs/index.html démarre aussi sur
+  // du blanc avant de faire apparaître SA propre spirale en fondu (voir
+  // valeursAnimation.js). Beaucoup moins de contraste qu'un cut en pleine
+  // spirale visible.
+  tl.to(groupeSpirale.node(), { opacity: 0, duration: d(1.5), ease: "power1.in" });
+
   tl.call(() => {
     console.log("🌀 Transition terminée — navigation vers valeurs/");
   });
-  tl.to({}, { duration: d(5) }); // pause avant navigation — allonge ce chiffre pour observer plus longtemps
   tl.call(() => {
     window.location.href = "../valeurs/index.html";
   });

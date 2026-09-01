@@ -1,0 +1,36 @@
+/* ==================================================
+   valeurs/css/style.css
+   Styles de la Partie 4 — Valeurs (spirale, couple, collier de perles)
+
+   Rôle : Zone de scène plein écran pour le SVG de la Partie 4. Thème
+   TOUJOURS clair (décision du 31 août) — pas de bascule dynamique ici,
+   contrairement au scrolly. Les couleurs passent par les jetons de
+   variables.css (--color-scene-bg).
+   Dépend de : shared/css/variables.css
+   Utilisé par : valeurs/index.html
+
+   FF2EplusADA (scrollyFFADA2S v2)
+   Isabel Cayer · Atelier Love & Code · 2026
+   ================================================== */
+
+body {
+  margin: 0;
+  background: var(--color-scene-bg);
+}
+
+.zone-scene-valeurs {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--color-scene-bg);
+}
+
+/* Même correctif que scrolly/css/timeline.css : les <svg> sources n'ont
+   ni width ni height sur la balise racine, seulement un viewBox. */
+#graphic svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
