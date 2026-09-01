@@ -19,7 +19,7 @@
 // ==================================================
 
 import { loadSVG } from "../../../shared/js/utils.js";
-import { resolve } from "../../../shared/js/i18n.js";
+import { resolve, getLanguage } from "../../../shared/js/i18n.js";
 import { reduitMouvement } from "../../../shared/js/navigationEtat.js";
 
 let container = null;
@@ -164,9 +164,17 @@ function afficherCarteValeur(valeurId) {
   const carte = document.getElementById("carte-valeur");
   if (!valeur || !carte) return;
 
+  // Ligne 1 : le mot dans la langue autochtone active si valeur.nom la
+  // contient (ex. "inuktitut" un jour), sinon repli sur innu-aimun. On
+  // exclut explicitement "fr"/"en" : valeur.nom a AUSSI ces clés (elles
+  // alimentent la ligne 2 ci-dessous), donc sans ce garde la ligne 1
+  // afficherait "Partage" en français — un doublon avec la ligne 2.
+  const langueActive = getLanguage();
+  const langueAutochtone = (langueActive === "fr" || langueActive === "en") ? null : langueActive;
+  const motAutochtone = (langueAutochtone && valeur.nom[langueAutochtone]) || valeur.nom["innu-aimun"];
+  carte.querySelector(".carte-valeur-autochtone").textContent = motAutochtone;
   // resolve({fr, en}) plutôt que resolve(valeur.nom) directement, pour ne
-  // jamais dupliquer le mot innu-aimun sur les deux lignes de la carte.
-  carte.querySelector(".carte-valeur-autochtone").textContent = valeur.nom["innu-aimun"];
+  // jamais dupliquer le mot autochtone sur les deux lignes de la carte.
   carte.querySelector(".carte-valeur-traduction").textContent = resolve({ fr: valeur.nom.fr, en: valeur.nom.en });
   carte.querySelector(".carte-valeur-definition").textContent = resolve(valeur.definition);
   carte.classList.add("visible");
