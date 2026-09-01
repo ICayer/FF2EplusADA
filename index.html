@@ -6,9 +6,12 @@
   <title>scrollyFFADA2S — [Titre à venir de Déline]</title>
   <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="shared/css/variables.css" />
+  <link rel="stylesheet" href="shared/css/headerControls.css" />
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
+  <div id="entete-controles"></div>
+
   <div class="container">
     <header class="home-header">
       <h1>[Titre à venir de Déline]</h1>
@@ -34,5 +37,14 @@
       <p>[Crédits équipe et partenaires à venir]</p>
     </div>
   </footer>
+
+  <script type="module">
+    import { initI18n } from "./shared/js/i18n.js";
+    import { langueSauvegardee } from "./shared/js/preferences.js";
+    import { initHeaderControls } from "./shared/js/headerControls.js";
+
+    await initI18n(langueSauvegardee() || 'fr');
+    initHeaderControls(document.getElementById("entete-controles"));
+  </script>
 </body>
 </html>
