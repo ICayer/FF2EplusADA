@@ -32,7 +32,6 @@ const revele = { spirale: false, communaute: false, territoire: false };
 
 let valeurs = []; // chargé une fois depuis shared/data/valeurs.json
 let groupeCercles = null;
-const COULEURS_VALEURS = ["#FFC800", "#F6992D", "#ED6A5A", "#A75A5A", "#60495A", "#4C7680", "#38A3A5", "#7DBA60", "#C2D11B"];
 
 const TEXTE_B = "Femmes, filles et\npersonnes bispirituelles";
 const TEXTE_C = "Femmes, filles et\npersonnes bispirituelles\nautochtones";
@@ -145,7 +144,7 @@ function construireCerclesValeurs() {
     cercle.setAttribute("cx", centre.x + Math.cos(angle) * rayon);
     cercle.setAttribute("cy", centre.y + Math.sin(angle) * rayon);
     cercle.setAttribute("r", rayonCercle);
-    cercle.setAttribute("fill", COULEURS_VALEURS[i]);
+    cercle.setAttribute("fill", valeur.couleur);
     cercle.setAttribute("fill-opacity", "0.7");
     cercle.setAttribute("opacity", "0");
     cercle.style.cursor = "pointer";

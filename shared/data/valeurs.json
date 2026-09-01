@@ -3,54 +3,63 @@
     "id": "partage",
     "nom": { "fr": "Partage", "en": "Sharing", "innu-aimun": "Matenueun" },
     "definition": { "fr": "[Texte à venir des artistes]", "en": null },
-    "audio": { "innu-aimun": null }
+    "couleur": "#ffdae3",
+    "audio": { "innu-aimun": "partage.mp3" }
   },
   {
     "id": "force",
     "nom": { "fr": "Force", "en": "Strength", "innu-aimun": "Shutshiun" },
     "definition": { "fr": "[Texte à venir des artistes]", "en": null },
-    "audio": { "innu-aimun": null }
+    "couleur": "#ffbbd8",
+    "audio": { "innu-aimun": "force.mp3" }
   },
   {
     "id": "entraide",
     "nom": { "fr": "Entraide", "en": "Mutual aid", "innu-aimun": "Uauitshitun" },
     "definition": { "fr": "[Texte à venir des artistes]", "en": null },
-    "audio": { "innu-aimun": null }
+    "couleur": "#7cb9e7",
+    "audio": { "innu-aimun": "entraide.mp3" }
   },
   {
     "id": "vie",
     "nom": { "fr": "Vie", "en": "Life", "innu-aimun": "Inniun" },
     "definition": { "fr": "[Texte à venir des artistes]", "en": null },
-    "audio": { "innu-aimun": null }
+    "couleur": "#fb53a0",
+    "audio": { "innu-aimun": "vie.mp3" }
   },
   {
     "id": "rire",
     "nom": { "fr": "Rire", "en": "Laugh", "innu-aimun": "Papun" },
     "definition": { "fr": "[Texte à venir des artistes]", "en": null },
-    "audio": { "innu-aimun": null }
+    "couleur": "#dbf2ab",
+    "audio": { "innu-aimun": "rire.mp3" }
   },
   {
     "id": "espoir",
     "nom": { "fr": "Espoir", "en": "Hope", "innu-aimun": "Pakushenitamun" },
     "definition": { "fr": "[Texte à venir des artistes]", "en": null },
-    "audio": { "innu-aimun": null }
+    "couleur": "#91de99",
+    "audio": { "innu-aimun": "espoir.mp3" }
   },
   {
     "id": "amour-de-soi",
     "nom": { "fr": "Amour de soi", "en": "Self-love", "innu-aimun": "Shatshitun" },
     "definition": { "fr": "[Texte à venir des artistes]", "en": null },
-    "audio": { "innu-aimun": null }
+    "couleur": "#fffa61",
+    "audio": { "innu-aimun": "amour-de-soi.mp3" }
   },
   {
     "id": "bienveillance",
     "nom": { "fr": "Bienveillance", "en": "Kindness", "innu-aimun": "Tshisheuatishitun" },
     "definition": { "fr": "[Texte à venir des artistes]", "en": null },
-    "audio": { "innu-aimun": null }
+    "couleur": "#f73984",
+    "audio": { "innu-aimun": "bienveillance.mp3" }
   },
   {
     "id": "confiance",
     "nom": { "fr": "Confiance", "en": "Trust", "innu-aimun": "Shutshenimeu" },
     "definition": { "fr": "[Texte à venir des artistes]", "en": null },
-    "audio": { "innu-aimun": null }
+    "couleur": "#ff8f00",
+    "audio": { "innu-aimun": "confiance.mp3" }
   }
 ]
