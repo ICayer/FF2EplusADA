@@ -25,9 +25,11 @@
 
 import { loadSVG } from "../../shared/js/utils.js";
 import { initI18n, resolve, getLanguage } from "../../shared/js/i18n.js";
+import { langueSauvegardee } from "../../shared/js/preferences.js";
 
 let container = null;
 let audioActif = null; // un seul audio à la fois — une nouvelle lecture arrête la précédente
+const boutonsReveles = new Map(); // boutonEl -> valeur, pour le rafraîchissement de langue
 
 function reduitMouvement() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -231,12 +233,15 @@ function revelerCercleSwirl(imageEl, sens, timeline) {
   });
 }
 
-// Crée et attache l'étiquette bilingue d'un bouton (mot autochtone selon
-// getLanguage() + repli innu-aimun, traduction fr/en via resolve()),
-// visible au survol/focus. Rend le bouton focusable au clavier. Séparée
-// de revelerBouton() pour que la branche prefers-reduced-motion puisse
-// l'appeler directement, sans passer par une timeline.
-function attacherEtiquetteBouton(boutonEl, valeur) {
+// (Re)construit le <text> bilingue d'un bouton. Sûre à rappeler : retire
+// l'ancienne étiquette (.etiquette-valeur) avant d'en poser une nouvelle
+// — c'est ce qui permet de la rafraîchir au changement de langue sans
+// toucher aux écouteurs. font-size via classes CSS (.ligne-autochtone /
+// .ligne-secondaire) pour que A-/A+ agisse aussi dessus.
+function mettreAJourEtiquette(boutonEl, valeur) {
+  const ancienne = boutonEl.querySelector(".etiquette-valeur");
+  if (ancienne) ancienne.remove();
+
   const rect = boutonEl.querySelector("rect");
   const x = parseFloat(rect.getAttribute("x")) + parseFloat(rect.getAttribute("width")) / 2;
   const y = parseFloat(rect.getAttribute("y"));
@@ -248,6 +253,7 @@ function attacherEtiquetteBouton(boutonEl, valeur) {
 
   const NS_SVG = "http://www.w3.org/2000/svg";
   const texte = document.createElementNS(NS_SVG, "text");
+  texte.setAttribute("class", "etiquette-valeur");
   texte.setAttribute("text-anchor", "middle");
   texte.setAttribute("font-family", "Agoradp_15, sans-serif");
   texte.style.opacity = "0";
@@ -259,9 +265,9 @@ function attacherEtiquetteBouton(boutonEl, valeur) {
   // est peint AVANT le texte (sinon il l'épaissit par-dessus au lieu de
   // l'entourer). stroke-width un peu plus fin sur la 2e ligne, plus petite.
   const ligneAutochtone = document.createElementNS(NS_SVG, "tspan");
+  ligneAutochtone.setAttribute("class", "ligne-autochtone");
   ligneAutochtone.setAttribute("x", x);
   ligneAutochtone.setAttribute("y", y - 45);
-  ligneAutochtone.setAttribute("font-size", "36");
   ligneAutochtone.setAttribute("stroke", "#fff");
   ligneAutochtone.setAttribute("stroke-width", "5");
   ligneAutochtone.setAttribute("stroke-linejoin", "round");
@@ -269,9 +275,9 @@ function attacherEtiquetteBouton(boutonEl, valeur) {
   ligneAutochtone.textContent = motAutochtone;
 
   const ligneSecondaire = document.createElementNS(NS_SVG, "tspan");
+  ligneSecondaire.setAttribute("class", "ligne-secondaire");
   ligneSecondaire.setAttribute("x", x);
   ligneSecondaire.setAttribute("y", y - 15);
-  ligneSecondaire.setAttribute("font-size", "26");
   ligneSecondaire.setAttribute("fill", "#666");
   ligneSecondaire.setAttribute("stroke", "#fff");
   ligneSecondaire.setAttribute("stroke-width", "4");
@@ -283,22 +289,19 @@ function attacherEtiquetteBouton(boutonEl, valeur) {
   texte.appendChild(ligneSecondaire);
   boutonEl.appendChild(texte);
 
-  boutonEl.style.cursor = "pointer";
-  boutonEl.setAttribute("tabindex", "0");
-  boutonEl.setAttribute("role", "button");
   boutonEl.setAttribute("aria-label", `${motAutochtone} — ${motSecondaire}`);
-  // Pas de contour de focus par défaut : la boîte englobante inclut
-  // l'étiquette ajoutée au-dessus du cercle → grand rectangle disgracieux.
-  // L'étiquette qui apparaît au focus (écouteurs ci-dessous) sert
-  // elle-même d'indicateur visuel de focus — pas de style de remplacement.
-  boutonEl.style.outline = "none";
+}
 
-  const montrer = () => { texte.style.opacity = "1"; };
-  const cacher = () => { texte.style.opacity = "0"; };
-  boutonEl.addEventListener("mouseenter", montrer);
-  boutonEl.addEventListener("focus", montrer);
-  boutonEl.addEventListener("mouseleave", cacher);
-  boutonEl.addEventListener("blur", cacher);
+// Attache — UNE SEULE FOIS par bouton — l'étiquette (via
+// mettreAJourEtiquette), l'icône audio permanente, le focus clavier et les
+// écouteurs survol/clic/clavier. Séparée de revelerBouton() pour que la
+// branche prefers-reduced-motion puisse l'appeler directement, sans
+// passer par une timeline.
+function attacherEtiquetteBouton(boutonEl, valeur) {
+  mettreAJourEtiquette(boutonEl, valeur);
+  boutonsReveles.set(boutonEl, valeur);
+
+  const NS_SVG = "http://www.w3.org/2000/svg";
 
   // Icône permanente (pas seulement au survol) — indique clairement qu'un
   // audio est disponible, avant même d'interagir (Design doc, Partie 4).
@@ -330,6 +333,32 @@ function attacherEtiquetteBouton(boutonEl, valeur) {
   );
   icone.style.pointerEvents = "none";
   boutonEl.appendChild(icone);
+
+  boutonEl.style.cursor = "pointer";
+  // Pas de contour de focus par défaut : la boîte englobante inclut
+  // l'étiquette au-dessus du cercle → grand rectangle disgracieux.
+  // L'étiquette qui apparaît au focus sert elle-même d'indicateur.
+  boutonEl.style.outline = "none";
+  boutonEl.setAttribute("tabindex", "0");
+  boutonEl.setAttribute("role", "button");
+  // aria-label : posé (et mis à jour au changement de langue) par mettreAJourEtiquette().
+
+  // Les écouteurs cherchent l'étiquette EN DIRECT via querySelector plutôt
+  // que de fermer sur une variable `texte` — indispensable maintenant
+  // qu'elle peut être remplacée par mettreAJourEtiquette() sans que ces
+  // écouteurs soient réattachés.
+  const montrer = () => {
+    const et = boutonEl.querySelector(".etiquette-valeur");
+    if (et) et.style.opacity = "1";
+  };
+  const cacher = () => {
+    const et = boutonEl.querySelector(".etiquette-valeur");
+    if (et) et.style.opacity = "0";
+  };
+  boutonEl.addEventListener("mouseenter", montrer);
+  boutonEl.addEventListener("focus", montrer);
+  boutonEl.addEventListener("mouseleave", cacher);
+  boutonEl.addEventListener("blur", cacher);
 
   // Clic ou Entrée/Espace : lecture de l'audio de la valeur.
   boutonEl.addEventListener("click", () => jouerAudioValeur(valeur, boutonEl));
@@ -364,9 +393,9 @@ function animerGroupePerlesEnVague(groupeEl, timeline, positionRelative) {
 // — non utilisé ici (loadSVG cible déjà "graphic" par défaut).
 export async function initValeurs(selecteurGraphic) {
   // Cohérent avec le reste du projet (chaque page appelle initI18n() une
-  // fois). Pas strictement requis aujourd'hui (currentLang = 'fr' par
-  // défaut), mais évite un piège si un sélecteur de langue est ajouté ici.
-  await initI18n('fr');
+  // fois). Langue = préférence sauvegardée (persiste entre les pages)
+  // sinon 'fr' — pour que le 1er rendu soit déjà dans la bonne langue.
+  await initI18n(langueSauvegardee() || 'fr');
 
   const c = await assurerContainer();
   if (!c) return;
@@ -439,3 +468,10 @@ export async function initValeurs(selecteurGraphic) {
     if (boutonEl && valeur) revelerBouton(boutonEl, valeur, tl);
   }
 }
+
+// Changement de langue en cours de visite : rafraîchit les étiquettes des
+// boutons DÉJÀ révélés (mettreAJourEtiquette retire l'ancienne avant d'en
+// poser une nouvelle) — aucun écouteur n'est réattaché.
+window.addEventListener("languagechange", () => {
+  boutonsReveles.forEach((valeur, boutonEl) => mettreAJourEtiquette(boutonEl, valeur));
+});

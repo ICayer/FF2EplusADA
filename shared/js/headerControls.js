@@ -7,7 +7,7 @@
 // rien de scrolly/, univers/ ni valeurs/ — après un changement de langue,
 // émet un événement DOM global "languagechange" pour que chaque partie se
 // rafraîchisse elle-même (ce module ne sait pas quoi rafraîchir).
-// Dépend de : shared/js/i18n.js
+// Dépend de : shared/js/i18n.js, shared/js/preferences.js
 // Utilisé par : scrolly/index.html (univers/, valeurs/, landing à venir)
 //
 // FF2EplusADA (scrollyFFADA2S v2)
@@ -15,6 +15,7 @@
 // ==================================================
 
 import { setLanguage, getLanguage } from "./i18n.js";
+import { sauvegarderLangue, echelleSauvegardee, sauvegarderEchelle } from "./preferences.js";
 
 // Orthographe exacte : infographie officielle d'Isabel (voir Registre, 24 août).
 // Codes alignés sur les clés de shared/data/fallbackByLanguage.json.
@@ -79,6 +80,7 @@ function construireBlocLangue() {
     if (code === langueActuelle.code) item.classList.add("active");
     item.addEventListener("click", async () => {
       await setLanguage(code);
+      sauvegarderLangue(code);
       window.dispatchEvent(new CustomEvent("languagechange", { detail: { lang: code } }));
       boutonLangue.innerHTML = `${nom} <span aria-hidden="true">▾</span>`;
       boutonsLangue.forEach((b) => b.classList.toggle("active", b === item));
@@ -109,14 +111,23 @@ function construireControleTailleTexte() {
   bloc.setAttribute("role", "group");
   bloc.setAttribute("aria-label", "Taille du texte");
 
+  // Appliquer la taille sauvegardée dès la construction (jeton CSS =
+  // application instantanée, pas de flash) et en déduire le bouton actif.
+  const echelleRestauree = echelleSauvegardee();
+  if (echelleRestauree !== null) {
+    document.documentElement.style.setProperty("--echelle-texte", echelleRestauree);
+  }
+
   const boutons = ECHELLES_TEXTE.map(({ niveau, valeur }) => {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.textContent = niveau;
     btn.setAttribute("aria-label", `Taille du texte : ${niveau}`);
-    if (valeur === 1) btn.classList.add("active");
+    const estActif = echelleRestauree !== null ? echelleRestauree === valeur : valeur === 1;
+    if (estActif) btn.classList.add("active");
     btn.addEventListener("click", () => {
       document.documentElement.style.setProperty("--echelle-texte", valeur);
+      sauvegarderEchelle(valeur);
       boutons.forEach((b) => b.classList.toggle("active", b === btn));
     });
     bloc.appendChild(btn);

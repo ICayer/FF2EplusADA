@@ -6,20 +6,40 @@
   <title>scrollyFFADA2S — Univers</title>
   <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../shared/css/variables.css" />
+  <link rel="stylesheet" href="../shared/css/headerControls.css" />
+  <link rel="stylesheet" href="../shared/css/railParcours.css" />
   <link rel="stylesheet" href="./css/style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
 <body>
 
+  <div id="entete-controles"></div>
+
   <div id="univers-canvas">
     <div id="univers-tooltip"></div>
-    <a id="bouton-explorer-valeurs" href="../valeurs/index.html">Explorer les valeurs</a>
+    <a id="bouton-explorer-valeurs" href="../valeurs/index.html"></a>
   </div>
+
+  <div id="rail-parcours" class="rail-parcours"></div>
 
   <script type="module">
     import { initUnivers } from "./js/etoiles.js";
+    import { initHeaderControls } from "../shared/js/headerControls.js";
+    import { initProgression } from "../shared/js/progression.js";
+    import { construireRailParcours } from "../shared/js/railParcours.js";
+
     initUnivers("#univers-canvas");
+    initHeaderControls(document.getElementById("entete-controles"));
+
+    await initProgression();
+    construireRailParcours(document.getElementById("rail-parcours"), {
+      pageCourante: "univers/index.html",
+      onClicEtape: (etape) => {
+        if (etape.page === "univers/index.html") return; // déjà ici
+        window.location.href = "../" + etape.page;
+      },
+    });
   </script>
 
 </body>

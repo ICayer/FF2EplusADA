@@ -20,6 +20,7 @@ import { initTimeline, getOrder } from "./timeline.js";
 import { initTimelineRail } from "./timelineRail.js";
 import { initProgression, deverrouiller } from "../../shared/js/progression.js";
 import { construireRailParcours, definirEtapeActive, rafraichirVerrous } from "../../shared/js/railParcours.js";
+import { langueSauvegardee } from "../../shared/js/preferences.js";
 
 const PAGE_COURANTE = "scrolly/index.html";
 
@@ -31,7 +32,7 @@ async function afficherTexte(steps, stepId) {
 }
 
 async function init() {
-  await initI18n('fr');
+  await initI18n(langueSauvegardee() || 'fr');
   await initTimeline();
   await initProgression();
 

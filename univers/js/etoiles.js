@@ -6,7 +6,8 @@
 // puis dessiner le tout (Lune, étoiles, traits, arcs-étiquettes). Gère aussi
 // le survol ; le clic vers le récit complet arrive en S2B3T1 (testimonyModal.js).
 // Dépend de : univers/js/constellations.js, univers/data/etoiles.json,
-//             univers/data/nations.json, d3 (global, CDN)
+//             univers/data/nations.json, shared/js/i18n.js (initI18n/t),
+//             d3 (global, CDN)
 // Utilisé par : univers/index.html
 //
 // FF2EplusADA (scrollyFFADA2S v2)
@@ -16,6 +17,8 @@
 import { calculerDisposition, cheminArc } from "./constellations.js";
 import { initTestimonyModal, showTestimony } from "./testimonyModal.js";
 import { initConditionSortie, lancerTransitionValeurs } from "./transitionValeurs.js";
+import { initI18n, t } from "../../shared/js/i18n.js";
+import { langueSauvegardee } from "../../shared/js/preferences.js";
 
 // --- Réglages visuels ---
 // Tout est en coordonnées du viewBox (1000 x 1000), pas en pixels d'écran :
@@ -43,6 +46,12 @@ let signalerInteractionFn = null; // référence mise à jour après initConditi
  * @param {string} selecteurConteneur - ex. "#univers-canvas"
  */
 export async function initUnivers(selecteurConteneur = "#univers-canvas") {
+  // initI18n() était absent d'univers/ : sans lui, le repli par nation
+  // (fallbackByLanguage) n'est jamais chargé si une langue autochtone est
+  // choisie. À appeler une fois, avant tout le reste. Langue = préférence
+  // sauvegardée (persiste entre les pages) sinon 'fr'.
+  await initI18n(langueSauvegardee() || 'fr');
+
   universContainer = document.querySelector(selecteurConteneur);
   if (!universContainer) {
     console.error(`❌ Conteneur introuvable : ${selecteurConteneur}`);
@@ -67,6 +76,13 @@ export async function initUnivers(selecteurConteneur = "#univers-canvas") {
   const resultats = await dessiner({ nations, secteurs, noeuds, liens });
 
   const boutonTransition = document.getElementById("bouton-explorer-valeurs");
+
+  if (boutonTransition) {
+    boutonTransition.textContent = t("nav.explorerValeurs");
+  }
+  window.addEventListener("languagechange", () => {
+    if (boutonTransition) boutonTransition.textContent = t("nav.explorerValeurs");
+  });
 
   const { signalerInteraction } = initConditionSortie(() => {
     // La condition est atteinte : on RÉVÈLE le bouton, on ne lance rien tout
