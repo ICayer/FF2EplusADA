@@ -1,5 +1,5 @@
 [
-  { "id": "accueil", "page": "index.html" },
+  { "id": "accueil", "page": "index.html", "nom": { "fr": "Accueil", "en": "Home" } },
   { "id": "nuit-des-temps", "page": "scrolly/index.html", "epoque": "avant" },
   { "id": "lien-communaute", "page": "scrolly/index.html", "epoque": "avant" },
   { "id": "lien-territoire", "page": "scrolly/index.html", "epoque": "avant" },
@@ -9,6 +9,6 @@
   { "id": "transformation-coeur", "page": "scrolly/index.html", "epoque": "apres" },
   { "id": "communaute-etoiles", "page": "scrolly/index.html", "epoque": "apres" },
   { "id": "seuil-univers", "page": "scrolly/index.html", "epoque": "apres" },
-  { "id": "univers", "page": "univers/index.html" },
-  { "id": "valeurs", "page": "valeurs/index.html" }
+  { "id": "univers", "page": "univers/index.html", "nom": { "fr": "Univers", "en": "Universe" } },
+  { "id": "valeurs", "page": "valeurs/index.html", "nom": { "fr": "Valeurs", "en": "Values" } }
 ]

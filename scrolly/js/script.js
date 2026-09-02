@@ -93,11 +93,11 @@ async function init() {
     },
     onSurvolEtape: (etape) => {
       if (etape) {
-        // Aperçu temporaire au survol — libellé simple pour les 3 étapes
-        // hors scrolly (pas encore de vraies données de titre pour elles),
-        // resolve(nomStep) pour les 9 du scrolly.
+        // Aperçu temporaire au survol : resolve(nomStep) pour les 9 du
+        // scrolly, resolve(etape.nom) pour accueil/univers/valeurs (nom
+        // traduisible dans parcours.json, la source partagée du rail).
         const contenu = steps[etape.id];
-        titreTexteEl.textContent = contenu ? resolve(contenu.nomStep) : etape.id.replace(/-/g, " ");
+        titreTexteEl.textContent = contenu ? resolve(contenu.nomStep) : resolve(etape.nom);
       } else {
         titreTexteEl.textContent = libelleActif;
       }

@@ -26,11 +26,22 @@ export async function initI18n(defaultLang = 'fr') {
 // Change la langue active ET recharge le dictionnaire d'interface correspondant
 export async function setLanguage(lang) {
   currentLang = lang;
+  uiDictionary = await chargerDictionnaireInterface(lang);
+}
+
+// Charge le dictionnaire d'interface de `lang` ; s'il n'existe pas,
+// retombe sur sa langue de repli (fallbackByLanguage.json) — même logique
+// que resolve() pour le contenu éditorial, appliquée maintenant aussi au
+// chrome d'interface.
+async function chargerDictionnaireInterface(lang) {
   try {
     const res = await fetch(`/shared/data/i18n/${lang}.json`);
-    uiDictionary = await res.json();
+    if (!res.ok) throw new Error("dictionnaire introuvable");
+    return await res.json();
   } catch {
-    uiDictionary = {}; // langue pas encore documentée — t() retombera sur la clé brute
+    const fallbackLang = fallbackMap[lang] || 'fr';
+    if (fallbackLang === lang) return {}; // évite une boucle infinie si le repli pointe sur lui-même
+    return chargerDictionnaireInterface(fallbackLang);
   }
 }
 

@@ -1,19 +1,20 @@
 .container { max-width: var(--container-max-width); margin: 0 auto; padding: var(--container-padding); }
 .home-header { text-align: center; padding: 4rem 1rem 2rem; }
-.home-header h1 { font-family: var(--font-title); font-size: 4rem; margin-bottom: 0.5rem; }
+.home-header h1 {font-size: calc(4rem * var(--echelle-texte)); font-family: var(--font-title); margin-bottom: 0.5rem; }
 .home-header .subtitle { color: var(--color-accent); font-size: 1.8rem; }
 .context-section { text-align: center; max-width: 700px; margin: 0 auto 2rem; }
-.context-section p { margin-bottom: 1rem; font-size: 1.2rem; }
-.remerciements-texte p { margin-bottom: 1rem; font-size: 1.2rem;}
+.context-section p { font-size: calc(1.4rem * var(--echelle-texte));margin-bottom: 1rem; }
+.remerciements-texte p {font-size: calc(1.4rem * var(--echelle-texte)); margin-bottom: 1rem; }
 .entry-buttons { text-align: center; margin: 3rem 0; }
 .entry-btn {
-  display: inline-block; padding: 0.9rem 2.2rem; font-family: var(--font-title);
+  display: inline-block; padding: 0.9rem 2.2rem; font-family: "Agoradp_15", sans-serif;
   background-color: var(--color-primary); color: var(--color-text);
   text-decoration: none; border-radius: 4px; transition: background-color 0.2s ease;
+  font-size: calc(2rem * var(--echelle-texte));
 }
 .entry-btn:hover { background-color: var(--color-accent); color: #111; }
 .thanks-section { border-top: 1px solid var(--color-border); padding-top: 2rem; margin-top: 3rem; text-align: center; }
-.thanks-section h3 { font-family: var(--font-title); margin-bottom: 1rem; font-size: 1.8rem;}
+.thanks-section h3 {font-size: calc(1.8rem * var(--echelle-texte)); font-family: var(--font-title); margin-bottom: 1rem; }
 .site-footer { border-top: 1px solid var(--color-border); padding: 2rem 1rem; font-size: 0.85rem; text-align: center; color: var(--color-text); opacity: 0.8; }
 
 /* Image décorative entre le sous-titre et l'intro (S5B1T2). */
@@ -57,10 +58,10 @@ body {
   font-family: "Agoradp_15", sans-serif;
   color: #ffffff;
   margin-bottom: 0.75rem;
-  font-size: 1.4rem;
+  font-size: calc(1.4rem * var(--echelle-texte));
 }
 .credits-liste ul { list-style: none; margin-bottom: 3rem; }
-.credits-liste li { margin-bottom: 0.4rem; font-size: 0.9rem; color: #ffffff; }
+.credits-liste li { margin-bottom: 0.4rem; font-size: 0.9rem; color: #ffffff; font-size: calc(0.9rem * var(--echelle-texte));}
 
 .footer-section {
   text-align: center;

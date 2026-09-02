@@ -2,67 +2,67 @@
   {
     "id": "anishinaabe",
     "nom": "Anishinaabe",
-    "couleur": "#cdc310",
+    "couleur": "#FFB74D",
     "langue": "Anishinaabemowin"
   },
   {
     "id": "atikamekw",
     "nom": "Atikamekw Nehirowisiw",
-    "couleur": "#5f6f3c",
+    "couleur": "#FFE082",
     "langue": "Atikamekw"
   },
   {
     "id": "eeyou",
     "nom": "Eeyou",
-    "couleur": "#882851",
+    "couleur": "#A5D6A7",
     "langue": "Iiyiyuu ayimuun"
   },
   {
     "id": "innu",
     "nom": "Innu/Ilnu",
-    "couleur": "#e9bcb7",
+    "couleur": "#90CAF9",
     "langue": "Innu-aimun"
   },
   {
     "id": "inuit",
     "nom": "Inuit",
-    "couleur": "#133e63",
+    "couleur": "#80DEEA",
     "langue": "Inuktitut"
   },
   {
     "id": "kanienkeha",
     "nom": "Kanien'kehá:ka",
-    "couleur": "#dddbf1",
+    "couleur": "#CE93D8",
     "langue": "Kanien'kéhà"
   },
   {
     "id": "metis-ouest",
     "nom": "Métis de l'Ouest",
-    "couleur": "#a1e8af",
+    "couleur": "#9FA8DA",
     "langue": null
   },
   {
     "id": "mikmaq",
     "nom": "Mi'gmaq",
-    "couleur": "#673104",
+    "couleur": "#F48FB1",
     "langue": "Migmaq, Mi'kmaq"
   },
   {
     "id": "naskapi",
     "nom": "Naskapi",
-    "couleur": "#a6cfd5",
+    "couleur": "#80CBC4",
     "langue": "Naskapi Iyuw-Iyimuun"
   },
   {
     "id": "w8banaki",
     "nom": "W8banaki",
-    "couleur": "#d89a3a",
+    "couleur": "#FF9E80",
     "langue": "Aln8ba8dwaw8gan"
   },
   {
     "id": "inconnue",
     "nom": "Inconnue",
-    "couleur": "#aaaaaa",
+    "couleur": "#E0E0E0",
     "langue": null
   }
 ]

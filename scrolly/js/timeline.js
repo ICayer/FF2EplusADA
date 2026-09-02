@@ -25,6 +25,15 @@ export function getOrder() {
 }
 
 export function goToStep(index) {
+  // Re-naviguer vers le step OÙ ON EST DÉJÀ (ex. allerEtAfficher(indexActuel)
+  // relancé par script.js sur "languagechange" pour retraduire le titre)
+  // ne doit JAMAIS déclencher un cycle hide()+show() : hide() nettoie son
+  // DOM dans un onComplete GSAP asynchrone (300-500 ms plus tard) qui
+  // effacerait la scène que show() vient de reconstruire (condition de
+  // course, Playbook §3.1). Le retraduisage passe déjà par afficherTexte()
+  // / mettreAJourTitreScene() à chaque rendu — le cycle hide+show n'y
+  // apportait rien. NE JAMAIS retirer ce garde.
+  if (index === currentIndex) return;
   const prevEntry = order[currentIndex];
   const nextEntry = order[index];
   if (prevEntry && stepsRegistry[prevEntry.id]) stepsRegistry[prevEntry.id].hide();

@@ -1,49 +1,53 @@
 {
   "nuit-des-temps": {
-    "nomStep": { "fr": "Depuis la nuit des temps", "en": null }
+    "nomStep": { "fr": "Depuis la nuit des temps", "en": "Since time immemorial" }
   },
   "lien-communaute": {
-    "nomStep": { "fr": "Lié·es à leur communauté", "en": null }
+    "nomStep": { "fr": "Lié·es à leur communauté", "en": "Connected to their community" },
+    "phraseProgressive": { "fr": "Femmes, filles et\npersonnes bispirituelles", "en": "Women, girls, and\nTwo-Spirit people" }
   },
   "lien-territoire": {
-    "nomStep": { "fr": "Lié·es à leur communauté et à leur territoire", "en": null }
+    "nomStep": { "fr": "Lié·es à leur communauté et à leur territoire", "en": "Connected to their community and their land" },
+    "phraseProgressive": { "fr": "Femmes, filles et\npersonnes bispirituelles\nautochtones", "en": "Women, girls, and\nTwo-Spirit people,\nIndigenous" }
   },
   "lien-valeurs": {
-    "nomStep": { "fr": "Lié·es à leurs valeurs", "en": null }
+    "nomStep": { "fr": "Lié·es à leurs valeurs", "en": "Connected to their values" }
   },
   "rupture-coloniale": {
-    "nomStep": { "fr": "Déconnexion du territoire", "en": null }
+    "nomStep": { "fr": "Déconnexion du territoire", "en": "Disconnection from the land" },
+    "phraseProgressive": { "fr": "Femmes, filles et\npersonnes bispirituelles\nautochtones\ndisparu·es et assassiné·es", "en": "Women, girls, and\nTwo-Spirit people,\nIndigenous,\nmissing and murdered" },
+    "sousTitreRupture": { "fr": "Spirale de la violence", "en": "Spiral of violence" }
   },
   "hommage-victimes": {
-    "nomStep": { "fr": "Hommage aux victimes", "en": null },
-    "titre": { "fr": "Intention", "en": null },
+    "nomStep": { "fr": "Hommage aux victimes", "en": "Tribute to the victims" },
+    "titre": { "fr": "Intention", "en": "Intention" },
     "texte": {
       "fr": "Les femmes, les filles et les personnes bispirituelles disparu·es et assassiné·es, 6 fois plus que dans la population allochtone.",
-      "en": null
+      "en": "Missing and murdered women, girls, and Two-Spirit people, at six times the rate of the non-Indigenous population."
     }
   },
   "transformation-coeur": {
-    "nomStep": { "fr": "Transformation du cœur", "en": null },
-    "titre": { "fr": "Intention", "en": null },
+    "nomStep": { "fr": "Transformation du cœur", "en": "Transformation of the heart" },
+    "titre": { "fr": "Intention", "en": "Intention" },
     "texte": {
       "fr": "La réalité des personnes survivant·es, porteur·ses de la mémoire.",
-      "en": null
+      "en": "The reality of survivors, keepers of memory."
     }
   },
   "communaute-etoiles": {
-    "nomStep": { "fr": "Communauté-étoiles", "en": null },
-    "titre": { "fr": "Intention", "en": null },
+    "nomStep": { "fr": "Communauté-étoiles", "en": "Community of stars" },
+    "titre": { "fr": "Intention", "en": "Intention" },
     "texte": {
       "fr": "Les femmes, les filles et les personnes bispirituelles sont gardien·nes de la mémoire, de la culture, créateur·trice et solidaire.",
-      "en": null
+      "en": "Women, girls, and Two-Spirit people are keepers of memory and culture, creators, and allies in solidarity."
     }
   },
   "seuil-univers": {
-    "nomStep": { "fr": "Seuil de l'univers", "en": null },
-    "titre": { "fr": "La mémoire", "en": null },
+    "nomStep": { "fr": "Seuil de l'univers", "en": "Threshold of the universe" },
+    "titre": { "fr": "La mémoire", "en": "Memory" },
     "texte": {
       "fr": "[Texte à venir de Déline] Chaque étoile est une vie, une mémoire vivante dans le ciel.",
-      "en": null
+      "en": "[Texte à venir de Déline] Each star is a life, a living memory in the sky."
     }
   }
 }

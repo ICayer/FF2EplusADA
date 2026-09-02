@@ -1,8 +1,12 @@
 {
   "nav.explorer": "Explorer",
   "nav.explorerValeurs": "Explorer les valeurs",
+  "nav.explorerEtoiles": "Explorer les étoiles",
   "nav.retour": "Retour",
   "nav.ecouter": "Écouter",
+  "legende.colonisation": "Colonisation",
+  "legende.memoire": "Mémoire",
+  "legende.aujourdhui": "Aujourd'hui",
   "lang.francais": "Français",
   "lang.anglais": "English",
   "lang.innu-aimun": "Innu-aimun"

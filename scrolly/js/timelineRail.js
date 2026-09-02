@@ -12,7 +12,8 @@
 // reste du code doit appeler pour naviguer — jamais goToStep() de
 // timeline.js directement depuis l'extérieur de ce module.
 // Dépend de : scrolly/js/timeline.js, scrolly/js/steps/avantColonisation.js,
-// shared/js/navigationEtat.js (logique générique thème + bloc-titre)
+// shared/js/navigationEtat.js (logique générique thème + bloc-titre),
+// shared/js/i18n.js (t — légendes d'orientation)
 // Utilisé par : scrolly/js/script.js
 //
 // FF2EplusADA (scrollyFFADA2S v2)
@@ -22,6 +23,7 @@
 import { goToStep, getOrder } from "./timeline.js";
 import { masquerSceneComplete } from "./steps/avantColonisation.js";
 import { appliquerTheme, reduitMouvement as reduitMouvementPartage, mettreAJourTitreScene } from "../../shared/js/navigationEtat.js";
+import { t } from "../../shared/js/i18n.js";
 
 const DUREE_FONDU_MS = 200;
 
@@ -34,6 +36,7 @@ let curseurEl = null;
 let titreCompteurEl = null;
 let titreTexteEl = null;
 let legendes = [];
+let legendesAvecCle = []; // [{ el, cle }] — pour retraduire les légendes au "languagechange"
 let btnRecule = null;
 let btnAvance = null;
 
@@ -89,19 +92,20 @@ function construireRail() {
   const POSITION_UNIVERS = 95;  // doit correspondre à .repere-univers (timeline.css)
   const POSITION_VALEURS = 100; // doit correspondre à .repere-valeurs (timeline.css)
 
-  legendes = [
-    { texte: "Colonisation", position: POSITION_RUPTURE },
-    { texte: "Mémoire", position: POSITION_UNIVERS },
-    { texte: "Aujourd'hui", position: POSITION_VALEURS },
-  ].map(({ texte, position }) => {
+  legendesAvecCle = [
+    { cle: "legende.colonisation", position: POSITION_RUPTURE },
+    { cle: "legende.memoire", position: POSITION_UNIVERS },
+    { cle: "legende.aujourdhui", position: POSITION_VALEURS },
+  ].map(({ cle, position }) => {
     const el = document.createElement("span");
     el.className = "legende-orientation cachee";
-    el.textContent = texte;
+    el.textContent = t(cle);
     el.style.left = `${position}%`;
     el.setAttribute("aria-hidden", "true");
     railEl.appendChild(el);
-    return el;
+    return { el, cle };
   });
+  legendes = legendesAvecCle.map(({ el }) => el);
 
   curseurEl = document.createElement("img");
   curseurEl.className = "curseur";
@@ -215,3 +219,10 @@ export function initTimelineRail(railContainer, titreContainer) {
 
   return { allerAuStep };
 }
+
+// Retraduisage léger des 3 légendes d'orientation au changement de langue
+// — même patron que le bouton "Explorer les étoiles" (step11.js) : on ne
+// touche QUE le textContent, jamais un re-rendu du rail.
+window.addEventListener("languagechange", () => {
+  legendesAvecCle.forEach(({ el, cle }) => { el.textContent = t(cle); });
+});

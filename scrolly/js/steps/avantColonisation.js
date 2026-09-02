@@ -11,7 +11,8 @@
 // continu même en naviguant vers un step antérieur — les hide() de
 // A/B/C sont donc volontairement vides.
 // Dépend de : shared/js/utils.js (loadSVG), shared/js/i18n.js (resolve),
-// shared/data/valeurs.json
+// shared/data/valeurs.json, scrolly/data/steps.json (phrases progressives
+// traduites : phraseProgressive / sousTitreRupture)
 // Utilisé par : scrolly/js/stepsRegistry.js
 //
 // FF2EplusADA (scrollyFFADA2S v2)
@@ -60,16 +61,43 @@ function assurerCalquesAvant(jusquExclu) {
       if (groupePerles) gsap.set(groupePerles.querySelectorAll("path"), { opacity: 1 });
     }
     revele.territoire = true;
-    definirPhrase(TEXTE_C, "gauche");
+    definirPhrase(phraseProgressive("lien-territoire"), "gauche");
   }
 }
 
 let valeurs = []; // chargé une fois depuis shared/data/valeurs.json
 let groupeCercles = null;
 
-const TEXTE_B = "Femmes, filles et\npersonnes bispirituelles";
-const TEXTE_C = "Femmes, filles et\npersonnes bispirituelles\nautochtones";
-const TEXTE_E = "Femmes, filles et\npersonnes bispirituelles\nautochtones\ndisparu·es et assassiné·es";
+// scrolly/data/steps.json — pour les phrases progressives traduites. Le
+// fetch est lancé dès le chargement du module (concurremment à l'init de
+// script.js, qui charge le même fichier), donc stepsData est en pratique
+// déjà prêt quand la 1re animation de step joue (délai +=3 s de la
+// timeline). chargerStepsData() n'attend alors qu'une promesse résolue
+// (microtâche) — n'élargit pas la fenêtre de course GSAP (§3.1).
+let stepsData = null;
+const stepsDataPromise = fetch("/scrolly/data/steps.json")
+  .then((r) => r.json())
+  .catch((err) => {
+    console.error("❌ Impossible de charger scrolly/data/steps.json", err);
+    return {}; // phraseProgressive()/sousTitreRupture() retomberont sur '' — pas de plantage
+  });
+stepsDataPromise.then((d) => { stepsData = d; });
+async function chargerStepsData() {
+  if (!stepsData) stepsData = await stepsDataPromise;
+}
+
+// Phrase progressive / sous-titre d'un step dans la langue active (repli
+// fr via resolve). Lecture SYNCHRONE de stepsData : chaque show...() fait
+// `await chargerStepsData()` juste après assurerContainer(), donc
+// stepsData est déjà là quand ces helpers sont appelés — y compris depuis
+// assurerCalquesAvant() et hideRuptureColoniale(), qui restent synchrones
+// (stepsData a forcément été chargé au premier passage sur B/C/D/E).
+function phraseProgressive(stepId) {
+  return resolve(stepsData?.[stepId]?.phraseProgressive);
+}
+function sousTitreRupture() {
+  return resolve(stepsData?.["rupture-coloniale"]?.sousTitreRupture);
+}
 
 async function assurerContainer() {
   if (!container) {
@@ -283,6 +311,7 @@ export async function showLienCommunaute() {
   timelineActuelle = gsap.timeline();
   const c = await assurerContainer();
   if (!c) return;
+  await chargerStepsData();
   assurerCalquesAvant("communaute");
 
   const communauteEl = c.querySelector("#communaute");
@@ -296,10 +325,10 @@ export async function showLienCommunaute() {
       duration: 1.5,
       onComplete: () => { revele.communaute = true; },
     }, "+=3");
-    timelineActuelle.call(() => definirPhrase(TEXTE_B, "gauche"), null, "<");
+    timelineActuelle.call(() => definirPhrase(phraseProgressive("lien-communaute"), "gauche"), null, "<");
   } else {
     // Remet la phrase au bon état si on revient sur B depuis un step plus avancé.
-    definirPhrase(TEXTE_B, "gauche");
+    definirPhrase(phraseProgressive("lien-communaute"), "gauche");
   }
 }
 
@@ -311,6 +340,7 @@ export async function showLienTerritoire() {
   timelineActuelle = gsap.timeline();
   const c = await assurerContainer();
   if (!c) return;
+  await chargerStepsData();
   assurerCalquesAvant("territoire");
 
   const territoireEl = c.querySelector("#territoire");
@@ -318,7 +348,7 @@ export async function showLienTerritoire() {
 
   if (!revele.territoire) {
     timelineActuelle.to(territoireEl, { opacity: 1, duration: 1.5 }, "+=3");
-    timelineActuelle.call(() => definirPhrase(TEXTE_C, "gauche"), null, "<");
+    timelineActuelle.call(() => definirPhrase(phraseProgressive("lien-territoire"), "gauche"), null, "<");
     for (let i = 1; i <= 5; i++) {
       animerPerlesEnVague(c.querySelector(`#perles${i}`), timelineActuelle, "+=2");
     }
@@ -326,7 +356,7 @@ export async function showLienTerritoire() {
     // moment de la planifier — même précaution que showNuitDesTemps().
     timelineActuelle.call(() => { revele.territoire = true; });
   } else {
-    definirPhrase(TEXTE_C, "gauche");
+    definirPhrase(phraseProgressive("lien-territoire"), "gauche");
   }
 }
 
@@ -338,6 +368,7 @@ export async function showLienValeurs() {
   timelineActuelle = gsap.timeline();
   const c = await assurerContainer();
   if (!c) return;
+  await chargerStepsData();
   assurerCalquesAvant("valeurs");
   await chargerValeurs();
 
@@ -361,13 +392,14 @@ export async function showRuptureColoniale() {
   timelineActuelle = gsap.timeline();
   const c = await assurerContainer();
   if (!c) return;
+  await chargerStepsData();
   assurerCalquesAvant("barres");
 
-  definirPhrase(TEXTE_E, "gauche");
+  definirPhrase(phraseProgressive("rupture-coloniale"), "gauche");
 
   const barres = [1, 2, 3, 4, 5].map((i) => c.querySelector(`#barre${i}`));
   const sousTitre = document.getElementById("sous-titre-rupture");
-  if (sousTitre) sousTitre.textContent = "Spirale de la violence";
+  if (sousTitre) sousTitre.textContent = sousTitreRupture();
 
   // clip-path plutôt qu'opacity (décision Sprint 3) — chaque barre alterne
   // de sens (gauche→droite / droite→gauche), pas de stagger.
@@ -410,6 +442,7 @@ export function hideRuptureColoniale() {
 
   // Si on recule de E vers D, D ne touche pas à la phrase — elle doit
   // refléter C (le dernier step qui l'a définie), pas rester à la version
-  // complète de E.
-  definirPhrase(TEXTE_C, "gauche");
+  // complète de E. Lecture synchrone de stepsData : on vient forcément de
+  // E, donc showRuptureColoniale() l'a déjà chargé.
+  definirPhrase(phraseProgressive("lien-territoire"), "gauche");
 }

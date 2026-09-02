@@ -16,7 +16,8 @@
 // step10.js, qui reste intact et non modifié.
 // Dépend de : shared/js/utils.js (loadSVG), shared/js/progression.js
 // (deverrouiller "univers" au moment de la récompense), shared/js/railParcours.js
-// (rafraichirVerrous — le rail est visible sur cette page)
+// (rafraichirVerrous — le rail est visible sur cette page), shared/js/i18n.js
+// (t — texte du bouton "Explorer les étoiles")
 // Utilisé par : scrolly/js/stepsRegistry.js
 //
 // FF2EplusADA (scrollyFFADA2S v2)
@@ -26,6 +27,7 @@
 import { loadSVG } from "../../../shared/js/utils.js";
 import { initProgression, deverrouiller } from "../../../shared/js/progression.js";
 import { rafraichirVerrous } from "../../../shared/js/railParcours.js";
+import { t } from "../../../shared/js/i18n.js";
 
 let step11Container = null;
 let step11Timeline = null;
@@ -173,6 +175,7 @@ export async function showStep11() {
   step11Timeline.call(async () => {
     const bouton = document.getElementById("bouton-explorer-etoiles");
     if (bouton) {
+      bouton.textContent = t("nav.explorerEtoiles");
       bouton.classList.add("visible");
       console.log('🔘 Bouton "Explorer les étoiles" révélé');
     }
@@ -223,3 +226,14 @@ export function hideStep11({ soft = false } = {}) {
     });
   });
 }
+
+// Retraduisage léger du bouton si la langue change pendant que le step est
+// affiché (bouton déjà révélé) — même patron que univers/js/etoiles.js et
+// valeurs/js/valeursAnimation.js : on ne touche QUE le texte du bouton,
+// jamais un re-rendu de scène.
+window.addEventListener("languagechange", () => {
+  const bouton = document.getElementById("bouton-explorer-etoiles");
+  if (bouton && bouton.classList.contains("visible")) {
+    bouton.textContent = t("nav.explorerEtoiles");
+  }
+});
