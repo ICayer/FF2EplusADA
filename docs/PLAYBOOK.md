@@ -215,6 +215,14 @@ Illustrator Image Trace reste le filet de sécurité si cette approche ne suffit
 **Étape 6 — Vérifier avant de considérer que c'est fait.** Ni l'aperçu VS Code ni un navigateur ouvrant le `.svg` directement ne sont des tests valides (les chemins relatifs se résolvent différemment hors contexte). Le seul test fiable : charger via `loadSVG()` dans la vraie page (console du navigateur), onglet **Network** des DevTools, confirmer un code **200** sur chaque ressource — et **vider tout filtre de recherche actif** dans ce panneau avant de conclure qu'une requête manque.
 
 ---
+## 8 — Règles de rédaction
+
+### Voix rédactionnelle (repères tirés des fiches services d'Isabel, [date])
+- Jamais de tiret cadratin (—) comme procédé stylistique/rythmique
+- Cadence naturelle des phrases, pas de fragments poétiques en cascade
+- Images ancrées dans le concret et le spécifique, pas l'abstrait générique
+- Ton chaleureux et direct, jamais grandiloquent
+- Clôture par une adresse directe, pas une formule solennelle
 
 ## Journal des versions du Playbook
 

@@ -8,6 +8,9 @@
   <link rel="stylesheet" href="shared/css/variables.css" />
   <link rel="stylesheet" href="shared/css/headerControls.css" />
   <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/landingScroll.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 </head>
 <body>
   <div id="entete-controles"></div>
@@ -18,12 +21,51 @@
       <p class="subtitle">scrollyFFADA2S</p>
     </header>
 
+    <img src="valeurs/svg/couple.webp" alt="" class="landing-couple" />
+
     <section class="context-section">
       <p>[Texte d'introduction à venir de Déline — présentation du projet, du contexte de commémoration FFADA2S]</p>
     </section>
 
     <section class="entry-buttons">
       <a href="scrolly/index.html" class="entry-btn">Découvrir le récit</a>
+    </section>
+
+    <section class="spirale-swirl-section">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1000 1000" class="landing-spirale-swirl">
+        <g id="spirale">
+          <image id="spirale1" width="1800" height="1653" transform="translate(1078.421 1089) rotate(-180) scale(.6491)" xlink:href="valeurs/svg/spirale.webp"/>
+        </g>
+        <g id="swirls">
+          <g id="swirl1" class="swirl">
+            <image width="2224" height="1668" transform="translate(-520.33 -210.66) scale(.89)" xlink:href="valeurs/svg/swirl1.webp"/>
+          </g>
+          <g id="swirl2" class="swirl">
+            <image width="2224" height="1668" transform="translate(-313.52 -13.04) scale(.74)" xlink:href="valeurs/svg/swirl2.webp"/>
+          </g>
+          <g id="swirl3" class="swirl">
+            <image width="2224" height="1668" transform="translate(-490.72 -117.21) scale(.89)" xlink:href="valeurs/svg/swirl3.webp"/>
+          </g>
+          <g id="swirl4" class="swirl">
+            <image width="2224" height="1668" transform="translate(-439.14 -170.83) scale(.82)" xlink:href="valeurs/svg/swirl4.webp"/>
+          </g>
+          <g id="swirl5" class="swirl">
+            <image width="2224" height="1668" transform="translate(-494.29 -114.15) scale(.83)" xlink:href="valeurs/svg/swirl5.webp"/>
+          </g>
+          <g id="swirl6" class="swirl">
+            <image width="2224" height="1668" transform="translate(-477.44 -121.81) scale(.84)" xlink:href="valeurs/svg/swirl6.webp"/>
+          </g>
+          <g id="swirl7" class="swirl">
+            <image width="2224" height="1668" transform="translate(-367.65 -54.4) scale(.78)" xlink:href="valeurs/svg/swirl7.webp"/>
+          </g>
+          <g id="swirl8" class="swirl">
+            <image width="2224" height="1668" transform="translate(-285.95 -5.38) scale(.67)" xlink:href="valeurs/svg/swirl8.webp"/>
+          </g>
+          <g id="swirl9" class="swirl">
+            <image width="2224" height="1668" transform="translate(-113.6864 1399.6348) rotate(-91.578) scale(.7828)" xlink:href="valeurs/svg/swirl9.webp"/>
+          </g>
+        </g>
+      </svg>
     </section>
 
     <section class="thanks-section">
@@ -42,9 +84,11 @@
     import { initI18n } from "./shared/js/i18n.js";
     import { langueSauvegardee } from "./shared/js/preferences.js";
     import { initHeaderControls } from "./shared/js/headerControls.js";
+    import { initLandingScroll } from "./assets/js/landingScroll.js";
 
     await initI18n(langueSauvegardee() || 'fr');
     initHeaderControls(document.getElementById("entete-controles"));
+    initLandingScroll();
   </script>
 </body>
 </html>

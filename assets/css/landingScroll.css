@@ -1,0 +1,47 @@
+/* ==================================================
+   assets/css/landingScroll.css
+   Landing — composition décorative spirale + 9 swirls révélée au scroll
+
+   Rôle : Mise en page de la section spirale/swirls de la page d'accueil.
+   position:sticky + zone de scroll dédiée (min-height:150vh) donnent
+   l'espace nécessaire pour que GSAP ScrollTrigger (landingScroll.js) pilote
+   l'apparition progressive des 9 swirls. En prefers-reduced-motion : la
+   section redevient une image fixe (position:static, swirls opacity:1),
+   sans zone de scroll démesurée.
+   Dépend de : aucun
+   Utilisé par : index.html (racine)
+
+   FF2EplusADA (scrollyFFADA2S v2)
+   Isabel Cayer · Atelier Love & Code · 2026
+   ================================================== */
+
+.spirale-swirl-section {
+  min-height: 150vh; /* espace de scroll pour laisser le temps à l'effet de se dérouler */
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10vh;
+}
+
+.landing-spirale-swirl {
+  width: min(90vw, 700px);
+  height: auto;
+  position: sticky;
+  top: 15vh;
+}
+
+.landing-spirale-swirl .swirl {
+  opacity: 0; /* état initial — révélé au scroll par landingScroll.js */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spirale-swirl-section {
+    min-height: auto; /* pas de zone de scroll dédiée si l'animation est désactivée */
+  }
+  .landing-spirale-swirl {
+    position: static;
+  }
+  .landing-spirale-swirl .swirl {
+    opacity: 1; /* tout visible d'emblée, pas de révélation progressive */
+  }
+}
