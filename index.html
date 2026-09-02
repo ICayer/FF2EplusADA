@@ -69,14 +69,38 @@
     </section>
 
     <section class="thanks-section">
-      <h3>Remerciements</h3>
-      <p>[À compléter — hommage aux femmes, artistes et communautés impliquées]</p>
+      <h3></h3>
+      <div class="remerciements-texte"></div>
     </section>
   </div>
 
   <footer class="site-footer">
+    <div class="container credits-liste"></div>
+
     <div class="container">
-      <p>[Crédits équipe et partenaires à venir]</p>
+      <div class="footer-section">
+        <h4>Produit par</h4>
+        <div class="footer-logos">
+          <a href="https://www.agora-uqar.com" target="_blank" rel="noopener">
+            <img class="logo-ofi" src="assets/images/logos/Agora.png" alt="L'Agora, votre accélérateur de la transformation" />
+          </a>
+          <a href="https://www.uqar.ca" target="_blank" rel="noopener">
+            <img class="logo-ofi" src="assets/images/logos/UQAR.png" alt="Université du Québec à Rimouski" />
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-section">
+        <h4>Partenaires financiers</h4>
+        <div class="footer-logos">
+          <a href="https://www.cfref-apogee.gc.ca/home-accueil-fra.aspx" target="_blank" rel="noopener">
+            <img class="logo-ofi" src="assets/images/logos/CFREF.png" alt="Fonds d'excellence en recherche Apogée du Canada" />
+          </a>
+          <a href="https://www.nserc-crsng.gc.ca" target="_blank" rel="noopener">
+            <img class="logo-ofi" src="assets/images/logos/CRSNG.png" alt="Conseil de recherches en sciences naturelles et en génie du Canada" />
+          </a>
+        </div>
+      </div>
     </div>
   </footer>
 
@@ -85,9 +109,11 @@
     import { langueSauvegardee } from "./shared/js/preferences.js";
     import { initHeaderControls } from "./shared/js/headerControls.js";
     import { initLandingScroll } from "./assets/js/landingScroll.js";
+    import { initLandingContent } from "./assets/js/landingContent.js";
 
     await initI18n(langueSauvegardee() || 'fr');
     initHeaderControls(document.getElementById("entete-controles"));
+    await initLandingContent();
     initLandingScroll();
   </script>
 </body>

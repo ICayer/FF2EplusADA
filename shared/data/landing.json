@@ -1,0 +1,42 @@
+{
+  "titre": {
+    "fr": "M'entends-tu?",
+    "en": "Can you hear me?"
+  },
+  "sousTitre": {
+    "fr": "La réconciliation par la recherche-création",
+    "en": "Reconciliation through research-creation"
+  },
+  "intro": {
+    "fr": "L'histoire des femmes, des filles et des personnes bispirituelles autochtones disparues et assassinées se raconte trop souvent à travers des statistiques. Six fois plus de risque que dans la population allochtone. Des dossiers non résolus. Des chiffres qui, à force d'être répétés, finissent par effacer les visages derrière eux.\n\nCe projet part d'un autre endroit.\n\nIl y a longtemps, bien avant la colonisation, il existait un lien fort entre les femmes, les communautés et le territoire, porté par des valeurs comme le partage, la force, la bienveillance. Ce lien n'a jamais complètement disparu. Il a survécu, transmis d'une génération à l'autre, parfois en silence, parfois avec éclat.\n\nC'est ce fil qu'on suit ici : depuis la nuit des temps, à travers la rupture de la colonisation, jusqu'aux étoiles qui gardent aujourd'hui la mémoire de chaque vie perdue, jusqu'aux valeurs qu'on continue de porter, ensemble.\n\nParce que se souvenir et se reconnecter, ce n'est pas seulement l'affaire des femmes autochtones. C'est une responsabilité et une invitation qui concernent tout le monde : les hommes, les enfants, les communautés entières, autochtones et allochtones.\n\nPrenez le temps de suivre ce récit. Laissez-le vous montrer ce qui, malgré tout, continue de vivre.",
+    "en": "The story of missing and murdered Indigenous women, girls, and Two-Spirit people is too often told through statistics. Six times the risk faced by the non-Indigenous population. Unsolved cases. Numbers that, repeated so often, end up erasing the faces behind them.\n\nThis project starts from another place.\n\nLong ago, well before colonization, there was a strong bond between women, communities, and the land, carried by values like sharing, strength, kindness. That bond never fully disappeared. It survived, passed down from one generation to the next, sometimes quietly, sometimes openly.\n\nThat's the thread we follow here: since time immemorial, through the rupture of colonization, to the stars that now hold the memory of each life lost, to the values we continue to carry, together.\n\nBecause remembering and reconnecting isn't only the responsibility of Indigenous women. It's a responsibility, and an invitation, that concerns everyone: men, children, entire communities, Indigenous and non-Indigenous alike.\n\nTake the time to follow this story. Let it show you what, despite everything, continues to live on."
+  },
+  "boutonEntree": {
+    "fr": "Découvrir le récit",
+    "en": "Discover the story"
+  },
+  "remerciementsTitre": {
+    "fr": "Remerciements",
+    "en": "Acknowledgements"
+  },
+  "remerciementsTexte": {
+    "fr": "Ce projet existe grâce à un appel lancé par l'honorable sénatrice Michèle Audette, elle-même innue, invitant des femmes autochtones de l'Est-du-Québec à se joindre à une réflexion collective sur la mémoire des femmes, des filles et des personnes bispirituelles autochtones disparues et assassinées.\n\n De cet appel est né un atelier de cocréation d'une journée à la station Uapishka, sur la Côte-Nord, avec Germaine, Lise et Shannon, trois femmes artistes de la nation innue. Par le scribing graphique de Déline, cette rencontre a fait émerger la lumière et les valeurs qui traversent maintenant ce récit.\n\nNous n'avons jamais voulu porter ce projet en marge, à distance des personnes concernées. Nous l'avons plutôt porté comme une perle précieuse entre nos mains, pour l'offrir humblement à Michèle, Germaine, Lise et Shannon, afin qu'elles le façonnent à leur image.\n\nMerci à vous quatre. Ce récit vous appartient.",
+    "en": "This project exists because of a call issued by the Honourable Senator Michèle Audette, herself Innu, inviting Indigenous women from Eastern Quebec to join a collective reflection on the memory of missing and murdered Indigenous women, girls, and Two-Spirit people.\n\n From that call came a one-day co-creation workshop at Station Uapishka, on the Côte-Nord, with Germaine, Lise, and Shannon, three Innu women artists. Through Déline's graphic scribing, that gathering brought forward the light and the values that now run through this story.\n\nWe never wanted to carry this project at a distance from the people it concerns. Instead, we carried it like a precious pearl in our hands, to offer it humbly to Michèle, Germaine, Lise, and Shannon, so they could shape it in their own image.\n\nThank you to all four of you. This story belongs to you."
+  },
+  "credits": {
+    "titre": { "fr": "Équipe de projet", "en": "Project team" },
+    "personnes": [
+      { "fr": "Déline Petrone, département des émotions et facilitation graphique (L'Agora – UQAR)", "en": "Déline Petrone, Emotions department and graphic facilitation (L'Agora – UQAR)" },
+      { "fr": "Isabel Cayer, design et prototypage (L'Agora – UQAR)", "en": "Isabel Cayer, design and prototyping (L'Agora – UQAR)" },
+      { "fr": "Catherine Alexandra Gagnon, participation à l'atelier de cocréation (L'Agora – UQAR)", "en": "Catherine Alexandra Gagnon, co-creation workshop participant (L'Agora – UQAR)" },
+      { "fr": "Annie Trépanier, participation à l'atelier de cocréation (L'Agora – UQAR)", "en": "Annie Trépanier, co-creation workshop participant (L'Agora – UQAR)" },
+      { "fr": "Maurie Girard-Gadreau, coordination et participation à l'atelier de cocréation (L'Agora – UQAR)", "en": "Maurie Girard-Gadreau, coordination and co-creation workshop participant (L'Agora – UQAR)" },
+      { "fr": "Michèle Audette, appel à l'action", "en": "Michèle Audette, call to action" },
+      { "fr": "Germaine, participation à l'atelier de cocréation et voix", "en": "Germaine, co-creation workshop participant and voice" },
+      { "fr": "Lise, participation à l'atelier de cocréation et voix", "en": "Lise, co-creation workshop participant and voice" },
+      { "fr": "Shannon, participation à l'atelier de cocréation", "en": "Shannon, co-creation workshop participant" },
+      { "fr": "À déterminer, rédaction", "en": "To be determined, writing" },
+      { "fr": "À déterminer, traduction du contenu en innu-aimun", "en": "To be determined, Innu-aimun translation" }
+    ]
+  }
+}
