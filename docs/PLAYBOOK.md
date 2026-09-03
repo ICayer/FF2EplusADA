@@ -18,6 +18,20 @@
 - `t(clé)` — pour le chrome d'interface (dictionnaires plats dans `shared/data/i18n/{lang}.json`)
 - `resolve(champ)` — pour le contenu éditorial langue-clé (récits, textes de step, valeurs), avec repli automatique via `fallbackByLanguage.json`
 - Le repli n'est **pas** un français universel — chaque langue autochtone a son propre repli selon la réalité linguistique de sa communauté (ex: innu-aimun→français, mi'gmaq→anglais).
+- **`t()` et `resolve()` partagent maintenant la même logique de repli**
+  (corrigé le 2 septembre — `t()` n'avait aucun repli avant ça, une
+  langue sans dictionnaire propre affichait des clés brutes comme
+  `"nav.explorerValeurs"`). `shared/data/i18n/` contient `fr.json` ET
+  `en.json` — toute nouvelle langue autochtone documentée retombe
+  proprement sur sa langue de repli pour le chrome ET le contenu
+  éditorial, pas seulement l'un des deux.
+- **Patron établi pour tout nouveau contenu bilingue statique**
+  (landing page, futurs textes de valeurs) : un fichier
+  `shared/data/*.json` avec des champs `{fr, en, ...}` par clé, un
+  script d'initialisation qui peuple le DOM via `resolve()` au
+  chargement ET réécoute `"languagechange"` pour retraduire sans
+  recharger la page — voir `shared/data/landing.json` +
+  `assets/js/landingContent.js` comme référence.
 
 **Steps — moteur générique, jamais de logique par nom** (`scrolly/js/timeline.js` + `stepsRegistry.js` + `stepsOrder.json`) :
 - `timeline.js` ne connaît jamais un step par son nom — il cherche dans `stepsRegistry` par la clé lue dans `stepsOrder.json`.
@@ -144,6 +158,44 @@ Même principe pour une croissance ciblée (ex: "grossir à 80% de la hauteur de
 `loadSVG()` (dans `shared/js/utils.js`) donne à chaque conteneur de step/asset un `z-index: 1500`, pour permettre l'empilement propre entre steps successifs. **Ce chiffre a causé le même bug à répétition** (curseur de test caché, bouton caché derrière la Lune, voile de transition mal empilé) — toujours vérifier qu'un élément d'interface censé rester au-dessus (bouton, curseur, overlay UI) a un `z-index` **supérieur à 1500**, et qu'un élément censé former un **fond** (voile de transition, overlay coloré) a un `z-index` **inférieur** à celui du contenu SVG qu'il est censé mettre en valeur, pas au-dessus.
 
 Repère à garder en tête : fond de page < overlay de fond (voile, assombrissement) < contenu SVG animé (steps, Lune, étoiles) < interface de contrôle (boutons, curseur).
+
+### 3.5 Ne jamais rejouer hide+show sur une navigation vers le MÊME step *(leçon goToStep, 2 septembre 2026)*
+
+Toute fonction qui orchestre une transition entre deux états (ici,
+`goToStep()` appelant `hide()` du step qu'on quitte puis `show()` du
+step qu'on rejoint) doit vérifier que l'état cible est RÉELLEMENT
+différent de l'état courant avant de déclencher quoi que ce soit.
+Sans ce garde, naviguer vers le step où l'on est déjà (ex. : un
+changement de langue qui rappelle la navigation sur le même index pour
+forcer un nouveau `resolve()`) déclenche un hide() suivi immédiatement
+d'un show() du même step — et si hide() nettoie son DOM à l'intérieur
+d'un callback GSAP asynchrone (`onComplete`, comme c'est le cas pour
+step7/9/10/11 et avantColonisation.js), ce nettoyage tardif peut
+s'exécuter APRÈS que show() ait déjà reconstruit la scène, l'effaçant
+silencieusement.
+
+```javascript
+// ❌ Piège : aucune vérification, hide()+show() se rejouent même si rien ne change
+export function goToStep(index) {
+  const prevEntry = order[currentIndex];
+  const nextEntry = order[index];
+  if (prevEntry && stepsRegistry[prevEntry.id]) stepsRegistry[prevEntry.id].hide();
+  if (nextEntry && stepsRegistry[nextEntry.id]) stepsRegistry[nextEntry.id].show();
+  currentIndex = index;
+}
+
+// ✅ Un garde suffit — rien à cacher ni à révéler si l'index n'a pas changé
+export function goToStep(index) {
+  if (index === currentIndex) return;
+  // ... reste identique
+}
+```
+
+Ce correctif protège TOUS les steps d'un coup (la cause est en amont,
+dans l'orchestrateur, pas dans chaque step individuellement) — un signe
+qu'un bug qui semble propre à un seul endroit (ici, découvert sur
+seuil-univers/step11) mérite de vérifier s'il vient en fait d'une
+fonction partagée plus haut dans la chaîne d'appel.
 
 ---
 
