@@ -23,7 +23,8 @@
     import { initValeurs } from "./js/valeursAnimation.js";
     import { initHeaderControls } from "../shared/js/headerControls.js";
     import { initProgression } from "../shared/js/progression.js";
-    import { construireRailParcours } from "../shared/js/railParcours.js";
+    import { construireRailParcours, definirEtapeActive } from "../shared/js/railParcours.js";
+    import { initRailPlume } from "../shared/js/railPlume.js";
 
     await initI18n(langueSauvegardee() || 'fr');
     initValeurs("#graphic");
@@ -37,6 +38,13 @@
         window.location.href = "../" + etape.page;
       },
     });
+
+    // Doit venir APRÈS construireRailParcours() — celui-ci fait innerHTML = ""
+    // au début, ce qui effacerait la plume si elle était ajoutée avant
+    // (même leçon que scrolly/js/script.js, S6B0T1).
+    const { deplacerPlume } = await initRailPlume(document.getElementById("rail-parcours"));
+    definirEtapeActive("valeurs");
+    deplacerPlume("valeurs");
   </script>
 </body>
 </html>

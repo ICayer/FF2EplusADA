@@ -8,7 +8,7 @@
 // l'apparition du bouton vers la Partie 3 une fois le dernier step atteint.
 // Dépend de : scrolly/js/timeline.js, scrolly/js/timelineRail.js,
 //   scrolly/js/steps/*.js, shared/js/i18n.js, shared/js/progression.js,
-//   shared/js/railParcours.js
+//   shared/js/railParcours.js, shared/js/railPlume.js
 // Utilisé par : scrolly/index.html
 //
 // FF2EplusADA (scrollyFFADA2S v2)
@@ -20,6 +20,7 @@ import { initTimeline, getOrder } from "./timeline.js";
 import { initTimelineRail } from "./timelineRail.js";
 import { initProgression, deverrouiller } from "../../shared/js/progression.js";
 import { construireRailParcours, definirEtapeActive, rafraichirVerrous } from "../../shared/js/railParcours.js";
+import { initRailPlume } from "../../shared/js/railPlume.js";
 
 const PAGE_COURANTE = "scrolly/index.html";
 
@@ -56,6 +57,7 @@ async function init() {
     allerAuStep(index, texteTitre);
     afficherTexte(steps, stepId);
     definirEtapeActive(stepId);
+    deplacerPlume(stepId);
 
     // Déblocage en chaîne, uniquement à l'intérieur du scrolly : `order` ne
     // contient que les 9 steps du scrolly, donc order[index + 1] est
@@ -103,6 +105,12 @@ async function init() {
       }
     },
   });
+
+  // APRÈS construireRailParcours() : celui-ci fait container.innerHTML = ""
+  // au début, ce qui effacerait la plume si elle était ajoutée avant.
+  // `deplacerPlume` est capturé par la closure de allerEtAfficher() et
+  // n'est appelé qu'à partir de allerEtAfficher(0) ci-dessous.
+  const { deplacerPlume } = await initRailPlume(document.getElementById("rail-parcours"));
 
   allerEtAfficher(0);
 }

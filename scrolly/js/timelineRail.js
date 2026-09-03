@@ -109,7 +109,7 @@ function construireRail() {
 
   curseurEl = document.createElement("img");
   curseurEl.className = "curseur";
-  curseurEl.src = "./svg/timeline/plume.svg";
+  curseurEl.src = "../shared/svg/timeline/plume.svg";
   curseurEl.alt = "";
   curseurEl.setAttribute("aria-hidden", "true");
   railEl.appendChild(curseurEl);
