@@ -4,9 +4,15 @@
 
    Rôle : Styles du rail construit par shared/js/railParcours.js — pastille
    ronde par étape, états actif / verrouillé / page-actuelle, bulle
-   "Pas encore débloqué". Suit le basculement clair/sombre via les jetons
-   de variables.css (--color-scene-bg, --color-border, --color-primary) —
-   aucune couleur de thème codée en dur. Placeholder visuel des pastilles :
+   "Pas encore débloqué". Couleurs via les jetons de variables.css
+   (--color-border, --color-primary) — aucune couleur de thème codée en dur,
+   à une exception près :
+   Exception au thème : .rail-parcours utilise un blanc fixe plutôt que
+   var(--color-scene-bg) — le rail reste un repère de navigation constant,
+   indépendant du thème clair/sombre de la scène qu'il chevauche
+   (3 septembre 2026) ; la ligne du temps décorative utilise donc
+   --color-border (gris fixe) plutôt que --color-rail-piste (translucide,
+   invisible sur blanc hors thème clair). Placeholder visuel des pastilles :
    /shared/svg/spirale.webp (chemin ABSOLU — ce composant sert des pages à
    des profondeurs de dossier différentes).
    Dépend de : shared/css/variables.css
@@ -26,9 +32,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  background: linear-gradient(to top, var(--color-scene-bg) 0%, transparent 100%);
+  gap: 14px; /* espace de base entre groupes (ex. univers↔valeurs) — le grand écart
+                autour du scrolly vient de la marge dédiée sur .avec-ligne-temps, pas d'ici */
+  background: #fff; /* exception consciente à la règle de thème du fichier (voir en-tête) —
+                        le rail est un chrome de navigation, toujours blanc peu importe le
+                        thème de la scène. Décision du 3 septembre. */
   z-index: 2000;
+}
+
+.groupe-etapes {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px; /* ancien espacement du rail au complet, maintenant intra-groupe seulement */
 }
 
 .etape-bouton {
@@ -129,4 +145,51 @@
   height: auto;
   filter: var(--filtre-curseur);
   pointer-events: none;
+  z-index: 2; /* au-dessus de .etape-bouton (z-index: 1) — sans ça, le nouveau
+                 z-index explicite sur les boutons repasserait devant la plume,
+                 cassant l'effet "plume posée sur le numéro" (S6B0T1) */
+}
+
+/* Ligne du temps décorative — seulement sur un groupe à plus d'une étape
+   (.avec-ligne-temps, ajoutée par railParcours.js). Simple + flèche, pas
+   de trait de rupture (décision du 3 septembre, Registre). */
+.groupe-etapes.avec-ligne-temps {
+  margin: 0 56px; /* grand espace de chaque côté du groupe scrolly — Isabel ajustera à l'œil */
+  padding-right: 16px; /* espace RÉSERVÉ pour que la pointe de la flèche dépasse après le
+                          dernier bouton (10) plutôt que de se dessiner sous lui */
+}
+
+/* Ligne + flèche : var(--color-border) (gris foncé fixe #3c3e40, non
+   thémé — même jeton que la bordure des boutons) plutôt que
+   var(--color-rail-piste), qui vaut du blanc translucide hors thème clair
+   et serait donc invisible sur le nouveau fond blanc du rail (univers/ et
+   steps F-I du scrolly). Cohérent avec l'exception de thème du rail. */
+.groupe-etapes.avec-ligne-temps::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 16px; /* s'arrête au bord du dernier bouton, avant la zone réservée à la flèche */
+  height: 5px; /* ligne élargie — était 2px */
+  background: var(--color-border);
+  transform: translateY(-50%);
+  z-index: 0;
+}
+
+.groupe-etapes.avec-ligne-temps::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent; /* était 5px, agrandie avec la ligne */
+  border-bottom: 8px solid transparent;
+  border-left: 14px solid var(--color-border); /* était 9px */
+  transform: translateY(-50%);
+  z-index: 0;
+}
+
+.groupe-etapes .etape-bouton {
+  z-index: 1; /* toujours au-dessus de la ligne décorative */
 }

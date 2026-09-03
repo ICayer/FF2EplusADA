@@ -30,48 +30,80 @@ const DUREE_BULLE_MS = 1400;
 export function construireRailParcours(container, { pageCourante, onClicEtape, onSurvolEtape } = {}) {
   container.innerHTML = "";
 
-  obtenirParcours().forEach((etape, index) => {
-    const bouton = document.createElement("button");
-    bouton.type = "button";
-    bouton.className = "etape-bouton";
-    bouton.dataset.etapeId = etape.id;
-    // Libellé temporaire : l'id brut, tant qu'on n'a pas de vrai titre
-    // pour les 12 étapes (pas juste les 9 du scrolly).
-    bouton.setAttribute("aria-label", etape.id);
+  const etapes = obtenirParcours();
+  let indexGlobal = 0;
+  let i = 0;
 
-    if (etape.page === pageCourante) bouton.classList.add("page-actuelle");
-
-    const numero = document.createElement("span");
-    numero.className = "numero";
-    numero.textContent = String(index + 1);
-    bouton.appendChild(numero);
-
-    // Vérifie estDeverrouille(etape.id) EN DIRECT à chaque clic plutôt que
-    // de se fier à une variable capturée à la construction — sinon un
-    // déblocage survenu après la construction du rail ne serait jamais
-    // pris en compte tant que le bouton n'a pas explicitement été
-    // reconstruit.
-    bouton.addEventListener("click", () => {
-      if (!estDeverrouille(etape.id)) {
-        afficherBulleVerrouillee(bouton);
-        return;
-      }
-      if (onClicEtape) onClicEtape(etape);
-    });
-
-    if (onSurvolEtape) {
-      const entrer = () => onSurvolEtape(etape);
-      const sortir = () => onSurvolEtape(null);
-      bouton.addEventListener("mouseenter", entrer);
-      bouton.addEventListener("focus", entrer);
-      bouton.addEventListener("mouseleave", sortir);
-      bouton.addEventListener("blur", sortir);
+  // Regroupe les étapes consécutives qui partagent la même "page" — générique,
+  // ne présume jamais un nombre fixe d'étapes par groupe. Si une autre page
+  // héberge un jour plusieurs étapes, elle sera groupée et lignée pareil,
+  // sans toucher à ce fichier.
+  while (i < etapes.length) {
+    const page = etapes[i].page;
+    const groupe = [];
+    while (i < etapes.length && etapes[i].page === page) {
+      groupe.push(etapes[i]);
+      i++;
     }
 
-    container.appendChild(bouton);
-  });
+    const groupeEl = document.createElement("div");
+    groupeEl.className = "groupe-etapes";
+    if (groupe.length > 1) groupeEl.classList.add("avec-ligne-temps");
+
+    groupe.forEach((etape) => {
+      const bouton = construireBouton(etape, indexGlobal, { pageCourante, onClicEtape, onSurvolEtape });
+      groupeEl.appendChild(bouton);
+      indexGlobal++;
+    });
+
+    container.appendChild(groupeEl);
+  }
 
   rafraichirVerrous();
+}
+
+// Extrait de l'ancienne boucle forEach — construction d'un seul bouton,
+// inchangée dans son comportement, juste isolée pour être appelée par
+// groupe plutôt que directement sur tout le parcours.
+function construireBouton(etape, index, { pageCourante, onClicEtape, onSurvolEtape }) {
+  const bouton = document.createElement("button");
+  bouton.type = "button";
+  bouton.className = "etape-bouton";
+  bouton.dataset.etapeId = etape.id;
+  // Libellé temporaire : l'id brut, tant qu'on n'a pas de vrai titre
+  // pour les 12 étapes (pas juste les 9 du scrolly).
+  bouton.setAttribute("aria-label", etape.id);
+
+  if (etape.page === pageCourante) bouton.classList.add("page-actuelle");
+
+  const numero = document.createElement("span");
+  numero.className = "numero";
+  numero.textContent = String(index + 1);
+  bouton.appendChild(numero);
+
+  // Vérifie estDeverrouille(etape.id) EN DIRECT à chaque clic plutôt que
+  // de se fier à une variable capturée à la construction — sinon un
+  // déblocage survenu après la construction du rail ne serait jamais
+  // pris en compte tant que le bouton n'a pas explicitement été
+  // reconstruit.
+  bouton.addEventListener("click", () => {
+    if (!estDeverrouille(etape.id)) {
+      afficherBulleVerrouillee(bouton);
+      return;
+    }
+    if (onClicEtape) onClicEtape(etape);
+  });
+
+  if (onSurvolEtape) {
+    const entrer = () => onSurvolEtape(etape);
+    const sortir = () => onSurvolEtape(null);
+    bouton.addEventListener("mouseenter", entrer);
+    bouton.addEventListener("focus", entrer);
+    bouton.addEventListener("mouseleave", sortir);
+    bouton.addEventListener("blur", sortir);
+  }
+
+  return bouton;
 }
 
 // Retire "actif" de tous les boutons du rail et l'ajoute à celui dont
