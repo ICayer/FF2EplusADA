@@ -11,7 +11,8 @@
     "phraseProgressive": { "fr": "Femmes, filles et\npersonnes bispirituelles\nautochtones", "en": "Women, girls, and\nTwo-Spirit people,\nIndigenous" }
   },
   "lien-valeurs": {
-    "nomStep": { "fr": "Lié·es à leurs valeurs", "en": "Connected to their values" }
+    "nomStep": { "fr": "Lié·es à leurs valeurs", "en": "Connected to their values" },
+    "motPermanent": { "innuAimun": "Ishpenitamun", "fr": "Respect", "en": "Respect", "audio": "respect.mp3" }
   },
   "rupture-coloniale": {
     "nomStep": { "fr": "Déconnexion du territoire", "en": "Disconnection from the land" },

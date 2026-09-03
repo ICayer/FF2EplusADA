@@ -147,51 +147,54 @@ function definirPhrase(texte, alignement) {
   el.textContent = texte;
   el.classList.remove("aligne-gauche", "aligne-centre");
   el.classList.add(alignement === "centre" ? "aligne-centre" : "aligne-gauche");
-  positionnerPhraseRelativeSpirale();
-}
-
-// Mesure la position RÉELLE de #spirale à l'écran (Playbook §3.3) plutôt
-// que de présumer sa position depuis le viewBox — la phrase doit rester
-// ancrée visuellement à la spirale peu importe la taille d'écran.
-function positionnerPhraseRelativeSpirale() {
-  const spiraleEl = container?.querySelector("#spirale");
-  const graphicEl = document.getElementById("graphic");
-  const phraseEl = document.getElementById("phrase-progressive");
-  if (!spiraleEl || !graphicEl || !phraseEl) return;
-
-  const rectSpirale = spiraleEl.getBoundingClientRect();
-  const rectGraphic = graphicEl.getBoundingClientRect();
-  const centreX = rectSpirale.left + rectSpirale.width / 2 - rectGraphic.left;
-  const centreY = rectSpirale.top + rectSpirale.height / 2 - rectGraphic.top;
-
-  if (phraseEl.classList.contains("aligne-gauche")) {
-    phraseEl.style.left = `${centreX - 200}px`;
-    phraseEl.style.transform = "translateX(-100%)";
-  } else {
-    phraseEl.style.left = `${centreX}px`;
-    phraseEl.style.transform = "translateX(-50%)";
-  }
-  phraseEl.style.top = `${centreY}px`;
+  remplirMotPermanent(); // texte présent avant la mesure de hauteur ci-dessous
+  positionnerElementsRelatifsSpirale();
 }
 
 const PADDING_CARTE_SPIRALE_PX = 50;
+const PADDING_PHRASE_SPIRALE_PX = 50;
 
-// Même patron que positionnerPhraseRelativeSpirale() ci-dessus (Playbook §3.3) —
-// mesure la position RÉELLE de #spirale à l'écran plutôt que de présumer une position
-// fixe par rapport au bord de l'écran.
-function positionnerCarteValeurRelativeSpirale() {
+// Positionne, en une seule passe mesurée (Playbook §3.3), les trois éléments ancrés à
+// la spirale : la phrase de gauche, la carte de valeur au survol et le mot permanent
+// (Ishpenitamun/Respect). Appelée à CHAQUE step qui affiche une phrase (A-E), pas
+// seulement D — carte-valeur/mot-permanent-valeur sont repositionnés à chaque appel
+// même invisibles, pour que la phrase de gauche puisse mesurer leur vrai haut peu
+// importe l'ordre dans lequel les steps ont été visités.
+function positionnerElementsRelatifsSpirale() {
   const spiraleEl = container?.querySelector("#spirale");
   const graphicEl = document.getElementById("graphic");
   const carteEl = document.getElementById("carte-valeur");
-  if (!spiraleEl || !graphicEl || !carteEl) return;
+  const motPermanentEl = document.getElementById("mot-permanent-valeur");
+  const phraseEl = document.getElementById("phrase-progressive");
+  if (!spiraleEl || !graphicEl) return;
 
   const rectSpirale = spiraleEl.getBoundingClientRect();
   const rectGraphic = graphicEl.getBoundingClientRect();
   const centreY = rectSpirale.top + rectSpirale.height / 2 - rectGraphic.top;
-  const gaucheCarte = rectSpirale.right - rectGraphic.left + PADDING_CARTE_SPIRALE_PX;
+  const droiteCarte = rectSpirale.right - rectGraphic.left + PADDING_CARTE_SPIRALE_PX;
 
-  carteEl.style.left = `${gaucheCarte}px`;
-  carteEl.style.top = `${centreY}px`;
+  if (carteEl) { carteEl.style.left = `${droiteCarte}px`; carteEl.style.top = `${centreY}px`; }
+  if (motPermanentEl) { motPermanentEl.style.left = `${droiteCarte}px`; motPermanentEl.style.top = `${centreY}px`; }
+
+  if (!phraseEl) return;
+
+  // Haut RÉEL de "Ishpenitamun" — mesuré même invisible (opacity:0, jamais display:none).
+  // Repli sur centreY seulement si mot-permanent-valeur n'existe pas encore dans le DOM.
+  const ligneAutochtone = motPermanentEl?.querySelector(".carte-valeur-autochtone");
+  const hautCible = ligneAutochtone
+    ? ligneAutochtone.getBoundingClientRect().top - rectGraphic.top
+    : centreY;
+
+  if (phraseEl.classList.contains("aligne-gauche")) {
+    const gaucheSpirale = rectSpirale.left - rectGraphic.left;
+    phraseEl.style.left = `${gaucheSpirale - PADDING_PHRASE_SPIRALE_PX}px`;
+    phraseEl.style.transform = "translateX(-100%)"; // ancré par la droite du bloc de texte
+  } else {
+    const centreX = rectSpirale.left + rectSpirale.width / 2 - rectGraphic.left;
+    phraseEl.style.left = `${centreX}px`;
+    phraseEl.style.transform = "translateX(-50%)";
+  }
+  phraseEl.style.top = `${hautCible}px`;
 }
 
 function animerPerlesEnVague(groupeEl, timeline, positionRelative) {
@@ -272,10 +275,85 @@ function afficherCarteValeur(valeurId) {
   carte.querySelector(".carte-valeur-traduction").textContent = resolve({ fr: valeur.nom.fr, en: valeur.nom.en });
   carte.querySelector(".carte-valeur-definition").textContent = resolve(valeur.definition);
   carte.classList.add("visible");
+  // La carte recouvre le mot permanent tant qu'un cercle est survolé.
+  document.getElementById("mot-permanent-valeur")?.classList.remove("visible");
 }
+
+// "Retour à l'état par défaut" du step D : la carte disparaît, le mot
+// permanent (Ishpenitamun) réapparaît. Appelée au mouseleave d'un cercle
+// ET par hideLienValeurs() en quittant le step — d'où le garde
+// `motPermanentActif` : hideLienValeurs() le met à false juste avant, pour
+// que sortir du step D n'affiche pas le mot par-dessus le step suivant.
+let motPermanentActif = false;
 
 function cacherCarteValeur() {
   document.getElementById("carte-valeur")?.classList.remove("visible");
+  if (motPermanentActif) {
+    document.getElementById("mot-permanent-valeur")?.classList.add("visible");
+  }
+}
+
+// Renseigne le mot permanent depuis steps.json (lien-valeurs.motPermanent) —
+// texte + aria-label, et câblage du bouton haut-parleur une seule fois.
+// Idempotent, sans effet de visibilité : appelée dès qu'une phrase est posée
+// (definirPhrase, donc steps B/C/E) ET au step D, pour que la ligne
+// "Ishpenitamun" ait sa vraie hauteur quand positionnerElementsRelatifsSpirale()
+// la mesure pour aligner la phrase de gauche — même hauteur sur tous les steps.
+function remplirMotPermanent() {
+  const bloc = document.getElementById("mot-permanent-valeur");
+  const mot = stepsData?.["lien-valeurs"]?.motPermanent;
+  if (!bloc || !mot) return;
+
+  bloc.querySelector(".carte-valeur-autochtone").textContent = mot.innuAimun;
+  bloc.querySelector(".carte-valeur-traduction").textContent = resolve({ fr: mot.fr, en: mot.en });
+
+  const bouton = document.getElementById("bouton-audio-respect");
+  if (bouton) {
+    bouton.setAttribute("aria-label", resolve({ fr: `Écouter : ${mot.fr}`, en: `Listen: ${mot.en}` }));
+    if (!bouton.dataset.cable) {
+      bouton.dataset.cable = "1";
+      bouton.addEventListener("click", () => jouerAudioRespect(mot.audio));
+    }
+  }
+}
+
+// Step D : renseigne puis rend visible le mot permanent (Ishpenitamun/Respect).
+function afficherMotPermanent() {
+  remplirMotPermanent();
+  const bloc = document.getElementById("mot-permanent-valeur");
+  if (!bloc || !stepsData?.["lien-valeurs"]?.motPermanent) return;
+  motPermanentActif = true;
+  bloc.classList.add("visible");
+}
+
+// Audio du mot permanent — même patron que valeurs/js/valeursAnimation.js
+// (un seul audio à la fois, aucun plantage si le fichier manque). Le
+// fichier vit avec les audios de la Partie 4 : /valeurs/audio/innu-aimun/.
+let audioRespect = null;
+
+function jouerAudioRespect(nomFichier) {
+  if (!nomFichier) return;
+  const chemin = `/valeurs/audio/innu-aimun/${nomFichier}`;
+
+  if (audioRespect) {
+    audioRespect.pause();
+    audioRespect.currentTime = 0;
+  }
+
+  const bouton = document.getElementById("bouton-audio-respect");
+  const audio = new Audio(chemin);
+  audio.addEventListener("error", () => {
+    console.error(`❌ Impossible de lire l'audio : ${chemin}`);
+    bouton?.classList.remove("lecture-active");
+  });
+  audio.addEventListener("ended", () => bouton?.classList.remove("lecture-active"));
+  audio.play().catch((err) => {
+    console.error("❌ Lecture audio bloquée par le navigateur :", err);
+    bouton?.classList.remove("lecture-active");
+  });
+
+  bouton?.classList.add("lecture-active");
+  audioRespect = audio;
 }
 
 // Cache tout le conteneur avant-colonisation d'un coup — à appeler UNE
@@ -406,7 +484,11 @@ export async function showLienValeurs() {
 
   const cercles = construireCerclesValeurs();
   if (!cercles) return;
-  positionnerCarteValeurRelativeSpirale();
+  // Remplir le mot permanent AVANT de positionner : positionnerElementsRelatifsSpirale()
+  // mesure le haut réel de sa ligne "Ishpenitamun" pour aligner la phrase de gauche —
+  // mesure faussée si le texte n'est pas encore posé.
+  afficherMotPermanent();
+  positionnerElementsRelatifsSpirale();
 
   // Contrairement à A/B/C, D bascule vraiment à chaque entrée/sortie —
   // pas de garde "déjà révélé" ici, c'est voulu.
@@ -416,7 +498,12 @@ export async function showLienValeurs() {
 
 export function hideLienValeurs() {
   if (groupeCercles) gsap.set(groupeCercles.children, { opacity: 0 });
+  // On quitte le step D : le mot permanent ne doit PAS rester affiché
+  // par-dessus le step suivant. motPermanentActif à false d'abord, pour
+  // que cacherCarteValeur() ne le réaffiche pas.
+  motPermanentActif = false;
   cacherCarteValeur();
+  document.getElementById("mot-permanent-valeur")?.classList.remove("visible");
 }
 
 // --- E — Rupture coloniale ---

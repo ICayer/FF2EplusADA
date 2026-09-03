@@ -317,7 +317,7 @@
    motrice) --- */
 .carte-valeur {
   position: absolute;
-  /* top/left fixés dynamiquement par positionnerCarteValeurRelativeSpirale() —
+  /* top/left fixés dynamiquement par positionnerElementsRelatifsSpirale() —
      plus de right/top codés en dur, la carte suit la position réelle de la spirale */
   transform: translateY(-50%);
   max-width: 260px;
@@ -353,4 +353,72 @@
 .carte-valeur-definition {
   font-size: calc(13px * var(--echelle-texte));
   line-height: 1.4;
+}
+
+/* --- Mot permanent du step D (Ishpenitamun / Respect) — même ancrage que
+   .carte-valeur (top/left posés dynamiquement par
+   positionnerElementsRelatifsSpirale()), affiché tant qu'aucun cercle de
+   valeur n'est survolé. Pas de couleur de valeur ici : neutre, jetons de
+   thème seulement. --- */
+.mot-permanent-valeur {
+  position: absolute;
+  /* top/left fixés dynamiquement (voir avantColonisation.js) */
+  transform: translateY(-50%);
+  max-width: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  color: var(--color-scene-texte);
+  z-index: 1600; /* > 1500 (conteneur de loadSVG) — sans ça, le bouton
+                    haut-parleur est peint sous le SVG et ne reçoit pas les
+                    clics. Convention Playbook §3.4, même valeur que .titre-scene. */
+}
+
+.mot-permanent-valeur.visible {
+  opacity: 1;
+}
+
+/* Bouton haut-parleur — cercle noir plein, icône blanche (Material
+   "volume_up", dessinée dans le SVG inline, fill="#fff"). Aucune couleur de
+   valeur : gris/noir fixes, seul élément interactif du bloc donc
+   pointer-events réactivé ici. Même intention que le bouton audio de la
+   Partie 4 (valeurs/js/valeursAnimation.js). */
+.bouton-audio-respect {
+  margin-top: 4px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #1a1a1a;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  transition: transform 0.15s ease, background-color 0.2s ease;
+}
+
+.bouton-audio-respect:hover {
+  transform: scale(1.1);
+}
+
+.bouton-audio-respect:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.bouton-audio-respect.lecture-active {
+  background: #000;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mot-permanent-valeur,
+  .bouton-audio-respect {
+    transition: none;
+  }
 }
