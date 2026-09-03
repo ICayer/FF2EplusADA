@@ -317,16 +317,19 @@
    motrice) --- */
 .carte-valeur {
   position: absolute;
-  top: 50%;
-  right: 40px;
+  /* top/left fixés dynamiquement par positionnerCarteValeurRelativeSpirale() —
+     plus de right/top codés en dur, la carte suit la position réelle de la spirale */
   transform: translateY(-50%);
   max-width: 260px;
-  background: var(--color-controle-bg);
-  border: 1px solid var(--color-border);
+  /* Couleur du cercle survolé (--couleur-valeur-active, posée par
+     afficherCarteValeur() dans avantColonisation.js) — repli sur les jetons neutres
+     existants tant qu'aucun cercle n'a encore été survolé. */
+  background: color-mix(in srgb, var(--couleur-valeur-active, var(--color-controle-bg)) 70%, transparent);
+  border: 1px solid var(--couleur-valeur-active, var(--color-border));
   border-radius: 8px;
   padding: 16px 20px;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, background-color 0.2s ease, border-color 0.2s ease;
   pointer-events: none;
   color: var(--color-scene-texte);
 }

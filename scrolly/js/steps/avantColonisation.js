@@ -174,6 +174,26 @@ function positionnerPhraseRelativeSpirale() {
   phraseEl.style.top = `${centreY}px`;
 }
 
+const PADDING_CARTE_SPIRALE_PX = 50;
+
+// Même patron que positionnerPhraseRelativeSpirale() ci-dessus (Playbook §3.3) —
+// mesure la position RÉELLE de #spirale à l'écran plutôt que de présumer une position
+// fixe par rapport au bord de l'écran.
+function positionnerCarteValeurRelativeSpirale() {
+  const spiraleEl = container?.querySelector("#spirale");
+  const graphicEl = document.getElementById("graphic");
+  const carteEl = document.getElementById("carte-valeur");
+  if (!spiraleEl || !graphicEl || !carteEl) return;
+
+  const rectSpirale = spiraleEl.getBoundingClientRect();
+  const rectGraphic = graphicEl.getBoundingClientRect();
+  const centreY = rectSpirale.top + rectSpirale.height / 2 - rectGraphic.top;
+  const gaucheCarte = rectSpirale.right - rectGraphic.left + PADDING_CARTE_SPIRALE_PX;
+
+  carteEl.style.left = `${gaucheCarte}px`;
+  carteEl.style.top = `${centreY}px`;
+}
+
 function animerPerlesEnVague(groupeEl, timeline, positionRelative) {
   if (!groupeEl) return;
   const paths = Array.from(groupeEl.querySelectorAll("path"))
@@ -191,7 +211,15 @@ function construireCerclesValeurs() {
   // Même document SVG que #spirale (contrairement à step11.js, qui
   // réconciliait deux documents séparés) — coordonnées natives directes.
   const bbox = spiraleEl.getBBox();
-  const centre = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+  // Décalage manuel : le centre géométrique de la bbox n'est pas exactement le centre
+  // VISUEL du dessin (le coup de pinceau n'est pas parfaitement symétrique) — unités du
+  // viewBox de scrolly.svg, pas des pixels écran. Isabel ajustera à l'œil.
+  const DECALAGE_X = -6;
+  const DECALAGE_Y = -6;
+  const centre = {
+    x: bbox.x + bbox.width / 2 + DECALAGE_X,
+    y: bbox.y + bbox.height / 2 + DECALAGE_Y,
+  };
   const rayon = Math.min(bbox.width, bbox.height) * 0.4; // placeholder, à ajuster à l'œil
   const rayonCercle = rayon * 0.08; // placeholder, à ajuster à l'œil
 
@@ -225,6 +253,10 @@ function afficherCarteValeur(valeurId) {
   const valeur = valeurs.find((v) => v.id === valeurId);
   const carte = document.getElementById("carte-valeur");
   if (!valeur || !carte) return;
+
+  // Couleur du cercle survolé, lue par le CSS via cette variable (stroke plein,
+  // fill à 70% d'opacité via color-mix() — voir timeline.css).
+  carte.style.setProperty("--couleur-valeur-active", valeur.couleur);
 
   // Ligne 1 : le mot dans la langue autochtone active si valeur.nom la
   // contient (ex. "inuktitut" un jour), sinon repli sur innu-aimun. On
@@ -374,6 +406,7 @@ export async function showLienValeurs() {
 
   const cercles = construireCerclesValeurs();
   if (!cercles) return;
+  positionnerCarteValeurRelativeSpirale();
 
   // Contrairement à A/B/C, D bascule vraiment à chaque entrée/sortie —
   // pas de garde "déjà révélé" ici, c'est voulu.
