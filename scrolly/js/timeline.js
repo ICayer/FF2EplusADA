@@ -17,7 +17,7 @@ let order = [];
 let currentIndex = -1;
 
 export async function initTimeline() {
-  order = await fetch("/scrolly/data/stepsOrder.json").then(r => r.json());
+  order = await fetch(new URL("../data/stepsOrder.json", import.meta.url)).then(r => r.json());
 }
 
 export function getOrder() {

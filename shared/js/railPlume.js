@@ -23,7 +23,7 @@
 
 import { reduitMouvement } from "./navigationEtat.js";
 
-const CHEMIN_PLUME = "/shared/svg/timeline/plume.svg";
+const CHEMIN_PLUME = new URL("../svg/timeline/plume.svg", import.meta.url).href;
 const DUREE_DEPLACEMENT_S = 0.25;
 
 let railEl = null;

@@ -127,7 +127,7 @@ async function assurerContainer() {
 // — pas de nation favorisée (script technique : le collier change à chaque
 // exploration). Mélange approximatif (tri par Math.random) suffisant ici.
 async function chargerCouleursNations() {
-  const nations = await fetch("/univers/data/nations.json").then((r) => r.json());
+  const nations = await fetch(new URL("../../univers/data/nations.json", import.meta.url)).then((r) => r.json());
   return [...nations]
     .sort(() => Math.random() - 0.5)
     .slice(0, 5)
@@ -145,7 +145,7 @@ function appliquerCouleursPerles(c, couleurs) {
 let valeurs = [];
 async function chargerValeurs() {
   if (valeurs.length === 0) {
-    valeurs = await fetch("/shared/data/valeurs.json").then((r) => r.json());
+    valeurs = await fetch(new URL("../../shared/data/valeurs.json", import.meta.url)).then((r) => r.json());
   }
   return valeurs;
 }
@@ -157,7 +157,7 @@ function cheminAudioValeur(valeur, langue) {
   const langueDisponible = valeur.audio && valeur.audio[langue] ? langue : "innu-aimun";
   const nomFichier = valeur.audio && valeur.audio[langueDisponible];
   if (!nomFichier) return null;
-  return `/valeurs/audio/${langueDisponible}/${nomFichier}`;
+  return new URL(`../audio/${langueDisponible}/${nomFichier}`, import.meta.url).href;
 }
 
 // Joue l'audio d'une valeur — un seul à la fois (une nouvelle lecture

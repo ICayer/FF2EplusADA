@@ -39,7 +39,7 @@ function sauvegarderEtat() {
 // À appeler une seule fois au démarrage de chaque partie, avant tout
 // autre appel de ce module.
 export async function initProgression() {
-  const res = await fetch("/shared/data/parcours.json");
+  const res = await fetch(new URL("../data/parcours.json", import.meta.url));
   parcours = await res.json();
 
   const sauvegarde = chargerEtatSauvegarde();

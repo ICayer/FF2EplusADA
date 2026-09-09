@@ -18,7 +18,7 @@ let uiDictionary = {};
 
 // À appeler une seule fois au démarrage de chaque partie (Partie 1, 2, 3)
 export async function initI18n(defaultLang = 'fr') {
-  const res = await fetch('/shared/data/fallbackByLanguage.json');
+  const res = await fetch(new URL('../data/fallbackByLanguage.json', import.meta.url));
   fallbackMap = await res.json();
   await setLanguage(defaultLang);
 }
@@ -35,7 +35,7 @@ export async function setLanguage(lang) {
 // chrome d'interface.
 async function chargerDictionnaireInterface(lang) {
   try {
-    const res = await fetch(`/shared/data/i18n/${lang}.json`);
+    const res = await fetch(new URL(`../data/i18n/${lang}.json`, import.meta.url));
     if (!res.ok) throw new Error("dictionnaire introuvable");
     return await res.json();
   } catch {

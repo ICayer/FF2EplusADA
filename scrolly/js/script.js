@@ -35,7 +35,7 @@ async function init() {
   await initTimeline();
   await initProgression();
 
-  const steps = await fetch("/scrolly/data/steps.json").then(r => r.json());
+  const steps = await fetch(new URL("../data/steps.json", import.meta.url)).then(r => r.json());
 
   const railEl = document.getElementById("rail");
   const titreEl = document.getElementById("titre-scene");

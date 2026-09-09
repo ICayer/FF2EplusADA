@@ -75,7 +75,7 @@ let groupeCercles = null;
 // timeline). chargerStepsData() n'attend alors qu'une promesse résolue
 // (microtâche) — n'élargit pas la fenêtre de course GSAP (§3.1).
 let stepsData = null;
-const stepsDataPromise = fetch("/scrolly/data/steps.json")
+const stepsDataPromise = fetch(new URL("../../data/steps.json", import.meta.url))
   .then((r) => r.json())
   .catch((err) => {
     console.error("❌ Impossible de charger scrolly/data/steps.json", err);
@@ -137,7 +137,7 @@ async function assurerContainer() {
 
 async function chargerValeurs() {
   if (valeurs.length === 0) {
-    valeurs = await fetch("/shared/data/valeurs.json").then((r) => r.json());
+    valeurs = await fetch(new URL("../../../shared/data/valeurs.json", import.meta.url)).then((r) => r.json());
   }
 }
 
@@ -333,7 +333,7 @@ let audioRespect = null;
 
 function jouerAudioRespect(nomFichier) {
   if (!nomFichier) return;
-  const chemin = `/valeurs/audio/innu-aimun/${nomFichier}`;
+  const chemin = new URL(`../../../valeurs/audio/innu-aimun/${nomFichier}`, import.meta.url).href;
 
   if (audioRespect) {
     audioRespect.pause();
