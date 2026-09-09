@@ -23,11 +23,16 @@
   padding-top: 10vh;
 }
 
-.landing-spirale-swirl {
+.landing-spirale-conteneur {
   width: min(90vw, 700px);
-  height: auto;
   position: sticky;
   top: 15vh;
+}
+
+.landing-spirale-swirl {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .landing-spirale-swirl .swirl {
@@ -38,8 +43,10 @@
   .spirale-swirl-section {
     min-height: auto; /* pas de zone de scroll dédiée si l'animation est désactivée */
   }
-  .landing-spirale-swirl {
-    position: static;
+  .landing-spirale-conteneur {
+    position: relative; /* pas static — .lien-decouvrir-recit (absolute) a quand même
+                            besoin d'un ancrage, juste sans l'effet de fixation au scroll */
+    top: auto;
   }
   .landing-spirale-swirl .swirl {
     opacity: 1; /* tout visible d'emblée, pas de révélation progressive */

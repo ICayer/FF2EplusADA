@@ -42,7 +42,7 @@ function rendre() {
   intro.innerHTML = "";
   intro.appendChild(creerParagraphes(resolve(data.intro)));
 
-  document.querySelector(".entry-btn").textContent = resolve(data.boutonEntree);
+  document.querySelector(".lien-decouvrir-recit-texte").textContent = resolve(data.boutonEntree);
 
   document.querySelector(".thanks-section h3").textContent = resolve(data.remerciementsTitre);
 

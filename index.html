@@ -27,11 +27,8 @@
       <p>[Texte d'introduction à venir de Déline — présentation du projet, du contexte de commémoration FFADA2S]</p>
     </section>
 
-    <section class="entry-buttons">
-      <a href="scrolly/index.html" class="entry-btn">Découvrir le récit</a>
-    </section>
-
     <section class="spirale-swirl-section">
+      <div class="landing-spirale-conteneur">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1000 1000" class="landing-spirale-swirl">
         <g id="spirale">
           <image id="spirale1" width="1800" height="1653" transform="translate(1078.421 1089) rotate(-180) scale(.6491)" xlink:href="valeurs/svg/spirale.webp"/>
@@ -66,6 +63,15 @@
           </g>
         </g>
       </svg>
+        <a href="scrolly/index.html" id="lien-decouvrir-recit" class="lien-decouvrir-recit">
+          <span class="lien-decouvrir-recit-texte">Découvrir le récit</span>
+          <span class="lien-decouvrir-recit-bouton" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" focusable="false">
+              <path d="M9 6l6 6-6 6" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </a>
+      </div>
     </section>
 
     <section class="thanks-section">
@@ -110,11 +116,13 @@
     import { initHeaderControls } from "./shared/js/headerControls.js";
     import { initLandingScroll } from "./assets/js/landingScroll.js";
     import { initLandingContent } from "./assets/js/landingContent.js";
+    import { initLandingLienRecit } from "./assets/js/landingLienRecit.js";
 
     await initI18n(langueSauvegardee() || 'fr');
     initHeaderControls(document.getElementById("entete-controles"));
     await initLandingContent();
     initLandingScroll();
+    initLandingLienRecit();
   </script>
 </body>
 </html>
