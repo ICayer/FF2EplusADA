@@ -12,9 +12,9 @@
    indépendant du thème clair/sombre de la scène qu'il chevauche
    (3 septembre 2026) ; la ligne du temps décorative utilise donc
    --color-border (gris fixe) plutôt que --color-rail-piste (translucide,
-   invisible sur blanc hors thème clair). Placeholder visuel des pastilles :
-   /shared/svg/spirale.webp (chemin ABSOLU — ce composant sert des pages à
-   des profondeurs de dossier différentes).
+   invisible sur blanc hors thème clair). Fill des pastilles dérivé du champ
+   epoque de parcours.json (avant/rupture → blanc, apres → noir) via
+   [data-epoque], jamais d'une position de bouton codée en dur.
    Dépend de : shared/css/variables.css
    Utilisé par : scrolly/index.html (univers/, valeurs/, landing à venir)
 
@@ -27,7 +27,7 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 14px 24px 56px; /* bas élargi pour la plume — Isabel ajustera à l'œil */
+  padding: 10px 24px 24px; /* bas élargi pour la plume — Isabel ajustera à l'œil */
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -44,7 +44,8 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 10px; /* ancien espacement du rail au complet, maintenant intra-groupe seulement */
+  gap: 20px; /* était 10px — plus de respiration pour mieux voir la ligne du temps
+                entre les pastilles (demande #1) — Isabel ajustera à l'œil */
 }
 
 .etape-bouton {
@@ -53,14 +54,23 @@
   height: 52px;
   border-radius: 50%;
   border: 2px solid var(--color-border);
-  /* Placeholder — vraies illustrations de Déline à venir. Chemin absolu
-     défini ici une seule fois plutôt qu'en style inline par bouton. */
-  background-image: url("/shared/svg/spirale.webp");
-  background-size: cover;
-  background-position: center;
+  /* Image de spirale placeholder retirée (demande #3) — le fill vient
+     maintenant de [data-epoque], voir règles ci-dessous. */
   cursor: pointer;
   flex-shrink: 0;
   transition: transform 0.15s ease, filter 0.2s ease, opacity 0.2s ease;
+}
+
+/* Fill par époque narrative (champ epoque de parcours.json) — jamais par
+   position ou numéro de bouton. Les étapes sans epoque (accueil, univers,
+   valeurs) n'ont pas de fill explicite : cercle bordé sur fond de rail. */
+.etape-bouton[data-epoque="avant"],
+.etape-bouton[data-epoque="rupture"] {
+  background-color: #fff;
+}
+
+.etape-bouton[data-epoque="apres"] {
+  background-color: #000;
 }
 
 .etape-bouton:hover,
@@ -98,20 +108,30 @@
   border-width: 3px;
 }
 
+/* Ancre invisible pour le curseur plume (railPlume.js) — plus aucun style visuel,
+   juste un point de repère au même endroit qu'avant (demande du 4 septembre). */
 .numero {
   position: absolute;
   top: 2px;
   left: 2px;
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 50%;
   width: 18px;
   height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: bold;
-  color: #222;
+}
+
+.icone-accueil {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%; /* occupe 60% de la surface du bouton — demande A. Isabel : si tu voulais
+                 60% de l'AIRE plutôt que du diamètre, vise plutôt ~77% ici */
+  height: 60%;
+  pointer-events: none;
+}
+
+.icone-accueil svg {
+  width: 100%;
+  height: 100%;
 }
 
 .bulle-verrouillee {
@@ -155,8 +175,8 @@
    de trait de rupture (décision du 3 septembre, Registre). */
 .groupe-etapes.avec-ligne-temps {
   margin: 0 56px; /* grand espace de chaque côté du groupe scrolly — Isabel ajustera à l'œil */
-  padding-right: 16px; /* espace RÉSERVÉ pour que la pointe de la flèche dépasse après le
-                          dernier bouton (10) plutôt que de se dessiner sous lui */
+  padding-right: 32px; /* était 16px — flèche moins accotée au dernier bouton (demande #2) ;
+                          espace RÉSERVÉ pour que la pointe dépasse après le bouton 10 */
 }
 
 /* Ligne + flèche : var(--color-border) (gris foncé fixe #3c3e40, non
@@ -169,7 +189,8 @@
   position: absolute;
   top: 50%;
   left: 0;
-  right: 16px; /* s'arrête au bord du dernier bouton, avant la zone réservée à la flèche */
+  right: 18px; /* était 32px — étirée jusqu'à toucher la base de la flèche
+                  (border-left: 18px de ::after), plus de vide entre la ligne et la pointe */
   height: 5px; /* ligne élargie — était 2px */
   background: var(--color-border);
   transform: translateY(-50%);
@@ -183,13 +204,51 @@
   right: 0;
   width: 0;
   height: 0;
-  border-top: 8px solid transparent; /* était 5px, agrandie avec la ligne */
-  border-bottom: 8px solid transparent;
-  border-left: 14px solid var(--color-border); /* était 9px */
+  border-top: 10px solid transparent; /* était 8px — flèche agrandie (demande #2) */
+  border-bottom: 10px solid transparent;
+  border-left: 18px solid var(--color-border); /* était 14px */
   transform: translateY(-50%);
   z-index: 0;
 }
 
 .groupe-etapes .etape-bouton {
-  z-index: 1; /* toujours au-dessus de la ligne décorative */
+  z-index: 1; /* toujours au-dessus de la ligne décorative ET du diviseur de rupture */
+}
+
+/* Diviseur de rupture (stripe2 + "Colonisation") — construireDiviseurRupture()
+   dans railParcours.js, inséré comme item flex entre le bouton 6 (rupture) et le
+   7 (après). z-index: 0 → même plan que la ligne décorative (::before/::after),
+   donc SOUS les boutons (z:1) et SOUS la plume (.curseur-plume, z:2). À vérifier
+   visuellement (demande #6) que la plume passe bien PAR-DESSUS ce diviseur
+   quand elle est ancrée sur le bouton 6 ou 7. */
+.diviseur-rupture {
+  position: relative; /* nécessaire pour ancrer l'étiquette en absolu ci-dessous */
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  z-index: 0;
+  margin-top: 12px;
+}
+
+.diviseur-rupture-stripe {
+  width: 24px; /* placeholder — Isabel ajustera à l'œil. Plus de rotation : rupture.svg
+                  est déjà dessinée verticale (viewBox 100×300). */
+  height: auto;
+}
+
+.diviseur-rupture-etiquette {
+  /* Agoradp_15 (chargée partout via variables.css) plutôt que var(--font-title) :
+     --font-title = 'Zilla Slab' n'est chargée que sur index.html et univers/, donc
+     retomberait sur un serif générique sur scrolly/ et valeurs/. Agoradp_15 est
+     aussi la police des légendes d'orientation "Colonisation/Mémoire/Aujourd'hui"
+     de la timeline (Registre 26 août). — Isabel : à revoir si tu préfères Zilla. */
+  position: absolute;
+  top: 100%; /* juste sous la bande rupture.svg, ne compte plus dans la hauteur du parent */
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 4px;
+  font-family: "Agoradp_15", sans-serif;
+  color: var(--color-primary);
+  font-size: calc(0.8rem * var(--echelle-texte));
+  white-space: nowrap;
 }

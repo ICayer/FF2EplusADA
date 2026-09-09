@@ -61,7 +61,7 @@ function assurerCalquesAvant(jusquExclu) {
       if (groupePerles) gsap.set(groupePerles.querySelectorAll("path"), { opacity: 1 });
     }
     revele.territoire = true;
-    definirPhrase(phraseProgressive("lien-territoire"), "gauche");
+    definirPhraseParStep("lien-territoire", "gauche");
   }
 }
 
@@ -150,6 +150,29 @@ function definirPhrase(texte, alignement) {
   remplirMotPermanent(); // texte présent avant la mesure de hauteur ci-dessous
   positionnerElementsRelatifsSpirale();
 }
+
+let dernierStepIdPhrase = null;
+let dernierAlignementPhrase = null;
+
+// Enveloppe definirPhrase(phraseProgressive(stepId), alignement) — mémorise stepId
+// pour pouvoir retraduire sur languagechange sans rejouer le show() du step (bloqué
+// par le garde goToStep sur re-navigation vers le même index, S5B2T2).
+function definirPhraseParStep(stepId, alignement) {
+  dernierStepIdPhrase = stepId;
+  dernierAlignementPhrase = alignement;
+  definirPhrase(phraseProgressive(stepId), alignement);
+}
+
+window.addEventListener("languagechange", () => {
+  if (!dernierStepIdPhrase) return;
+  // Ne retraduire QUE si la phrase est effectivement à l'écran : sur un step F-I,
+  // timelineRail.js (allerAuStep, epoque "apres") a retiré aligne-gauche/-centre
+  // pour la masquer — sans ce garde, definirPhrase() les rajouterait et ferait
+  // réapparaître une phrase périmée par-dessus la scène « après ».
+  const el = document.getElementById("phrase-progressive");
+  if (!el || (!el.classList.contains("aligne-gauche") && !el.classList.contains("aligne-centre"))) return;
+  definirPhrase(phraseProgressive(dernierStepIdPhrase), dernierAlignementPhrase);
+});
 
 const PADDING_CARTE_SPIRALE_PX = 50;
 const PADDING_PHRASE_SPIRALE_PX = 50;
@@ -435,10 +458,10 @@ export async function showLienCommunaute() {
       duration: 1.5,
       onComplete: () => { revele.communaute = true; },
     }, "+=3");
-    timelineActuelle.call(() => definirPhrase(phraseProgressive("lien-communaute"), "gauche"), null, "<");
+    timelineActuelle.call(() => definirPhraseParStep("lien-communaute", "gauche"), null, "<");
   } else {
     // Remet la phrase au bon état si on revient sur B depuis un step plus avancé.
-    definirPhrase(phraseProgressive("lien-communaute"), "gauche");
+    definirPhraseParStep("lien-communaute", "gauche");
   }
 }
 
@@ -458,7 +481,7 @@ export async function showLienTerritoire() {
 
   if (!revele.territoire) {
     timelineActuelle.to(territoireEl, { opacity: 1, duration: 1.5 }, "+=3");
-    timelineActuelle.call(() => definirPhrase(phraseProgressive("lien-territoire"), "gauche"), null, "<");
+    timelineActuelle.call(() => definirPhraseParStep("lien-territoire", "gauche"), null, "<");
     for (let i = 1; i <= 5; i++) {
       animerPerlesEnVague(c.querySelector(`#perles${i}`), timelineActuelle, "+=2");
     }
@@ -466,7 +489,7 @@ export async function showLienTerritoire() {
     // moment de la planifier — même précaution que showNuitDesTemps().
     timelineActuelle.call(() => { revele.territoire = true; });
   } else {
-    definirPhrase(phraseProgressive("lien-territoire"), "gauche");
+    definirPhraseParStep("lien-territoire", "gauche");
   }
 }
 
@@ -515,7 +538,7 @@ export async function showRuptureColoniale() {
   await chargerStepsData();
   assurerCalquesAvant("barres");
 
-  definirPhrase(phraseProgressive("rupture-coloniale"), "gauche");
+  definirPhraseParStep("rupture-coloniale", "gauche");
 
   const barres = [1, 2, 3, 4, 5].map((i) => c.querySelector(`#barre${i}`));
   const sousTitre = document.getElementById("sous-titre-rupture");
@@ -564,5 +587,5 @@ export function hideRuptureColoniale() {
   // refléter C (le dernier step qui l'a définie), pas rester à la version
   // complète de E. Lecture synchrone de stepsData : on vient forcément de
   // E, donc showRuptureColoniale() l'a déjà chargé.
-  definirPhrase(phraseProgressive("lien-territoire"), "gauche");
+  definirPhraseParStep("lien-territoire", "gauche");
 }

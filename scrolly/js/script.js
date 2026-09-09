@@ -83,7 +83,7 @@ async function init() {
   // et déclenche afficherTexte à chaque clic/bouton via ce même pont.
   window.__scrollyAllerEtAfficher = allerEtAfficher;
 
-  construireRailParcours(document.getElementById("rail-parcours"), {
+  await construireRailParcours(document.getElementById("rail-parcours"), {
     pageCourante: PAGE_COURANTE,
     onClicEtape: (etape) => {
       if (etape.page !== PAGE_COURANTE) {

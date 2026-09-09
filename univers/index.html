@@ -37,7 +37,7 @@
     initHeaderControls(document.getElementById("entete-controles"));
 
     await initProgression();
-    construireRailParcours(document.getElementById("rail-parcours"), {
+    await construireRailParcours(document.getElementById("rail-parcours"), {
       pageCourante: "univers/index.html",
       onClicEtape: (etape) => {
         if (etape.page === "univers/index.html") return; // déjà ici

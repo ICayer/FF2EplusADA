@@ -8,7 +8,8 @@
 // logique propre à scrolly/, univers/ ou valeurs/. Reçoit des callbacks
 // de l'appelant (onClicEtape, onSurvolEtape) et se contente de les
 // invoquer.
-// Dépend de : shared/js/progression.js, /shared/svg/spirale.webp (via CSS)
+// Dépend de : shared/js/progression.js, shared/js/i18n.js (t — étiquette du
+//   diviseur), shared/svg/rupture.svg (fetch — bande du point de rupture)
 // Utilisé par : scrolly/js/script.js (univers/, valeurs/, landing à venir)
 //
 // FF2EplusADA (scrollyFFADA2S v2)
@@ -16,6 +17,7 @@
 // ==================================================
 
 import { obtenirParcours, estDeverrouille } from "./progression.js";
+import { t } from "./i18n.js";
 
 const DUREE_BULLE_MS = 1400;
 
@@ -27,11 +29,10 @@ const DUREE_BULLE_MS = 1400;
 //                   déverrouillée, avec l'objet complet de parcours.json.
 //   onSurvolEtape : (etape|null) => void — appelé à l'entrée (etape) et
 //                   à la sortie (null) du survol/focus, verrouillé ou non.
-export function construireRailParcours(container, { pageCourante, onClicEtape, onSurvolEtape } = {}) {
+export async function construireRailParcours(container, { pageCourante, onClicEtape, onSurvolEtape } = {}) {
   container.innerHTML = "";
 
   const etapes = obtenirParcours();
-  let indexGlobal = 0;
   let i = 0;
 
   // Regroupe les étapes consécutives qui partagent la même "page" — générique,
@@ -50,11 +51,20 @@ export function construireRailParcours(container, { pageCourante, onClicEtape, o
     groupeEl.className = "groupe-etapes";
     if (groupe.length > 1) groupeEl.classList.add("avec-ligne-temps");
 
-    groupe.forEach((etape) => {
-      const bouton = construireBouton(etape, indexGlobal, { pageCourante, onClicEtape, onSurvolEtape });
+    // for...of (pas forEach) : construireDiviseurRupture() est async (fetch de
+    // rupture.svg) — forEach n'attendrait pas le await, l'ordre d'insertion des
+    // groupes suivants ne serait plus garanti.
+    for (const etape of groupe) {
+      const bouton = construireBouton(etape, { pageCourante, onClicEtape, onSurvolEtape });
       groupeEl.appendChild(bouton);
-      indexGlobal++;
-    });
+
+      // Bande "Colonisation" insérée après l'étape epoque:"rupture" — dérivé
+      // de la donnée, jamais d'une position codée en dur (aujourd'hui : entre
+      // rupture-coloniale et hommage-victimes).
+      if (etape.epoque === "rupture") {
+        groupeEl.appendChild(await construireDiviseurRupture());
+      }
+    }
 
     container.appendChild(groupeEl);
   }
@@ -65,7 +75,7 @@ export function construireRailParcours(container, { pageCourante, onClicEtape, o
 // Extrait de l'ancienne boucle forEach — construction d'un seul bouton,
 // inchangée dans son comportement, juste isolée pour être appelée par
 // groupe plutôt que directement sur tout le parcours.
-function construireBouton(etape, index, { pageCourante, onClicEtape, onSurvolEtape }) {
+function construireBouton(etape, { pageCourante, onClicEtape, onSurvolEtape }) {
   const bouton = document.createElement("button");
   bouton.type = "button";
   bouton.className = "etape-bouton";
@@ -73,13 +83,25 @@ function construireBouton(etape, index, { pageCourante, onClicEtape, onSurvolEta
   // Libellé temporaire : l'id brut, tant qu'on n'a pas de vrai titre
   // pour les 12 étapes (pas juste les 9 du scrolly).
   bouton.setAttribute("aria-label", etape.id);
+  if (etape.epoque) bouton.dataset.epoque = etape.epoque; // pilote le fill via CSS
 
   if (etape.page === pageCourante) bouton.classList.add("page-actuelle");
 
+  // Ancre INVISIBLE pour le curseur plume (railPlume.js la cherche via .numero) —
+  // plus de chiffre affiché (demande du 4 septembre), même emplacement qu'avant
+  // pour ne pas déplacer, comme effet de bord, l'endroit où la plume se pose.
   const numero = document.createElement("span");
   numero.className = "numero";
-  numero.textContent = String(index + 1);
   bouton.appendChild(numero);
+
+  if (etape.id === "accueil") {
+    // Grande icône maison, séparée de l'ancre invisible ci-dessus — standard de
+    // lecture universel pour "retour à l'accueil".
+    const icone = document.createElement("span");
+    icone.className = "icone-accueil";
+    icone.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="#222"/></svg>';
+    bouton.appendChild(icone);
+  }
 
   // Vérifie estDeverrouille(etape.id) EN DIRECT à chaque clic plutôt que
   // de se fier à une variable capturée à la construction — sinon un
@@ -104,6 +126,61 @@ function construireBouton(etape, index, { pageCourante, onClicEtape, onSurvolEta
   }
 
   return bouton;
+}
+
+// Bande décorative (shared/svg/rupture.svg — coup de pinceau vertical, chargée en
+// direct comme plume.svg) + étiquette "Colonisation" — marque visuellement le
+// point de rupture sur la timeline du rail, insérée après l'étape epoque:"rupture"
+// (voir l'appel dans construireRailParcours).
+let ecouteurLangueBranche = false;
+
+async function construireDiviseurRupture() {
+  const diviseur = document.createElement("span");
+  diviseur.className = "diviseur-rupture";
+  // Décoratif — "Colonisation" est déjà porté par le titre/texte narratif du step
+  // rupture-coloniale lui-même pour les technologies d'assistance, pas besoin de
+  // le répéter ici.
+  diviseur.setAttribute("aria-hidden", "true");
+
+  // Chargée en direct (fetch + inline), même patron que railPlume.js. new URL(...,
+  // import.meta.url) : chemin relatif au FICHIER, résout correctement quelle que
+  // soit la page (scrolly/univers/valeurs) ou le sous-dossier de déploiement.
+  try {
+    const reponse = await fetch(new URL("../svg/rupture.svg", import.meta.url));
+    // fetch ne rejette pas sur un 404 — vérifier .ok comme railPlume.js, sinon
+    // reponse.text() renverrait le corps de la page d'erreur et querySelector("svg")
+    // échouerait en silence (diviseur sans bande, aucun message).
+    if (!reponse.ok) throw new Error(`HTTP ${reponse.status}`);
+    const texte = await reponse.text();
+    const enveloppe = document.createElement("div");
+    enveloppe.innerHTML = texte;
+    const svg = enveloppe.querySelector("svg");
+    if (svg) {
+      svg.classList.add("diviseur-rupture-stripe");
+      diviseur.appendChild(svg);
+    }
+  } catch (err) {
+    console.error("❌ Impossible de charger shared/svg/rupture.svg :", err);
+  }
+
+  const etiquette = document.createElement("span");
+  etiquette.className = "diviseur-rupture-etiquette";
+  etiquette.textContent = t("legende.colonisation");
+  diviseur.appendChild(etiquette);
+
+  // Retraduit si la langue change APRÈS la construction du rail (celui-ci n'est
+  // construit qu'une fois par chargement de page) — écouteur branché une seule
+  // fois, peu importe combien de fois construireRailParcours() est rappelée.
+  if (!ecouteurLangueBranche) {
+    ecouteurLangueBranche = true;
+    window.addEventListener("languagechange", () => {
+      document.querySelectorAll(".diviseur-rupture-etiquette").forEach((el) => {
+        el.textContent = t("legende.colonisation");
+      });
+    });
+  }
+
+  return diviseur;
 }
 
 // Retire "actif" de tous les boutons du rail et l'ajoute à celui dont
