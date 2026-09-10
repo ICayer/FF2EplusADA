@@ -318,8 +318,13 @@
                                      horizontalement — le bouton s'étend vers la
                                      droite depuis le bord du cercle */
   padding: 0.9rem 2.2rem;
-  font-family: var(--font-title, sans-serif);
-  font-size: 1rem;
+  font-family: "Agoradp_15", sans-serif; /* convention Registre 26 août — mots-titres
+                                             hors timeline/rail, @font-face dans
+                                             shared/css/variables.css (déjà chargé ici) */
+  font-size: calc(1rem * var(--echelle-texte)); /* préexistant, jamais branché au
+                                                     contrôle A-/A/A+ (headerControls.js)
+                                                     — 1rem gardé comme valeur de
+                                                     départ au niveau A neutre */
   letter-spacing: 0.04em;
   color: #1a1a1a;
   background-color: #f2ede2;

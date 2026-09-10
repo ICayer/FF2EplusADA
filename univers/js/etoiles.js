@@ -31,7 +31,7 @@ function positionnerBoutonExplorer(boutonEl, svgEl) {
   pt.y = CENTRE.y;
   const ptEcran = pt.matrixTransform(svgEl.getScreenCTM());
 
-  boutonEl.style.left = `${ptEcran.x + 48}px`; // quelques pixels au-delà du cercle — à l'œil
+  boutonEl.style.left = `${ptEcran.x + 148}px`; // quelques pixels au-delà du cercle — à l'œil
   boutonEl.style.top = `${ptEcran.y}px`;
 }
 
@@ -54,6 +54,84 @@ const ORDRE_DECENNIES = ['1950s','1960s','1970s','1980s','1990s','2000s','2010s'
 // Si lune.svg est un jour remplacé par un nouvel export, ces deux valeurs
 // devront être recalculées en même temps.
 const LUNE_CENTRE_SOURCE = { x: 238.07, y: 60.60 };
+
+// --- Masque terrain (univers/assets/terrain_masque.png) ---
+// ÉTAPE 0 (audit fait avant d'écrire ce mapping, grep -rn "milkyway" univers/css/) :
+// la règle qui affiche le fond (univers/css/style.css, #univers-canvas) est
+//   background-image: url("milkyway.webp");
+//   background-size: cover;
+//   background-position: bottom 140px center;
+//   background-repeat: no-repeat;
+// posée sur #univers-canvas LUI-MÊME, pas sur le <svg> enfant — le fond se peint
+// donc sur la boîte de PADDING de #univers-canvas (background-origin: padding-box,
+// valeur par défaut), qui INCLUT le padding 24px/140px ajouté au point D. C'est
+// l'INVERSE du calcul de lettrboxing du ciel étoilé plus bas (qui mesure
+// svg.node(), plus petit que le conteneur à cause de ce même padding) : ici, il
+// faut mesurer universContainer, jamais svg.node() — présumer le mauvais élément
+// donnerait un mapping qui semble correct à une taille de fenêtre mais décroche à
+// une autre. "background-position: bottom 140px" ancre le bord BAS de l'image à
+// (hauteurConteneur - 140) EXACTEMENT, quelle que soit la marge verticale laissée
+// par "cover" — donc le bas réel de l'image (terrain/horizon) tombe toujours sur
+// la même ligne que le bord bas du <svg> (padding-bottom: 140px). Dimensions
+// natives de terrain_masque.png vérifiées via son en-tête PNG (IHDR) : 2000×1000,
+// RGBA — alignées pixel pour pixel avec milkyway.webp (mêmes dimensions), comme
+// affirmé par Isabel.
+function ecranVersPixelMasque(xEcran, yEcran, elementFond) {
+  const rect = elementFond.getBoundingClientRect();
+  const echelle = Math.max(rect.width / 2000, rect.height / 1000); // background-size: cover
+  const renduLargeur = 2000 * echelle;
+  const renduHauteur = 1000 * echelle;
+
+  const decalageGauche = (rect.width - renduLargeur) / 2; // background-position: ... center
+  const decalageHaut = (rect.height - 140) - renduHauteur; // background-position: bottom 140px ...
+
+  return {
+    x: ((xEcran - rect.left) - decalageGauche) / echelle,
+    y: ((yEcran - rect.top) - decalageHaut) / echelle
+  };
+}
+
+// Chargé UNE SEULE FOIS (canvas hors-écran, jamais ajouté au DOM) — getImageData()
+// est l'opération coûteuse, appelée une fois sur toute l'image plutôt qu'une fois
+// par étoile candidate (le rejet peut tourner plusieurs centaines de fois pour 221
+// étoiles). testTerrain() ne fait ensuite que lire un pixel déjà en mémoire.
+let donneesMasqueTerrain = null; // ImageData, ou null tant que non chargé
+
+async function chargerMasqueTerrain() {
+  try {
+    const img = new Image();
+    const pret = new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+    });
+    img.src = new URL("../assets/terrain_masque.png", import.meta.url).href;
+    await pret;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    donneesMasqueTerrain = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  } catch (err) {
+    console.error("❌ Impossible de charger univers/assets/terrain_masque.png :", err);
+    // donneesMasqueTerrain reste null — testTerrain() ne rejette alors plus rien
+    // (dégradation : des étoiles peuvent retomber sur le terrain plutôt que de
+    // bloquer tout le rendu du ciel).
+  }
+}
+
+// true si le pixel du masque à (xMasque, yMasque) est opaque (terrain, à rejeter).
+// Coordonnées hors limites ou masque non chargé traités comme "pas du terrain" —
+// jamais présumés terrain par défaut, pour ne jamais bloquer le rendu du ciel.
+function testTerrain(xMasque, yMasque) {
+  if (!donneesMasqueTerrain) return false;
+  const x = Math.round(xMasque);
+  const y = Math.round(yMasque);
+  if (x < 0 || y < 0 || x >= donneesMasqueTerrain.width || y >= donneesMasqueTerrain.height) return false;
+  const indexAlpha = (y * donneesMasqueTerrain.width + x) * 4 + 3;
+  return donneesMasqueTerrain.data[indexAlpha] > 0;
+}
 
 let universContainer = null;
 let signalerInteractionFn = null; // référence mise à jour après initConditionSortie()
@@ -144,6 +222,11 @@ async function dessiner({ nations, secteurs, noeuds, liens, nbEtoilesCiel }) {
     .attr("viewBox", `0 0 ${VUE.largeur} ${VUE.hauteur}`)
     .attr("preserveAspectRatio", "xMidYMid meet");
 
+  // Lancé tôt (pas attendu tout de suite) pour chevaucher son temps de chargement
+  // avec la mise en place synchrone du SVG ci-dessous — attendu juste avant d'en
+  // avoir besoin (positionCiel(), plus bas).
+  const masqueTerrainPromise = chargerMasqueTerrain();
+
   const tooltip = universContainer.querySelector("#univers-tooltip");
 
   // --- Ciel étoilé : densité visuelle seulement, AUCUN lien avec etoiles.json au-delà
@@ -162,7 +245,8 @@ async function dessiner({ nations, secteurs, noeuds, liens, nbEtoilesCiel }) {
   // dernier inclut le padding vertical 24px/140px (point D), qui rétrécit le <svg> par
   // rapport au conteneur — mesurer le conteneur donnerait un ratio faussé, jamais
   // présumé à 0-1000 seulement.
-  const rectSvg = svg.node().getBoundingClientRect();
+  const svgEl = svg.node();
+  const rectSvg = svgEl.getBoundingClientRect();
   const rapportConteneur = rectSvg.width / rectSvg.height;
 
   let cielMinX = 0, cielMaxX = VUE.largeur, cielMinY = 0, cielMaxY = VUE.hauteur;
@@ -178,12 +262,34 @@ async function dessiner({ nations, secteurs, noeuds, liens, nbEtoilesCiel }) {
     cielMaxY = VUE.hauteur + exces;
   }
 
+  // Masque terrain : attendu ici, juste avant le premier appel à positionCiel() —
+  // lancé plus tôt (masqueTerrainPromise), donc son temps de chargement a déjà
+  // pu se chevaucher avec la mise en place du SVG ci-dessus.
+  await masqueTerrainPromise;
+
+  // CTM capturée UNE FOIS (pas à chaque tentative de tirage) : rien ne change la
+  // mise en page du SVG entre les tentatives de rejet d'un même appel, donc la
+  // recalculer à chaque itération serait un coût inutile — même principe que
+  // getImageData() ci-dessus (chargement une fois, lecture répétée).
+  const ctmEcran = svgEl.getScreenCTM();
+
   function positionCiel() {
-    let x, y;
+    let x, y, pt, ptEcran, pixelMasque;
     do {
       x = cielMinX + Math.random() * (cielMaxX - cielMinX);
       y = cielMinY + Math.random() * (cielMaxY - cielMinY);
-    } while (Math.hypot(x - CENTRE.x, y - CENTRE.y) < RAYON_CIEL_MIN);
+
+      // Position réelle à l'écran (Playbook §3.3 — jamais une simple proportion du
+      // viewBox), convertie en pixel du masque pour tester le terrain.
+      pt = svgEl.createSVGPoint();
+      pt.x = x;
+      pt.y = y;
+      ptEcran = pt.matrixTransform(ctmEcran);
+      pixelMasque = ecranVersPixelMasque(ptEcran.x, ptEcran.y, universContainer);
+    } while (
+      Math.hypot(x - CENTRE.x, y - CENTRE.y) < RAYON_CIEL_MIN ||
+      testTerrain(pixelMasque.x, pixelMasque.y)
+    );
     return { x, y };
   }
 
@@ -198,6 +304,30 @@ async function dessiner({ nations, secteurs, noeuds, liens, nbEtoilesCiel }) {
     .attr("cx", d => d.x)
     .attr("cy", d => d.y)
     .attr("r", () => (2.5 + Math.random() * 2.5).toFixed(2)) // grossies — était 1.5-3, à l'œil
+    .attr("fill", COULEUR_ETOILES_CIEL)
+    .style("opacity", 0);
+
+  // Une position de départ réservée par étoile-témoignage — même algorithme de rejet
+  // que le ciel anonyme, pour rester cohérent visuellement. Associée à l'id de
+  // l'étoile (Map, jamais stocké dans etoiles.json) : c'est cette association qui
+  // permet à migrerEtoilesTemoignage() de savoir QUELLE étoile migre depuis QUELLE
+  // position précise — condition de l'option "continuité d'identité" retenue le 10
+  // septembre 2026, plutôt qu'une simple coïncidence de timing.
+  const positionsDepartTemoignage = new Map(noeuds.map(n => [n.data.id, positionCiel()]));
+
+  // Cercles fantômes des étoiles-témoignage : MÊME style de départ que le ciel
+  // anonyme (indiscernables au premier coup d'œil — l'effet de révélation tombe à
+  // plat sinon), à leur position réservée. data-id permet de cibler individuellement
+  // chacun au moment de sa migration (voir migrerEtoilesTemoignage() plus bas).
+  const etoilesCielTemoignage = groupeCiel
+    .selectAll(".etoile-ciel-temoignage")
+    .data(noeuds, d => d.data.id)
+    .join("circle")
+    .attr("class", "etoile-ciel-temoignage")
+    .attr("data-id", d => d.data.id)
+    .attr("cx", d => positionsDepartTemoignage.get(d.data.id).x)
+    .attr("cy", d => positionsDepartTemoignage.get(d.data.id).y)
+    .attr("r", () => (2.5 + Math.random() * 2.5).toFixed(2)) // même gabarit que le ciel anonyme
     .attr("fill", COULEUR_ETOILES_CIEL)
     .style("opacity", 0);
 
@@ -303,8 +433,10 @@ async function dessiner({ nations, secteurs, noeuds, liens, nbEtoilesCiel }) {
   // Glow derrière l'étoile-témoignage — APPENDÉ AVANT groupeEtoilesEl pour peindre
   // derrière elle. Filtré sur estModele : si plusieurs étoiles ont un vrai témoignage
   // un jour (enrichissement post-diffusion), chacune reçoit son propre glow
-  // automatiquement, rien à modifier ici.
-  const groupeGlow = svg.append("g").attr("class", "glow-temoignage").style("opacity", 0);
+  // automatiquement, rien à modifier ici. Groupe toujours visible désormais — chaque
+  // glow individuel se révèle à la fin de SA migration (migrerEtoilesTemoignage()),
+  // plus au niveau du groupe entier d'un coup (voir timelineEntree plus bas).
+  const groupeGlow = svg.append("g").attr("class", "glow-temoignage");
   const noeudsTemoignage = noeuds.filter(d => d.data.estModele);
 
   groupeGlow
@@ -312,11 +444,13 @@ async function dessiner({ nations, secteurs, noeuds, liens, nbEtoilesCiel }) {
     .data(noeudsTemoignage)
     .join("circle")
     .attr("class", "etoile-glow")
+    .attr("data-id", d => d.data.id) // cible de migrerEtoilesTemoignage()
     .attr("cx", d => d.x)
     .attr("cy", d => d.y)
     .attr("r", RAYON_ETOILE_TEMOIGNAGE + 6)
     .attr("fill", d => couleurParNation[d.data.nation])
-    .attr("fill-opacity", 0.45);
+    .attr("fill-opacity", 0.45)
+    .style("opacity", 0); // révélé au onComplete de la migration, jamais avant
 
   const groupeEtoilesEl = svg.append("g").attr("class", "etoiles");
 
@@ -325,6 +459,7 @@ async function dessiner({ nations, secteurs, noeuds, liens, nbEtoilesCiel }) {
     .data(noeuds)
     .join("circle")
     .attr("class", "etoile")
+    .attr("data-id", d => d.data.id) // cible de migrerEtoilesTemoignage() (bascule finale)
     .attr("cx", d => d.x)
     .attr("cy", d => d.y)
     .attr("r", d => d.data.estModele ? RAYON_ETOILE_TEMOIGNAGE : RAYON_ETOILE_DEFAUT)
@@ -359,32 +494,69 @@ async function dessiner({ nations, secteurs, noeuds, liens, nbEtoilesCiel }) {
   const reduireAnimation = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const dureeBase = reduireAnimation ? 0.01 : 1;
 
+  // Migration "continuité d'identité" (décision du 10 septembre 2026) : chaque
+  // étoile-témoignage occupe d'abord une position anonyme dans le ciel (cercles
+  // .etoile-ciel-temoignage, plus haut), puis migre vers sa position organisée dans
+  // le cercle des mémoires. Ton doux et solennel — mouvement lent (~1,5-2s), ease
+  // douce, jamais de saut ni de fondu croisé visible : la bascule fantôme→final se
+  // fait au onComplete de CHAQUE étoile individuellement, pas à la fin de toutes,
+  // et sans transition (gsap.set) pour que rien ne clignote ni ne se superpose.
+  const ECART_STAGGER_MIGRATION = 0.4; // secondes entre le début de chaque migration
+  function migrerEtoilesTemoignage() {
+    noeuds.forEach((n, i) => {
+      const id = n.data.id;
+      const fantome = groupeCiel.select(`.etoile-ciel-temoignage[data-id="${id}"]`).node();
+      const finale = groupeEtoilesEl.select(`.etoile[data-id="${id}"]`).node();
+      const glow = groupeGlow.select(`.etoile-glow[data-id="${id}"]`).node();
+      if (!fantome) return;
+
+      gsap.to(fantome, {
+        attr: {
+          cx: n.x,
+          cy: n.y,
+          r: RAYON_ETOILE_TEMOIGNAGE,
+          fill: couleurParNation[n.data.nation]
+        },
+        duration: reduireAnimation ? 0.01 : 1.5 + Math.random() * 0.5, // ~1,5-2s, défauts validés
+        delay: reduireAnimation ? 0 : i * ECART_STAGGER_MIGRATION,
+        ease: "power1.inOut", // douce, jamais bounce/elastic — ton solennel
+        onComplete: () => {
+          // Bascule fantôme → final → glow au MÊME instant, sans transition — un
+          // seul mouvement continu, jamais une superposition visible de 2 cercles.
+          if (finale) gsap.set(finale, { opacity: 1 });
+          gsap.set(fantome, { opacity: 0 });
+          if (glow) gsap.set(glow, { opacity: 1 });
+        }
+      });
+    });
+  }
+
   const timelineEntree = gsap.timeline({ delay: reduireAnimation ? 0 : 0.4 });
   timelineEntree
-    // Le ciel étoilé apparaît EN PREMIER — l'ambiance avant le contenu organisé,
-    // même intention narrative que le commentaire existant plus haut ("la voie
-    // lactée seule d'abord, puis la visualisation apparaît par couches").
-    .to(etoilesCiel.nodes(), {
+    // Le ciel étoilé — anonyme ET fantômes des étoiles-témoignage ensemble, même
+    // apparence, indiscernables — apparaît EN PREMIER, même intention narrative que
+    // le commentaire existant plus haut ("la voie lactée seule d'abord, puis la
+    // visualisation apparaît par couches"). onComplete déclenche la migration :
+    // synchronisé sur la vraie fin du stagger GSAP, jamais un délai fixe codé en
+    // dur séparément.
+    .to([...etoilesCiel.nodes(), ...etoilesCielTemoignage.nodes()], {
       opacity: 1,
       duration: dureeBase * 1.2,
       stagger: reduireAnimation ? 0 : { amount: 1.8, from: "random" },
-      ease: "power1.out"
+      ease: "power1.out",
+      onComplete: migrerEtoilesTemoignage
     })
     .to(groupeLune.node(), { opacity: 1, duration: dureeBase * 1.8, ease: "power2.out" }, "-=0.6")
     .to(groupeEtiquettes.node(), { opacity: 1, duration: dureeBase * 1.2, ease: "power1.out" }, "-=0.8")
-    .to(groupeLiens.node(), { opacity: 1, duration: dureeBase * 1, ease: "power1.out" }, "-=0.4")
-    .to(groupeGlow.node(), { opacity: 1, duration: dureeBase * 1.2, ease: "power1.out" }, "-=0.3")
-    .to(selectionEtoiles.nodes(), {
-      opacity: 1,
-      duration: dureeBase * 1.2,
-      stagger: reduireAnimation ? 0 : { amount: 1.6, from: "random" },
-      ease: "power1.out"
-    }, "-=0.3");
+    .to(groupeLiens.node(), { opacity: 1, duration: dureeBase * 1, ease: "power1.out" }, "-=0.4");
 
   // Pulsation continue du glow, façon "cœur qui bat" — anime r + fill-opacity, jamais
-  // opacity (déjà utilisé ci-dessus pour le fondu d'entrée du GROUPE, pas des cercles
-  // individuels — pas de conflit, mais gardé sur des attributs distincts par prudence).
-  // Ignorée si prefers-reduced-motion : le glow reste visible, juste immobile.
+  // opacity (utilisé par migrerEtoilesTemoignage() pour révéler chaque glow
+  // individuellement à la fin de SA migration, gsap.set — pas de conflit, propriétés
+  // distinctes). Tourne en arrière-plan dès le chargement, même invisible tant que
+  // opacity reste à 0 : redevient visible instantanément dès la révélation.
+  // Ignorée si prefers-reduced-motion : le glow reste visible (révélé par la
+  // migration, near-instantanée dans ce mode), juste immobile.
   if (!reduireAnimation) {
     gsap.to(".etoile-glow", {
       attr: { r: RAYON_ETOILE_TEMOIGNAGE + 16, "fill-opacity": 0.15 },
