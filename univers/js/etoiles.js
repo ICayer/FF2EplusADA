@@ -19,6 +19,22 @@ import { initTestimonyModal, showTestimony } from "./testimonyModal.js";
 import { initConditionSortie, lancerTransitionValeurs } from "./transitionValeurs.js";
 import { t } from "../../shared/js/i18n.js";
 
+// Positionne le bouton juste à l'extérieur du cercle des mémoires (bord droit, 3h),
+// converti en coordonnées d'écran réelles via la matrice de transformation du SVG —
+// reste juste peu importe la taille de la fenêtre, contrairement à une position
+// d'écran codée en dur. Évite le centre de la visualisation, où une étoile-témoignage
+// pourrait un jour se trouver.
+function positionnerBoutonExplorer(boutonEl, svgEl) {
+  if (!boutonEl || !svgEl) return;
+  const pt = svgEl.createSVGPoint();
+  pt.x = CENTRE.x + RAYON_ETIQUETTES;
+  pt.y = CENTRE.y;
+  const ptEcran = pt.matrixTransform(svgEl.getScreenCTM());
+
+  boutonEl.style.left = `${ptEcran.x + 24}px`; // quelques pixels au-delà du cercle — à l'œil
+  boutonEl.style.top = `${ptEcran.y}px`;
+}
+
 // --- Réglages visuels ---
 // Tout est en coordonnées du viewBox (1000 x 1000), pas en pixels d'écran :
 // le SVG s'adapte ensuite à la taille de la fenêtre sans que ces valeurs changent.
@@ -73,9 +89,12 @@ export async function initUnivers(selecteurConteneur = "#univers-canvas") {
   const resultats = await dessiner({ nations, secteurs, noeuds, liens });
 
   const boutonTransition = document.getElementById("bouton-explorer-valeurs");
+  const svgEl = resultats.svg.node();
 
   if (boutonTransition) {
     boutonTransition.textContent = t("nav.explorerValeurs");
+    positionnerBoutonExplorer(boutonTransition, svgEl);
+    window.addEventListener("resize", () => positionnerBoutonExplorer(boutonTransition, svgEl));
   }
   window.addEventListener("languagechange", () => {
     if (boutonTransition) boutonTransition.textContent = t("nav.explorerValeurs");

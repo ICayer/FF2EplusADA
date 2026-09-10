@@ -12,7 +12,7 @@
   height: 100vh;
   overflow: hidden;
   background-color: #050507;
-  background-image: url("../assets/milkyway.png");
+  background-image: url("../assets/milkyway.webp");
   background-size: cover;
   background-position: center;
   box-sizing: border-box;
@@ -296,9 +296,11 @@
    avec le tooltip/la modale, pour rester lisible sur fond sombre. */
 #bouton-explorer-valeurs {
   position: fixed;
-  bottom: 8%;
-  left: 50%;
-  transform: translate(-50%, 0);
+  top: 0; /* recalculé par positionnerBoutonExplorer() — bord droit du cercle des mémoires */
+  left: 0; /* idem */
+  transform: translate(0, -50%); /* centré verticalement sur le point visé, pas
+                                     horizontalement — le bouton s'étend vers la
+                                     droite depuis le bord du cercle */
   padding: 0.9rem 2.2rem;
   font-family: var(--font-title, sans-serif);
   font-size: 1rem;
