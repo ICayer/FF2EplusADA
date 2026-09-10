@@ -63,7 +63,7 @@ async function assurerContainer() {
     // rien de précis.
     const spiraleEl = groupePrincipal.querySelector("#spirale");
     const rectSpiraleInitial = spiraleEl.getBoundingClientRect();
-    const hauteurCiblePx = window.innerHeight * 0.8;
+    const hauteurCiblePx = window.innerHeight * 0.72;
     const facteurEchelle = hauteurCiblePx / rectSpiraleInitial.height;
 
     const bbox = groupePrincipal.getBBox();

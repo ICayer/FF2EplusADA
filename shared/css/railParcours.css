@@ -243,10 +243,10 @@
      aussi la police des légendes d'orientation "Colonisation/Mémoire/Aujourd'hui"
      de la timeline (Registre 26 août). — Isabel : à revoir si tu préfères Zilla. */
   position: absolute;
-  top: 100%; /* juste sous la bande rupture.svg, ne compte plus dans la hauteur du parent */
+  top: 88%; /* juste sous la bande rupture.svg, ne compte plus dans la hauteur du parent */
   left: 50%;
   transform: translateX(-50%);
-  margin-top: 4px;
+  margin-top: 1px;
   font-family: "Agoradp_15", sans-serif;
   color: var(--color-primary);
   font-size: calc(0.8rem * var(--echelle-texte));

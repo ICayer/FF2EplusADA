@@ -15,6 +15,9 @@
   background-image: url("../assets/milkyway.png");
   background-size: cover;
   background-position: center;
+  box-sizing: border-box;
+  padding: 24px 0 140px; /* haut / côtés / bas — le bas réserve l'espace du rail,
+                             à ajuster à l'œil selon sa hauteur réelle actuelle */
 }
 
 /* Voile sombre semi-transparent par-dessus la voie lactée : garde les
