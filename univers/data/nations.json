@@ -18,6 +18,12 @@
     "langue": "Iiyiyuu ayimuun"
   },
   {
+    "id": "huronne-wendat",
+    "nom": "Huronne-Wendat",
+    "couleur": "#BCAAA4",
+    "langue": "Wendat"
+  },
+  {
     "id": "innu",
     "nom": "Innu/Ilnu",
     "couleur": "#90CAF9",
@@ -58,6 +64,12 @@
     "nom": "W8banaki",
     "couleur": "#FF9E80",
     "langue": "Aln8ba8dwaw8gan"
+  },
+  {
+    "id": "wolastoqey",
+    "nom": "Wolastoqey",
+    "couleur": "#EF9A9A",
+    "langue": "Wolastoqey Latuwewakon"
   },
   {
     "id": "inconnue",

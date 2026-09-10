@@ -64,7 +64,7 @@
 
 .arc-etiquette-texte {
   font-family: var(--font-title, sans-serif);
-  font-size: calc(18px * var(--echelle-texte));
+  font-size: calc(1.6rem * var(--echelle-texte));
   letter-spacing: 1px;
 }
 

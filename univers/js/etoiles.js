@@ -31,7 +31,7 @@ function positionnerBoutonExplorer(boutonEl, svgEl) {
   pt.y = CENTRE.y;
   const ptEcran = pt.matrixTransform(svgEl.getScreenCTM());
 
-  boutonEl.style.left = `${ptEcran.x + 24}px`; // quelques pixels au-delà du cercle — à l'œil
+  boutonEl.style.left = `${ptEcran.x + 36}px`; // quelques pixels au-delà du cercle — à l'œil
   boutonEl.style.top = `${ptEcran.y}px`;
 }
 
@@ -157,28 +157,49 @@ async function dessiner({ nations, secteurs, noeuds, liens }) {
   // --- Arcs-étiquettes : nomment chaque nation ET servent de légende ---
   const groupeEtiquettes = svg.append("g").attr("class", "etiquettes").style("opacity", 0);
 
+  const DECALAGE_LIGNE_ETIQUETTE = 24; // écart radial entre les 2 lignes — à l'œil
+  const SEUIL_COUPURE_ETIQUETTE = 10;
+
   nations.forEach(n => {
     const sect = secteurs[n.id];
-    const pathId = `arc-${n.id}`;
 
     // Dans la moitié basse du cercle, on inverse le sens de tracé pour que le
     // texte reste lisible à l'endroit (sinon textPath l'affiche renversé).
     const estEnBas = sect.milieu > Math.PI / 2 && sect.milieu < (3 * Math.PI) / 2;
 
-    groupeEtiquettes.append("path")
-      .attr("id", pathId)
-      .attr("class", "arc-etiquette-path")
-      .attr("d", cheminArc(sect.debut, sect.fin, RAYON_ETIQUETTES, CENTRE, estEnBas));
+    // Coupe sur le premier espace OU trait d'union rencontré (non-greedy — s'arrête
+    // au premier trouvé) — couvre "Atikamekw Nehirowisiw" (espace) ET
+    // "Huronne-Wendat" (trait d'union) sans lister aucune nation par son nom.
+    const separateur = n.nom.match(/^(\S+?)([\s-])(.+)$/);
+    const surDeuxLignes = !!separateur && n.nom.length > SEUIL_COUPURE_ETIQUETTE;
+    const lignes = surDeuxLignes
+      ? [separateur[2] === "-" ? `${separateur[1]}-` : separateur[1], separateur[3]]
+      : [n.nom];
 
-    groupeEtiquettes.append("text")
-      .attr("class", "arc-etiquette-texte")
-      .attr("fill", n.couleur) // repère visuel : l'étiquette porte la couleur de ses étoiles
-      .attr("dy", estEnBas ? 14 : -6)
-      .append("textPath")
-      .attr("href", `#${pathId}`)
-      .attr("startOffset", "50%")
-      .attr("text-anchor", "middle")
-      .text(n.nom);
+    lignes.forEach((ligne, i) => {
+      // 1re ligne plus proche du centre, 2e plus loin — ordre de lecture naturel en
+      // s'éloignant de la Lune. Rayon inchangé si une seule ligne.
+      const rayonLigne = surDeuxLignes
+        ? RAYON_ETIQUETTES + (i === 0 ? -DECALAGE_LIGNE_ETIQUETTE / 2 : DECALAGE_LIGNE_ETIQUETTE / 2)
+        : RAYON_ETIQUETTES;
+
+      const pathId = `arc-${n.id}-${i}`;
+
+      groupeEtiquettes.append("path")
+        .attr("id", pathId)
+        .attr("class", "arc-etiquette-path")
+        .attr("d", cheminArc(sect.debut, sect.fin, rayonLigne, CENTRE, estEnBas));
+
+      groupeEtiquettes.append("text")
+        .attr("class", "arc-etiquette-texte")
+        .attr("fill", n.couleur) // repère visuel : l'étiquette porte la couleur de ses étoiles
+        .attr("dy", estEnBas ? 14 : -6)
+        .append("textPath")
+        .attr("href", `#${pathId}`)
+        .attr("startOffset", "50%")
+        .attr("text-anchor", "middle")
+        .text(ligne);
+    });
   });
 
   // --- Traits de constellation (dessinés AVANT les étoiles pour passer dessous) ---
