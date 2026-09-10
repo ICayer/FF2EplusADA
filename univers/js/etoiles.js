@@ -80,7 +80,13 @@ export async function initUnivers(selecteurConteneur = "#univers-canvas") {
     d3.json("./data/etoiles.json")
   ]);
 
-  const { secteurs, noeuds, liens } = calculerDisposition(nations, etoiles, {
+  // Seules les étoiles ayant un vrai témoignage entrent dans le système organisé
+  // (secteur de nation, décennie, couleur, traits de constellation) — les autres
+  // deviennent un ciel étoilé anonyme, générées dans dessiner() (S2B1T3bis).
+  const etoilesTemoignage = etoiles.filter(e => e.estModele);
+  const nbEtoilesCiel = etoiles.length - etoilesTemoignage.length;
+
+  const { secteurs, noeuds, liens } = calculerDisposition(nations, etoilesTemoignage, {
     centre: CENTRE,
     rayonMin: RAYON_MIN_ETOILES,
     rayonMax: RAYON_MAX_ETOILES,
@@ -88,7 +94,7 @@ export async function initUnivers(selecteurConteneur = "#univers-canvas") {
   });
 
   initTestimonyModal(selecteurConteneur);
-  const resultats = await dessiner({ nations, secteurs, noeuds, liens });
+  const resultats = await dessiner({ nations, secteurs, noeuds, liens, nbEtoilesCiel });
 
   const boutonTransition = document.getElementById("bouton-explorer-valeurs");
   const svgEl = resultats.svg.node();
@@ -127,10 +133,10 @@ export async function initUnivers(selecteurConteneur = "#univers-canvas") {
     });
   }
 
-  console.log(`🌌 Univers : ${noeuds.length} étoiles réparties dans ${nations.length} constellations.`);
+  console.log(`🌌 Univers : ${noeuds.length} étoile(s)-témoignage dans ${nations.length} constellations, ${nbEtoilesCiel} étoiles anonymes dans le ciel.`);
 }
 
-async function dessiner({ nations, secteurs, noeuds, liens }) {
+async function dessiner({ nations, secteurs, noeuds, liens, nbEtoilesCiel }) {
   // Scoping systématique : toutes les requêtes passent par universContainer,
   // jamais par document — convention non négociable du Playbook (§2.4).
   const svg = d3.select(universContainer)
@@ -139,6 +145,61 @@ async function dessiner({ nations, secteurs, noeuds, liens }) {
     .attr("preserveAspectRatio", "xMidYMid meet");
 
   const tooltip = universContainer.querySelector("#univers-tooltip");
+
+  // --- Ciel étoilé : densité visuelle seulement, AUCUN lien avec etoiles.json au-delà
+  // du compte total — même principe que step11.js (gouvernance, voir Registre 24 août).
+  // Dispersion par rejet plutôt que angle+rayon aléatoires : une distribution uniforme
+  // du RAYON donnerait un anneau visiblement plus dense près du cercle des mémoires
+  // (l'aire d'un anneau croît avec le rayon) — le rejet sur des points (x,y) uniformes
+  // dans le carré donne une dispersion réellement uniforme, comme un vrai ciel.
+  const COULEUR_ETOILES_CIEL = "#eadd42"; // même jaune que step11
+  const RAYON_CIEL_MIN = RAYON_ETIQUETTES + 20; // juste à l'extérieur du cercle des mémoires
+
+  // Zone RÉELLEMENT visible du viewBox, en tenant compte du lettrboxing de
+  // preserveAspectRatio="xMidYMid meet" : sur un écran plus large que haut, le viewBox
+  // déborde horizontalement au-delà de 0-1000 (et inversement sur un écran plus haut
+  // que large) — mesuré sur le <svg> RÉEL (svg.node()), pas sur #univers-canvas : ce
+  // dernier inclut le padding vertical 24px/140px (point D), qui rétrécit le <svg> par
+  // rapport au conteneur — mesurer le conteneur donnerait un ratio faussé, jamais
+  // présumé à 0-1000 seulement.
+  const rectSvg = svg.node().getBoundingClientRect();
+  const rapportConteneur = rectSvg.width / rectSvg.height;
+
+  let cielMinX = 0, cielMaxX = VUE.largeur, cielMinY = 0, cielMaxY = VUE.hauteur;
+  if (rapportConteneur > 1) {
+    const largeurVisible = VUE.hauteur * rapportConteneur;
+    const exces = (largeurVisible - VUE.largeur) / 2;
+    cielMinX = -exces;
+    cielMaxX = VUE.largeur + exces;
+  } else if (rapportConteneur < 1) {
+    const hauteurVisible = VUE.largeur / rapportConteneur;
+    const exces = (hauteurVisible - VUE.hauteur) / 2;
+    cielMinY = -exces;
+    cielMaxY = VUE.hauteur + exces;
+  }
+
+  function positionCiel() {
+    let x, y;
+    do {
+      x = cielMinX + Math.random() * (cielMaxX - cielMinX);
+      y = cielMinY + Math.random() * (cielMaxY - cielMinY);
+    } while (Math.hypot(x - CENTRE.x, y - CENTRE.y) < RAYON_CIEL_MIN);
+    return { x, y };
+  }
+
+  const positionsCiel = d3.range(nbEtoilesCiel).map(positionCiel);
+
+  const groupeCiel = svg.append("g").attr("class", "ciel-etoile");
+  const etoilesCiel = groupeCiel
+    .selectAll("circle")
+    .data(positionsCiel)
+    .join("circle")
+    .attr("class", "etoile-ciel")
+    .attr("cx", d => d.x)
+    .attr("cy", d => d.y)
+    .attr("r", () => (2.5 + Math.random() * 2.5).toFixed(2)) // grossies — était 1.5-3, à l'œil
+    .attr("fill", COULEUR_ETOILES_CIEL)
+    .style("opacity", 0);
 
   // --- Lune (extraite de step10_lune_etoile.svg, calque "PleineLune" — voir Registre) ---
   const luneMarkup = await d3.text("./svg/lune.svg");
@@ -300,7 +361,16 @@ async function dessiner({ nations, secteurs, noeuds, liens }) {
 
   const timelineEntree = gsap.timeline({ delay: reduireAnimation ? 0 : 0.4 });
   timelineEntree
-    .to(groupeLune.node(), { opacity: 1, duration: dureeBase * 1.8, ease: "power2.out" })
+    // Le ciel étoilé apparaît EN PREMIER — l'ambiance avant le contenu organisé,
+    // même intention narrative que le commentaire existant plus haut ("la voie
+    // lactée seule d'abord, puis la visualisation apparaît par couches").
+    .to(etoilesCiel.nodes(), {
+      opacity: 1,
+      duration: dureeBase * 1.2,
+      stagger: reduireAnimation ? 0 : { amount: 1.8, from: "random" },
+      ease: "power1.out"
+    })
+    .to(groupeLune.node(), { opacity: 1, duration: dureeBase * 1.8, ease: "power2.out" }, "-=0.6")
     .to(groupeEtiquettes.node(), { opacity: 1, duration: dureeBase * 1.2, ease: "power1.out" }, "-=0.8")
     .to(groupeLiens.node(), { opacity: 1, duration: dureeBase * 1, ease: "power1.out" }, "-=0.4")
     .to(groupeGlow.node(), { opacity: 1, duration: dureeBase * 1.2, ease: "power1.out" }, "-=0.3")

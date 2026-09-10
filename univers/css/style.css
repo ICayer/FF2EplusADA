@@ -70,6 +70,10 @@
   pointer-events: none; /* la Lune ne doit jamais intercepter les clics destinés aux étoiles */
 }
 
+.etoile-ciel {
+  pointer-events: none; /* décorative seulement — aucun tooltip, aucun clic */
+}
+
 .arc-etiquette-path {
   fill: none;
 }
