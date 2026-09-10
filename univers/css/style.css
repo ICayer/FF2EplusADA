@@ -47,6 +47,12 @@
   cursor: pointer;
 }
 
+.etoile-glow {
+  filter: blur(4px); /* placeholder — Isabel ajustera à l'œil */
+  pointer-events: none; /* le glow ne doit jamais intercepter le survol/clic destiné
+                            à l'étoile elle-même, qui reste par-dessus */
+}
+
 .lien-constellation {
   stroke: var(--color-text, #ffffff);
   stroke-opacity: 0.25;

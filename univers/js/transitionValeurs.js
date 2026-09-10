@@ -86,12 +86,13 @@ async function declencher(source, callback) {
  *   luneCentreSource - { x, y } centre du contenu source de lune.svg
  *   selectionEtoiles - sélection D3 de tous les <circle> étoiles
  *   groupeEtiquettes - sélection D3 des arcs-étiquettes de nations (à faire disparaître)
+ *   groupeGlow       - sélection D3 du glow de l'étoile-témoignage (à éteindre, S2B4T1)
  *   canvasEl         - élément DOM #univers-canvas (pour le fond blanc)
  *   centre           - { x, y } centre de la scène (CENTRE dans etoiles.js)
  */
 export async function lancerTransitionValeurs({
   svg, groupeLune, echelleLuneActuelle, luneCentreSource,
-  selectionEtoiles, groupeEtiquettes, canvasEl, centre
+  selectionEtoiles, groupeEtiquettes, groupeGlow, canvasEl, centre
 }) {
   const reduireAnimation = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const d = (val) => (reduireAnimation ? 0.01 : val);
@@ -113,6 +114,15 @@ export async function lancerTransitionValeurs({
   // 0. Les étiquettes de nations disparaissent — plus pertinentes une fois
   // qu'on quitte l'exploration des constellations.
   tl.to(groupeEtiquettes.node(), { opacity: 0, duration: d(1), ease: "power1.out" }, 0);
+
+  // 0bis. Le glow de l'étoile-témoignage s'éteint en même temps — sans ça, il continue
+  // de pulser (invisible sous le voile blanc) jusqu'à la navigation réelle vers
+  // valeurs/index.html. On tue aussi la tween infinie (repeat:-1, posée dans
+  // etoiles.js) pour ne pas la laisser tourner inutilement en arrière-plan.
+  if (groupeGlow) {
+    gsap.killTweensOf(".etoile-glow");
+    tl.to(groupeGlow.node(), { opacity: 0, duration: d(1), ease: "power1.out" }, 0);
+  }
 
   // 1. Les étoiles convergent vers le centre — UNE étoile par nation reste
   // visible (peu importe sa position dans le tableau, on prend la première

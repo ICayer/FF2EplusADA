@@ -31,7 +31,7 @@ function positionnerBoutonExplorer(boutonEl, svgEl) {
   pt.y = CENTRE.y;
   const ptEcran = pt.matrixTransform(svgEl.getScreenCTM());
 
-  boutonEl.style.left = `${ptEcran.x + 36}px`; // quelques pixels au-delà du cercle — à l'œil
+  boutonEl.style.left = `${ptEcran.x + 48}px`; // quelques pixels au-delà du cercle — à l'œil
   boutonEl.style.top = `${ptEcran.y}px`;
 }
 
@@ -44,6 +44,8 @@ const RAYON_LUNE = 60;
 const RAYON_ETIQUETTES = 470;
 const RAYON_MIN_ETOILES = 130; // les étoiles ne s'approchent pas trop de la Lune
 const RAYON_MAX_ETOILES = 430; // ni trop des étiquettes
+const RAYON_ETOILE_TEMOIGNAGE = 10; // était 7 codé en dur — grossie, à ajuster à l'œil
+const RAYON_ETOILE_DEFAUT = 3.5;
 
 const ORDRE_DECENNIES = ['1950s','1960s','1970s','1980s','1990s','2000s','2010s','2020s'];
 
@@ -118,6 +120,7 @@ export async function initUnivers(selecteurConteneur = "#univers-canvas") {
         luneCentreSource: LUNE_CENTRE_SOURCE,
         selectionEtoiles: resultats.selectionEtoiles,
         groupeEtiquettes: resultats.groupeEtiquettes,
+        groupeGlow: resultats.groupeGlow,
         canvasEl: universContainer,
         centre: CENTRE
       });
@@ -157,7 +160,7 @@ async function dessiner({ nations, secteurs, noeuds, liens }) {
   // --- Arcs-étiquettes : nomment chaque nation ET servent de légende ---
   const groupeEtiquettes = svg.append("g").attr("class", "etiquettes").style("opacity", 0);
 
-  const DECALAGE_LIGNE_ETIQUETTE = 24; // écart radial entre les 2 lignes — à l'œil
+  const DECALAGE_LIGNE_ETIQUETTE = 28; // écart radial entre les 2 lignes — à l'œil
   const SEUIL_COUPURE_ETIQUETTE = 10;
 
   nations.forEach(n => {
@@ -236,6 +239,24 @@ async function dessiner({ nations, secteurs, noeuds, liens }) {
     ].filter(Boolean).join("<br/>");
   }
 
+  // Glow derrière l'étoile-témoignage — APPENDÉ AVANT groupeEtoilesEl pour peindre
+  // derrière elle. Filtré sur estModele : si plusieurs étoiles ont un vrai témoignage
+  // un jour (enrichissement post-diffusion), chacune reçoit son propre glow
+  // automatiquement, rien à modifier ici.
+  const groupeGlow = svg.append("g").attr("class", "glow-temoignage").style("opacity", 0);
+  const noeudsTemoignage = noeuds.filter(d => d.data.estModele);
+
+  groupeGlow
+    .selectAll("circle")
+    .data(noeudsTemoignage)
+    .join("circle")
+    .attr("class", "etoile-glow")
+    .attr("cx", d => d.x)
+    .attr("cy", d => d.y)
+    .attr("r", RAYON_ETOILE_TEMOIGNAGE + 6)
+    .attr("fill", d => couleurParNation[d.data.nation])
+    .attr("fill-opacity", 0.45);
+
   const groupeEtoilesEl = svg.append("g").attr("class", "etoiles");
 
   const selectionEtoiles = groupeEtoilesEl
@@ -245,7 +266,7 @@ async function dessiner({ nations, secteurs, noeuds, liens }) {
     .attr("class", "etoile")
     .attr("cx", d => d.x)
     .attr("cy", d => d.y)
-    .attr("r", d => d.data.estModele ? 7 : 3.5)
+    .attr("r", d => d.data.estModele ? RAYON_ETOILE_TEMOIGNAGE : RAYON_ETOILE_DEFAUT)
     .attr("fill", d => couleurParNation[d.data.nation])
     .style("opacity", 0) // révélées par la timeline d'entrée, pas instantanément
     // Repère de DÉVELOPPEMENT seulement : marque l'étoile modèle pour la retrouver
@@ -282,6 +303,7 @@ async function dessiner({ nations, secteurs, noeuds, liens }) {
     .to(groupeLune.node(), { opacity: 1, duration: dureeBase * 1.8, ease: "power2.out" })
     .to(groupeEtiquettes.node(), { opacity: 1, duration: dureeBase * 1.2, ease: "power1.out" }, "-=0.8")
     .to(groupeLiens.node(), { opacity: 1, duration: dureeBase * 1, ease: "power1.out" }, "-=0.4")
+    .to(groupeGlow.node(), { opacity: 1, duration: dureeBase * 1.2, ease: "power1.out" }, "-=0.3")
     .to(selectionEtoiles.nodes(), {
       opacity: 1,
       duration: dureeBase * 1.2,
@@ -289,7 +311,22 @@ async function dessiner({ nations, secteurs, noeuds, liens }) {
       ease: "power1.out"
     }, "-=0.3");
 
+  // Pulsation continue du glow, façon "cœur qui bat" — anime r + fill-opacity, jamais
+  // opacity (déjà utilisé ci-dessus pour le fondu d'entrée du GROUPE, pas des cercles
+  // individuels — pas de conflit, mais gardé sur des attributs distincts par prudence).
+  // Ignorée si prefers-reduced-motion : le glow reste visible, juste immobile.
+  if (!reduireAnimation) {
+    gsap.to(".etoile-glow", {
+      attr: { r: RAYON_ETOILE_TEMOIGNAGE + 16, "fill-opacity": 0.15 },
+      duration: 1.1,
+      ease: "sine.inOut",
+      repeat: -1,
+      yoyo: true,
+      delay: 2 // laisse le fondu d'entrée se terminer avant de commencer à pulser
+    });
+  }
+
   // Références renvoyées à initUnivers() pour piloter la transition de sortie
   // (S2B3T3) sans que ce fichier ait besoin de connaître cette logique lui-même.
-  return { svg, groupeLune, echelle, selectionEtoiles, groupeEtiquettes };
+  return { svg, groupeLune, echelle, selectionEtoiles, groupeEtiquettes, groupeGlow };
 }
