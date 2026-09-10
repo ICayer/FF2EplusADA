@@ -14,7 +14,13 @@
   background-color: #050507;
   background-image: url("../assets/milkyway.webp");
   background-size: cover;
-  background-position: center;
+  background-position: bottom 140px center; /* même réserve que le padding-bottom du
+                                                 SVG (point D) — les deux s'arrêtent à
+                                                 la même ligne, au-dessus du rail */
+  background-repeat: no-repeat; /* défensif — sans ça, le décalage vertical ci-dessus
+                                    peut exposer une répétition tuilée de l'image sur
+                                    les écrans où "cover" ne laisse aucune marge
+                                    verticale (voir synthèse) */
   box-sizing: border-box;
   padding: 24px 0 140px; /* haut / côtés / bas — le bas réserve l'espace du rail,
                              à ajuster à l'œil selon sa hauteur réelle actuelle */
