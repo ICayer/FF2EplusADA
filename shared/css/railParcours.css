@@ -1,22 +1,27 @@
 /* ==================================================
    shared/css/railParcours.css
-   Rail de navigation à 12 boutons (bas d'écran)
+   Rail de navigation à 12 étapes (bas d'écran)
 
-   Rôle : Styles du rail construit par shared/js/railParcours.js — pastille
-   ronde par étape, états actif / verrouillé / page-actuelle, bulle
-   "Pas encore débloqué". Couleurs via les jetons de variables.css
-   (--color-border, --color-primary) — aucune couleur de thème codée en dur,
-   à une exception près :
+   Rôle : Styles du conteneur du rail et des éléments interactifs de
+   shared/svg/timeline/timeline.svg, câblés par shared/js/railParcours.js —
+   états actif / verrouillé / page-actuelle. Depuis la Tranche B2
+   (11 septembre 2026), le rail est timeline.svg lui-même (script/asset de
+   Déline) : le rendu DOM à 12 boutons (.etape-bouton, .groupe-etapes,
+   .avec-ligne-temps, .diviseur-rupture) est retiré — timeline.svg porte
+   déjà sa propre bande de rupture (#rupture_stripe) et ses perles d'une
+   seule couleur, sans logique data-epoque.
+
+   .curseur-plume reste dans ce fichier bien qu'inutilisée (plus aucun
+   appelant de shared/js/railPlume.js) — orpheline intentionnellement,
+   conservée en miroir de railPlume.js pour la Tranche B3 (voir l'en-tête
+   de ce fichier JS). NE PAS la réactiver sans re-vérifier son usage.
+
    Exception au thème : .rail-parcours utilise un blanc fixe plutôt que
    var(--color-scene-bg) — le rail reste un repère de navigation constant,
    indépendant du thème clair/sombre de la scène qu'il chevauche
-   (3 septembre 2026) ; la ligne du temps décorative utilise donc
-   --color-border (gris fixe) plutôt que --color-rail-piste (translucide,
-   invisible sur blanc hors thème clair). Fill des pastilles dérivé du champ
-   epoque de parcours.json (avant/rupture → blanc, apres → noir) via
-   [data-epoque], jamais d'une position de bouton codée en dur.
+   (décision du 3 septembre 2026).
    Dépend de : shared/css/variables.css
-   Utilisé par : scrolly/index.html (univers/, valeurs/, landing à venir)
+   Utilisé par : scrolly/index.html, univers/index.html, valeurs/index.html
 
    FF2EplusADA (scrollyFFADA2S v2)
    Isabel Cayer · Atelier Love & Code · 2026
@@ -27,117 +32,81 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 10px 24px 24px; /* bas élargi pour la plume — Isabel ajustera à l'œil */
+  /* Ces 2 valeurs + la hauteur du <svg> ci-dessous composent --h-rail-parcours
+     (shared/css/variables.css) — source unique lue par les 3 scènes pour
+     réserver leur espace. Si tu changes ce padding, mets aussi à jour
+     --pad-rail-haut/--pad-rail-bas dans variables.css, sinon les scènes se
+     désynchronisent de nouveau (régression du 11 septembre 2026). */
+  padding: var(--pad-rail-haut) 24px var(--pad-rail-bas);
   box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px; /* espace de base entre groupes (ex. univers↔valeurs) — le grand écart
-                autour du scrolly vient de la marge dédiée sur .avec-ligne-temps, pas d'ici */
   background: #fff; /* exception consciente à la règle de thème du fichier (voir en-tête) —
                         le rail est un chrome de navigation, toujours blanc peu importe le
                         thème de la scène. Décision du 3 septembre. */
   z-index: 2000;
 }
 
-.groupe-etapes {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 20px; /* était 10px — plus de respiration pour mieux voir la ligne du temps
-                entre les pastilles (demande #1) — Isabel ajustera à l'œil */
+/* Le <svg> de timeline.svg, chargé directement dans .rail-parcours par
+   construireRailParcours() — hauteur native fixe (viewBox 1080.25 × 140.25),
+   largeur calculée par le navigateur selon ce ratio (jamais déformée),
+   centré. Fenêtre < 1080px non traitée ici, dépend de la décision "support
+   mobile" toujours en suspens (Registre, Sprint 6, S6B1T1). */
+.rail-parcours svg {
+  display: block;
+  /* Même source que --h-rail-svg dans variables.css (composant de
+     --h-rail-parcours) — si tu changes cette valeur, mets aussi à jour
+     --h-rail-svg, sinon les scènes se désynchronisent de nouveau. */
+  height: var(--h-rail-svg);
+  width: auto;
+  margin: 0 auto;
 }
 
-.etape-bouton {
-  position: relative;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  border: 2px solid var(--color-border);
-  /* Image de spirale placeholder retirée (demande #3) — le fill vient
-     maintenant de [data-epoque], voir règles ci-dessous. */
+/* Perles/boutons interactifs câblés par construireRailParcours() — ciblés
+   par [data-etape-id] (posé en JS sur chaque #perle_stepN/#bouton_accueil/
+   #bouton_valeur), jamais par une classe .etape-bouton qui n'existe plus. */
+.rail-parcours [data-etape-id] {
   cursor: pointer;
-  flex-shrink: 0;
-  transition: transform 0.15s ease, filter 0.2s ease, opacity 0.2s ease;
+  outline: none; /* retire l'anneau par défaut du navigateur (Chrome/Blink l'affiche
+                     au clic souris dès qu'un élément a tabindex, contrairement à un
+                     <button> natif) — aucune règle :focus n'existait avant celle-ci
+                     dans ce fichier, c'était bien le style UA par défaut, pas un
+                     correctif du projet à retirer. :focus-visible ci-dessous le
+                     restaure UNIQUEMENT à la navigation clavier. */
 }
 
-/* Fill par époque narrative (champ epoque de parcours.json) — jamais par
-   position ou numéro de bouton. Les étapes sans epoque (accueil, univers,
-   valeurs) n'ont pas de fill explicite : cercle bordé sur fond de rail. */
-.etape-bouton[data-epoque="avant"],
-.etape-bouton[data-epoque="rupture"] {
-  background-color: #fff;
+.rail-parcours [data-etape-id]:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
-.etape-bouton[data-epoque="apres"] {
-  background-color: #000;
-}
-
-.etape-bouton:hover,
-.etape-bouton:focus-visible {
-  transform: scale(1.12);
-  outline: none;
-}
-
-.etape-bouton.actif {
-  border-color: var(--color-primary);
-  /* Équivalent fixe de color-mix(in srgb, var(--color-primary) 25%, transparent) :
-     --color-primary vaut #a02421 et ne change pas selon le thème, donc la
-     valeur rgba() ne diverge jamais. Choix signalé dans la synthèse. */
-  box-shadow: 0 0 0 3px rgba(160, 36, 33, 0.25);
-}
-
-.etape-bouton.verrouille {
+.rail-parcours [data-etape-id].verrouille {
   filter: grayscale(1) brightness(1.3);
   opacity: 0.55;
   cursor: not-allowed;
 }
 
-.etape-bouton.verrouille::after {
-  content: "🔒";
-  position: absolute;
-  bottom: -4px;
-  right: -4px;
-  font-size: 13px;
-  background: #fff;
-  border-radius: 50%;
-  padding: 1px;
+/* Placeholder — traitement visuel de l'étape active sur une perle SVG,
+   pas encore défini par le script de Déline (l'ancien anneau de couleur
+   était pensé pour un cercle DOM séparé). Isabel ajustera à l'œil. */
+.rail-parcours [data-etape-id].actif {
+  filter: drop-shadow(0 0 4px var(--color-primary));
 }
 
-.etape-bouton.page-actuelle {
-  border-width: 3px;
+/* Placeholder — équivalent de l'ancien border-width:3px "page-actuelle"
+   des boutons DOM (tous les steps du scrolly l'avaient sur scrolly/,
+   par ex.) — à revoir, aucune règle de Déline ne le prévoit encore. */
+.rail-parcours [data-etape-id].page-actuelle {
+  filter: drop-shadow(0 0 2px var(--color-border));
 }
 
-/* Ancre invisible pour le curseur plume (railPlume.js) — plus aucun style visuel,
-   juste un point de repère au même endroit qu'avant (demande du 4 septembre). */
-.numero {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 18px;
-  height: 18px;
-}
-
-.icone-accueil {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 60%; /* occupe 60% de la surface du bouton — demande A. Isabel : si tu voulais
-                 60% de l'AIRE plutôt que du diamètre, vise plutôt ~77% ici */
-  height: 60%;
-  pointer-events: none;
-}
-
-.icone-accueil svg {
-  width: 100%;
-  height: 100%;
-}
-
+/* Bulle "Pas encore débloqué" — positionnée par JS (afficherBulleVerrouillee,
+   mesure réelle de la perle cliquée, Playbook §3.3) via left/bottom en style
+   inline ; cette règle ne fixe plus que l'apparence et le centrage horizontal
+   autour de ce point calculé. */
 .bulle-verrouillee {
   position: absolute;
-  bottom: 64px;
-  left: 50%;
   transform: translateX(-50%);
   background: #222;
   color: #fff;
@@ -154,101 +123,19 @@
   opacity: 1;
 }
 
-/* Curseur "plume" du rail (shared/js/railPlume.js). SVG inline, positionné
-   en absolu dans .rail-parcours, déplacé vers le bouton actif par GSAP. */
+/* Curseur "plume" — ORPHELINE depuis la Tranche B2 (shared/js/railPlume.js
+   n'a plus d'appelant, voir son en-tête). Conservée intentionnellement en
+   miroir du fichier JS, pas supprimée : référence possible pour la
+   Tranche B3, qui devra repenser entièrement le positionnement (la plume
+   vit maintenant DANS timeline.svg, plus dans un fichier séparé superposé
+   par cette règle). NE PAS réactiver sans revoir la Tranche B3 au complet. */
 .curseur-plume {
   position: absolute;
   top: 0;
   left: 0;
-  width: 45px; /* placeholder, même valeur de départ que scrolly/css/timeline.css .curseur —
-                  Isabel ajustera à l'œil */
+  width: 45px;
   height: auto;
   filter: var(--filtre-curseur);
   pointer-events: none;
-  z-index: 2; /* au-dessus de .etape-bouton (z-index: 1) — sans ça, le nouveau
-                 z-index explicite sur les boutons repasserait devant la plume,
-                 cassant l'effet "plume posée sur le numéro" (S6B0T1) */
-}
-
-/* Ligne du temps décorative — seulement sur un groupe à plus d'une étape
-   (.avec-ligne-temps, ajoutée par railParcours.js). Simple + flèche, pas
-   de trait de rupture (décision du 3 septembre, Registre). */
-.groupe-etapes.avec-ligne-temps {
-  margin: 0 56px; /* grand espace de chaque côté du groupe scrolly — Isabel ajustera à l'œil */
-  padding-right: 32px; /* était 16px — flèche moins accotée au dernier bouton (demande #2) ;
-                          espace RÉSERVÉ pour que la pointe dépasse après le bouton 10 */
-}
-
-/* Ligne + flèche : var(--color-border) (gris foncé fixe #3c3e40, non
-   thémé — même jeton que la bordure des boutons) plutôt que
-   var(--color-rail-piste), qui vaut du blanc translucide hors thème clair
-   et serait donc invisible sur le nouveau fond blanc du rail (univers/ et
-   steps F-I du scrolly). Cohérent avec l'exception de thème du rail. */
-.groupe-etapes.avec-ligne-temps::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 18px; /* était 32px — étirée jusqu'à toucher la base de la flèche
-                  (border-left: 18px de ::after), plus de vide entre la ligne et la pointe */
-  height: 5px; /* ligne élargie — était 2px */
-  background: var(--color-border);
-  transform: translateY(-50%);
-  z-index: 0;
-}
-
-.groupe-etapes.avec-ligne-temps::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: 0;
-  width: 0;
-  height: 0;
-  border-top: 10px solid transparent; /* était 8px — flèche agrandie (demande #2) */
-  border-bottom: 10px solid transparent;
-  border-left: 18px solid var(--color-border); /* était 14px */
-  transform: translateY(-50%);
-  z-index: 0;
-}
-
-.groupe-etapes .etape-bouton {
-  z-index: 1; /* toujours au-dessus de la ligne décorative ET du diviseur de rupture */
-}
-
-/* Diviseur de rupture (stripe2 + "Colonisation") — construireDiviseurRupture()
-   dans railParcours.js, inséré comme item flex entre le bouton 6 (rupture) et le
-   7 (après). z-index: 0 → même plan que la ligne décorative (::before/::after),
-   donc SOUS les boutons (z:1) et SOUS la plume (.curseur-plume, z:2). À vérifier
-   visuellement (demande #6) que la plume passe bien PAR-DESSUS ce diviseur
-   quand elle est ancrée sur le bouton 6 ou 7. */
-.diviseur-rupture {
-  position: relative; /* nécessaire pour ancrer l'étiquette en absolu ci-dessous */
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  z-index: 0;
-  margin-top: 12px;
-}
-
-.diviseur-rupture-stripe {
-  width: 24px; /* placeholder — Isabel ajustera à l'œil. Plus de rotation : rupture.svg
-                  est déjà dessinée verticale (viewBox 100×300). */
-  height: auto;
-}
-
-.diviseur-rupture-etiquette {
-  /* Agoradp_15 (chargée partout via variables.css) plutôt que var(--font-title) :
-     --font-title = 'Zilla Slab' n'est chargée que sur index.html et univers/, donc
-     retomberait sur un serif générique sur scrolly/ et valeurs/. Agoradp_15 est
-     aussi la police des légendes d'orientation "Colonisation/Mémoire/Aujourd'hui"
-     de la timeline (Registre 26 août). — Isabel : à revoir si tu préfères Zilla. */
-  position: absolute;
-  top: 88%; /* juste sous la bande rupture.svg, ne compte plus dans la hauteur du parent */
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: 1px;
-  font-family: "Agoradp_15", sans-serif;
-  color: var(--color-primary);
-  font-size: calc(0.8rem * var(--echelle-texte));
-  white-space: nowrap;
+  z-index: 2;
 }

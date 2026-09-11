@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080.25 140.25">
+  <g id="fil_du_temps">
+    <polyline points="229.41 40.25 294.35 48.05 359.28 53.24 424.22 59.74 490.45 62.98 589.15 58.44 656.03 50.64 720.97 44.8 784.61 41.55 852.14 38.31" fill="none" stroke="#000" stroke-miterlimit="10"/>
+  </g>
+  <g id="fil_de_laine">
+    <g id="corde">
+      <g>
+        <polyline points="125.5 28.5 233.5 37.7 367.53 58.38 463.27 60.67 585.82 60.67 703.01 45.35 830.15 39.23 933.33 31.34" fill="none" stroke="#000" stroke-linecap="round" stroke-miterlimit="10" stroke-width="5"/>
+        <path d="M929.57,31.63l-5.17-7.19.24-.19,12.68,3.95c4.36.62,8.72,1.23,13.07,1.85-4.21,1.27-8.43,2.54-12.64,3.81l-11.93,5.83-.27-.11,4.01-7.94Z"/>
+      </g>
+    </g>
+  </g>
+  <g id="bouton_accueil">
+    <circle id="fond_accueil" cx="66.04" cy="69.9" r="20"/>
+    <polygon id="maison" points="66.04 55.73 52.54 68.51 57.1 68.51 57.1 84.07 62.59 84.07 62.59 74.12 69.49 74.12 69.49 84.07 75.36 84.07 75.36 68.51 79.54 68.51 66.04 55.73" fill="#fff"/>
+  </g>
+  <g id="bouton_valeur">
+    <circle id="fond_valeur" cx="1014.94" cy="71.02" r="20"/>
+    <g id="Calque_6" data-name="Calque 6">
+      <path id="coeur" d="M1020.78,85.85l-7.4-4.85-8.43-5.87s-4.12-4.87-4.34-6.89c-.21-1.89.78-6.47,2.55-7.15,1.02-.39,3.15.97,4.09,1.53,1.38.82,4.09,3.54,5.62,3.06.82-.26,1.53-3.06,1.53-3.06,0,0,3.03-4.15,4.6-4.6,1.07-.31,3.37.48,4.34,1.02,1.18.66,4.02,2.49,3.83,3.83-1.28,8.94-6.38,22.98-6.38,22.98Z" fill="#fff"/>
+    </g>
+  </g>
+  <g id="perles_deco">
+    <g id="perle_blanche3">
+      <ellipse cx="908.57" cy="33.51" rx="4" ry="8" transform="translate(-.45 51.17) rotate(-3.23)" fill="#a02421"/>
+    </g>
+    <g id="perle_blanche3-2" data-name="perle_blanche3">
+      <circle cx="248.67" cy="40.74" r="8" transform="translate(207.48 289.33) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche2">
+      <circle cx="262.28" cy="41.92" r="8" transform="translate(219.89 304.13) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche1">
+      <circle cx="276.41" cy="43.19" r="8" transform="translate(232.72 319.52) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche3-3" data-name="perle_blanche3">
+      <circle cx="179.3" cy="35.09" r="8" transform="translate(143.88 214.32) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche2-2" data-name="perle_blanche2">
+      <circle cx="193.68" cy="36.28" r="8" transform="translate(157.05 229.89) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche1-2" data-name="perle_blanche1">
+      <circle cx="209.08" cy="37.29" r="8" transform="translate(171.42 246.3) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche3-4" data-name="perle_blanche3">
+      <circle cx="313.34" cy="49.64" r="8" transform="translate(263.13 362.89) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche2-3" data-name="perle_blanche2">
+      <circle cx="326.96" cy="50.83" r="8" transform="translate(275.53 377.69) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche1-3" data-name="perle_blanche1">
+      <circle cx="341.08" cy="52.1" r="8" transform="translate(288.37 393.08) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche3-5" data-name="perle_blanche3">
+      <circle cx="379.98" cy="55.52" r="8" transform="translate(323.77 435.39) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche2-4" data-name="perle_blanche2">
+      <circle cx="393.59" cy="56.7" r="8" transform="translate(336.18 450.19) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche1-4" data-name="perle_blanche1">
+      <circle cx="407.72" cy="57.97" r="8" transform="translate(349.02 465.58) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche3-6" data-name="perle_blanche3">
+      <circle cx="446.61" cy="59.09" r="8" transform="translate(386.72 505.6) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche2-5" data-name="perle_blanche2">
+      <circle cx="460.23" cy="60.28" r="8" transform="translate(399.12 520.4) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche1-5" data-name="perle_blanche1">
+      <circle cx="474.36" cy="61.54" r="8" transform="translate(411.96 535.79) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche3-7" data-name="perle_blanche3">
+      <circle cx="507.12" cy="59.86" r="8" transform="translate(446.35 566.87) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche2-6" data-name="perle_blanche2">
+      <circle cx="520.74" cy="61.04" r="8" transform="translate(458.76 581.68) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche1-6" data-name="perle_blanche1">
+      <circle cx="534.87" cy="62.31" r="8" transform="translate(471.59 597.06) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche3-8" data-name="perle_blanche3">
+      <circle cx="577" cy="57.05" r="8" transform="translate(-.1 1.04)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche2-7" data-name="perle_blanche2">
+      <circle cx="563.38" cy="58.23" r="8" transform="translate(-.1 1.02)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche1-7" data-name="perle_blanche1">
+      <circle cx="549.25" cy="59.5" r="8" transform="translate(-.11 .99)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche3-9" data-name="perle_blanche3">
+      <circle cx="637.25" cy="52.45" r="8" transform="translate(-.09 1.15)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche2-8" data-name="perle_blanche2">
+      <circle cx="623.63" cy="53.64" r="8" transform="translate(-.1 1.13)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche1-8" data-name="perle_blanche1">
+      <circle cx="609.51" cy="54.9" r="8" transform="translate(-.1 1.1)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche3-10" data-name="perle_blanche3">
+      <circle cx="703.13" cy="47.09" r="8" transform="translate(-.08 1.27)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche2-9" data-name="perle_blanche2">
+      <circle cx="689.51" cy="48.28" r="8" transform="translate(-.09 1.25)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche1-9" data-name="perle_blanche1">
+      <circle cx="673.85" cy="50.05" r="8" transform="translate(-.09 1.22)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche3-11" data-name="perle_blanche3">
+      <circle cx="767.98" cy="42.24" r="8" transform="translate(-.08 1.39)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche2-10" data-name="perle_blanche2">
+      <circle cx="754.36" cy="43.43" r="8" transform="translate(-.08 1.37)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche1-10" data-name="perle_blanche1">
+      <circle cx="740.23" cy="44.69" r="8" transform="translate(-.08 1.34)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche3-12" data-name="perle_blanche3">
+      <circle cx="833.08" cy="39.43" r="8" transform="translate(-.07 1.51)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche2-11" data-name="perle_blanche2">
+      <circle cx="819.46" cy="40.62" r="8" transform="translate(-.07 1.48)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche1-11" data-name="perle_blanche1">
+      <circle cx="805.34" cy="41.88" r="8" transform="translate(-.07 1.46)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche3-13" data-name="perle_blanche3">
+      <circle cx="897.93" cy="35.09" r="8" transform="translate(-.06 1.63)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche2-12" data-name="perle_blanche2">
+      <circle cx="884.31" cy="36.28" r="8" transform="translate(-.06 1.6)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche1-12" data-name="perle_blanche1">
+      <circle cx="870.19" cy="37.54" r="8" transform="translate(-.07 1.57)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10"/>
+    </g>
+    <g id="perle_blanche3-14" data-name="perle_blanche3">
+      <ellipse cx="168.92" cy="33.14" rx="8" ry="4" transform="translate(111.46 195.4) rotate(-81.6)" fill="#a02421"/>
+    </g>
+  </g>
+  <g id="perles_steps">
+    <g id="perle_step1">
+      <circle cx="229.63" cy="39.13" r="12.5" transform="translate(190.19 268.7) rotate(-89.92)"/>
+    </g>
+    <g id="perle_step2">
+      <circle cx="294.71" cy="46.75" r="12.5"/>
+    </g>
+    <g id="perle_step3">
+      <circle cx="360.74" cy="52.72" r="12.5"/>
+    </g>
+    <g id="perle_step4">
+      <circle cx="426.04" cy="59.09" r="12.5"/>
+    </g>
+    <g id="perle_step5">
+      <circle cx="491.13" cy="60.38" r="12.5" transform="translate(426.81 551.01) rotate(-89.54)"/>
+    </g>
+    <g id="perle_step6">
+      <circle cx="589.33" cy="56.49" r="12.5" transform="translate(-.11 1.11)"/>
+    </g>
+    <g id="perle_step7">
+      <circle cx="654.91" cy="51.94" r="12.5" transform="translate(601.92 706.77) rotate(-89.91)"/>
+    </g>
+    <g id="perle_step8">
+      <circle cx="720.5" cy="44.15" r="12.5" transform="translate(670.58 764.27) rotate(-89.54)"/>
+    </g>
+    <g id="perle_step9">
+      <circle cx="785.58" cy="40.25" r="12.5"/>
+    </g>
+    <g id="perle_step10">
+      <circle cx="851.11" cy="37.66" r="12.5"/>
+    </g>
+  </g>
+  <g id="rupture_stripe">
+    <path id="stripe4" d="M565.22,30.64c.08.02.16.05.46.21,1.01.46,1.81.8,2.6,1.14.01.26.03.52.04,1.07,0,.29,0,.51,0,.51,0,0-.03.01-.19.1-.71.63-1.57,1.09-1.74,1.73-.46,1.74-1.21,1.49-2.15.51-1.01-1.05-1.96-2.18-2.98-3.34-2.12,3.85,2.44,3.55,3.54,6.06-1.4.18-2.56.36-3.74.47-.51.05-1.39-.22-1.49-.03-.66,1.31-1.16,2.7-1.77,4.25-1.5,1.62-2.76,1.39-3.77-.69-.15,2.02-.28,3.88-.41,5.66,1.99-.99,3.85-1.92,5.53-2.76-.17-.55-.45-1.43-.53-2.35,2.71-1.32,2.11,1.1,2.56,2.23,1.28,2.31-1.08,3.13-1.73,4.56-.54-.4-1.05-.88-1.64-1.16-.16-.08-.6.45-.91.7,1.38,1.12-.49,1.41-.69,2.07-2.97-1.44-2.06.97-2.75,2.31,1.95-.13,2.98.42,2.63,2.42-.37.68-.73,1.19-1.24,1.6-2.2.94-4.52,1.67-6.22,3.13-2.14,1.84-1.68,4.18.41,6.08.41.38.27,1.36.22,2.09-.71.75-1.25,1.47-1.96,2.24-3.89-.72-2.74,2.5-3.42,4.44-3.88-4.11-5.03.96-7.54,1.71.71,2.05,1.35,3.91,2.03,5.86-.34.5-.78,1.17-1.36,1.9-.31.29-.49.53-.83.79-.69.36-1.22.68-1.56.89.44,1.49.82,2.78,1.18,4.08-.02,0-.02.05-.17.08-.43.57-.7,1.1-1.06,1.69-.09.05-.3.11-.47.16-.9,1.14-1.64,2.24-2.46,3.47.51-.07.98-.14,1.76-.24-1.46,2.43-2.08,5.25-5.49,5.16-.5-.48-.93-1.06-1.5-1.41-1.44-.89-3.1-1.49-4.39-2.55-2.43-2-2.49-2.71-1.38-5.44,1.33-3.3,2.64-6.5,4.71-9.39.88-1.22,1.8-2.4,2.81-3.81.64.18,1.12.7,1.72.92.65.24,1.41.2,2.12.28-.29-.57-.46-1.25-.89-1.69-.88-.89-1.68-1.7-.75-3.14.23-.31.33-.5.55-.71.27-.27.42-.53.7-.93.96-1.71,2.13-3.16,1.86-5.12,1.4-2.14,2.8-4.29,4.3-6.67.52-.65.94-1.06,1.36-1.47,1.04-.68,2.92-1.04,1.08-3.03.02-.28.08-.4.05-.43-.1-.12-.23-.21-.34-.32-.03-.13-.06-.25-.15-.51-.07-.14-.1-.05.05-.09.36-.08.56-.12.77-.15.53.07,1.4.35,1.52.16,1.47-2.35,2.84-4.77,4.29-7.48.61-1,1.29-1.62,1.67-2.39.5-1.06.76-2.22,1.12-3.35.86-1.32,1.79-2.59,2.55-3.96,1-1.79,1.9-3.64,2.79-5.5.26-.56.34-1.2.64-2.04.26-.57.39-.9.53-1.24.22-.23.45-.46.95-.81.5-.22.73-.32.95-.41.37.03.74.06,1.4.15.57.07.84.08,1.12.09,0,0,.06.07.18.24,1.02.13,1.93.1,2.83.07.09.04.19.08.46.3.48.35.78.53,1.09.7,0,0,.06.07.15.16.19.17.3.21.43.2M544.48,69.31c-.26-3.05-3.34-.8-4.35-2.69-.24,1.11-.41,1.87-.62,2.85,1.64.05,3.19.11,4.97-.16M529.25,89.43c.25.39.49.79.75,1.19,2.51-1.98,2.42-3.03,0-4.81-.29,1.03-.6,2.17-.75,3.61M541.58,70.38l-2.5.46c.09.38.17.76.26,1.14.98-.24,1.95-.47,2.93-.71-.12-.27-.23-.54-.68-.89" fill="#a02421"/>
+  </g>
+  <g id="curseur_plume">
+    <g>
+      <g id="plume">
+        <g id="remplissage">
+          <polygon points="200.62 79.61 193.95 79.46 190.33 76.77 182.01 77.33 177.12 77.76 178.63 82.24 175.68 83.9 169.93 82.7 170.3 85.11 166.93 84.1 161.16 88 157.22 89.54 147.55 98.36 136.95 104.41 125.02 110.41 114.54 116.26 125.66 116.25 131.55 115.09 131.35 117.39 144.17 116.56 162.56 111.93 168.92 107.01 165.86 111.85 170.86 111.22 176.28 103.53 179.75 102.74 178.27 107.23 181.8 105.94 188.13 99.37 187.72 104.48 191.09 98.53 190.98 101.71 195.27 97.92 199.55 93.31 200.39 91.13 201.54 94.02 203.34 89.46 204.9 83.13 207.27 84.09 207.81 79.83 202.83 76.13 199.25 80.51 200.62 79.61" fill="#f9f7f7"/>
+        </g>
+        <g>
+          <path d="M200.43,74.27c.31-1.06,1.58-1.34,1.31-2.99,2.08,1.56,2.92,3.34,3.84,5.19,2.28-.8,3.65-2.81,5.28-4.54,1.72-1.84,2.27-1.75,3.39.67-1.45,1.52-3.36,2.49-5.04,3.77-.85.64-1.66,1.34-.4,2.37.52.43.25.99.16,1.49-.16.99-.6,1.99-.49,2.95.14,1.26-.4,1.94-1.38,2.32-1.25.49-1.1-1.04-1.98-1.55-.4,2-1.93,3.75-.37,5.94-1.37.59-.99,2.52-2.93,3.4.46-2.39,1.37-4.58-.31-6.56-3.88.67-1.03-2.87-2.71-4.07-2.46,1.32-5.22,2.73-7.91,4.27-6.49,3.72-12.64,8.02-19.37,11.33-3.9,1.92-7.79,3.85-11.96,5.13-.44.13-.85.43-1.76-.25,7.37-3.04,14.45-6.07,20.98-10.21,6.59-4.19,13.23-8.3,20.47-12.42-4.18.83-6.82-.85-8.92-3.74,1.97,1.16,3.92,2.27,6.61,1.99-1.54-1.39-3.37-2.32-3.42-4.54-.03-1.16,1.07-1.41,1.38-2.33,1.94,1.3.12,1.69-.4,2.46.63,1.23,1.28,2.44,3.08,2.07.13-.03.3-.08.39-.03,2.64,1.58,2.43-.34,2.45-2.13M203.07,83.11c0,.51,0,1.01-.02,1.87.89-1.98,2.25-3.47,1.49-5.65-1.69.78-1.05,2.37-1.48,3.77M205.96,79.01c1.31.88-.72,2.45.7,3.35,1.36-1,.38-2.18.25-3.25-.06-.5-.48-.82-.95-.11h0Z"/>
+          <path d="M130.07,107.26c4.1-2.27,8.13-4.36,12.01-6.7,4.75-2.87,9.06-6.38,13.24-10.02.54-.47.95-1.14,1.91-.98.62.91-.04,1.45-.62,1.97-4.75,4.33-9.79,8.27-15.45,11.35-6.16,3.35-12.36,6.63-18.59,9.85-2.12,1.1-4.39,1.93-6.56,3.35,1.78,0,3.57.08,5.35.02,1.6-.06,3.2-.29,4.79-.37.61-.03,1.53-.27,1.61.69.08.94-.82.89-1.46.96-4.99.61-10.01.62-15.01.25-1.65-.12-3.33.63-4.94-.22-.28-.15-.56-.31-.91-.51.23-.22.36-.47.48-.46,5.9.43,10.84-2.38,15.94-4.69,2.81-1.27,5.41-2.91,8.21-4.49h0Z"/>
+          <path d="M189.2,97.64c-.69,2.33-1.36,4.51-1.48,6.84-.04.79-.9,1.11-1.66,1.23-.94.15-1.22-.48-1.13-1.47-1.9,2.21-4.25,3.04-6.66,4.44-.03-1.49.66-1.77,1.21-2.04,3.56-1.73,5.38-4.93,7.08-8.26.57-1.1,1.21-2.17,2.63-.74h0Z"/>
+          <path d="M170.5,109.77c2.19-.75,2.98-2.91,4.74-4.36-1.04,5.45-4.61,8.02-10.51,7.67,1.4-2.12,3.99-1.89,5.76-3.31h0Z"/>
+          <path d="M144.52,115.73c.71.15,1.28.29.7,1.03-.39.51-.98.72-1.58.75-3.93.19-7.83.73-11.78.59-.16,0-.32-.16-.52-.72,4.34-.56,8.68-1.11,13.17-1.65h0Z"/>
+          <path d="M166.09,85.73c-2.83.47-4.71,3.07-7.88,3.11.46-1,1.13-1.31,1.76-1.58,1.53-.66,2.98-1.41,4.12-2.7.28-.32.78-.49,1.21-.63.55-.18,1.23-.49,1.63.16.47.76-.09,1.21-.84,1.63h0Z"/>
+          <path d="M168.93,82.99c-.68-1.2-.14-1.67.89-1.47,1.34.26,2.7.63,4.12,1.92-1.93.51-3.41.12-5.01-.45Z"/>
+          <path d="M178.97,78.12c-.81.1-1.42.7-2.34.16,1.64-1.66,3.57-1.6,6.03-1.65-1.2,1.44-2.47,1.2-3.69,1.48Z"/>
+          <path d="M197.11,97.57c-1.03,1-1.39,2.64-3.15,2.57.26-2.06,1.9-3.39,3.15-2.57Z"/>
+        </g>
+      </g>
+      <g id="perle">
+        <g id="perle_noire3" data-name="perle noire3">
+          <circle cx="215.8" cy="65.9" r="8.02" stroke="#f9f7f7" stroke-miterlimit="10"/>
+        </g>
+        <g id="perle_noire2" data-name="perle noire2">
+          <circle cx="223.28" cy="53.01" r="8.02" stroke="#f9f7f7" stroke-miterlimit="10"/>
+        </g>
+        <g id="perle_noire1" data-name="perle noire1">
+          <circle cx="229.57" cy="39.64" r="8.02" stroke="#f9f7f7" stroke-miterlimit="10"/>
+        </g>
+      </g>
+    </g>
+    <path d="M222.92,84.41s20.78,9.74,40.26,1.95,25.97-19.48,25.97-19.48c0,0-7.24,4.58-14.94,3.25-3.56-.62,12.99,8.44,12.99,8.44" fill="none" stroke="#000" stroke-miterlimit="10"/>
+  </g>
+</svg>

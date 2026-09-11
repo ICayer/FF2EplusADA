@@ -31,7 +31,40 @@ body {
 
 :root {
   --h-barre-haut: 64px;
-  --h-zone-timeline: clamp(110px, 13vh, 150px);
+
+  /* Hauteur RÉELLE de .rail-parcours (shared/css/railParcours.css) — source
+     UNIQUE pour toute réserve d'espace en bas des scènes (scrolly, univers,
+     valeurs). Composée plutôt qu'un seul nombre codé en dur : si la hauteur
+     du SVG du rail ou son padding change un jour, ces 3 valeurs ET la
+     réserve des scènes changent ensemble automatiquement, sans plus jamais
+     se désynchroniser (régression Tranche B2 → B2 bis, 11 septembre 2026 :
+     le rail est passé de ~86px, DOM, à 174px, timeline.svg, mais les
+     réserves des 3 scènes étaient restées codées sur l'ancienne hauteur).
+     --h-zone-timeline (scrolly) référence --h-rail-parcours ci-dessous ;
+     univers/css/style.css et valeurs/css/style.css font de même.
+
+     Priorité de design (11 septembre 2026, correctif B2 ter) : les
+     graphiques de scène méritent le MAXIMUM d'espace, le rail (chrome de
+     navigation) le MINIMUM nécessaire — jamais l'inverse. --pad-rail-haut/
+     --pad-rail-bas descendent donc au strict minimum plutôt que de garder
+     le padding hérité de l'ancien rail à boutons DOM (10px/24px, pensé
+     pour des cibles de clic de 52px de diamètre qui n'existent plus).
+     Les cibles réelles aujourd'hui (perle_stepN r=12.5, bouton_accueil/
+     bouton_valeur r=20) sont dessinées avec leur propre marge interne au
+     sein des 140px natifs de timeline.svg (aucune ne touche le bord haut
+     ou bas du SVG) — le padding de .rail-parcours n'a donc plus qu'un
+     rôle cosmétique (éviter que la boîte blanche du rail semble collée
+     à ses voisins), pas fonctionnel pour la cliquabilité. 4px en haut
+     (juste assez pour ne pas coller visuellement au contenu de scène
+     au-dessus) et 8px en bas (un peu plus, pour ne pas coller au bord
+     réel de l'écran/du châssis de l'appareil) — valeurs à ajuster à
+     l'œil par Isabel si trop serré, mais delibérément minimales. */
+  --h-rail-svg: 140px; /* hauteur native de shared/svg/timeline/timeline.svg (voir railParcours.css) */
+  --pad-rail-haut: 4px; /* était 10px, hérité de l'ancien rail DOM */
+  --pad-rail-bas: 8px; /* était 24px, hérité de l'ancien rail DOM */
+  --h-rail-parcours: calc(var(--h-rail-svg) + var(--pad-rail-haut) + var(--pad-rail-bas)); /* 152px, était 174px */
+
+  --h-zone-timeline: var(--h-rail-parcours);
   --pad-timeline-haut: 24px;
   --echelle-texte: 1;
 

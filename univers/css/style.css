@@ -14,16 +14,19 @@
   background-color: #050507;
   background-image: url("../assets/milkyway.webp");
   background-size: cover;
-  background-position: bottom 140px center; /* même réserve que le padding-bottom du
-                                                 SVG (point D) — les deux s'arrêtent à
-                                                 la même ligne, au-dessus du rail */
+  background-position: bottom var(--h-rail-parcours) center; /* même réserve que le
+                                 padding-bottom ci-dessous (même variable) — les deux
+                                 s'arrêtent à la même ligne, au-dessus du rail */
   background-repeat: no-repeat; /* défensif — sans ça, le décalage vertical ci-dessus
                                     peut exposer une répétition tuilée de l'image sur
                                     les écrans où "cover" ne laisse aucune marge
                                     verticale (voir synthèse) */
   box-sizing: border-box;
-  padding: 24px 0 140px; /* haut / côtés / bas — le bas réserve l'espace du rail,
-                             à ajuster à l'œil selon sa hauteur réelle actuelle */
+  /* --h-rail-parcours (shared/css/variables.css) — hauteur RÉELLE du rail,
+     jamais recodée en dur ici : corrige la régression du 11 septembre 2026
+     (rail passé à 174px avec timeline.svg, cette réserve était restée à
+     l'ancienne valeur de 140px, cachant le bas de la scène derrière le rail). */
+  padding: 24px 0 var(--h-rail-parcours);
 }
 
 /* Voile sombre semi-transparent par-dessus la voie lactée : garde les

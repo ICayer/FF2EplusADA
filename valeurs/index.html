@@ -24,7 +24,6 @@
     import { initHeaderControls } from "../shared/js/headerControls.js";
     import { initProgression } from "../shared/js/progression.js";
     import { construireRailParcours, definirEtapeActive } from "../shared/js/railParcours.js";
-    import { initRailPlume } from "../shared/js/railPlume.js";
 
     await initI18n(langueSauvegardee() || 'fr');
     initValeurs("#graphic");
@@ -39,12 +38,11 @@
       },
     });
 
-    // Doit venir APRÈS construireRailParcours() — celui-ci fait innerHTML = ""
-    // au début, ce qui effacerait la plume si elle était ajoutée avant
-    // (même leçon que scrolly/js/script.js, S6B0T1).
-    const { deplacerPlume } = await initRailPlume(document.getElementById("rail-parcours"));
     definirEtapeActive("valeurs");
-    deplacerPlume("valeurs");
+    // Plus d'appel à initRailPlume()/deplacerPlume() depuis la Tranche B2 :
+    // le curseur plume vit maintenant DANS timeline.svg (#curseur_plume),
+    // révélé statique par construireRailParcours() — aucun déplacement
+    // animé pour l'instant (Tranche B3, séparée, à venir).
   </script>
 </body>
 </html>

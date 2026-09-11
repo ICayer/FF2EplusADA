@@ -23,7 +23,11 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  bottom: 100px; /* espace réservé pour le rail — ajuste selon sa hauteur réelle */
+  /* --h-rail-parcours (shared/css/variables.css) — hauteur RÉELLE du rail,
+     jamais recodée en dur ici : corrige la régression du 11 septembre 2026
+     (rail passé à 174px avec timeline.svg, cette réserve était restée à
+     l'ancienne valeur de 100px, cachant le bas de la scène derrière le rail). */
+  bottom: var(--h-rail-parcours);
   width: 100%;
   height: auto;
   overflow: hidden;
