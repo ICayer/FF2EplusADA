@@ -61,5 +61,12 @@
     "definition": { "fr": "[Texte à venir des artistes]", "en": null },
     "couleur": "#ff8f00",
     "audio": { "innu-aimun": "confiance.mp3" }
+  },
+  {
+    "id": "respect",
+    "nom": { "fr": "Respect", "en": "Respect", "innu-aimun": "Ishpenitamun" },
+    "definition": { "fr": "[Texte à venir des artistes]", "en": null },
+    "couleur": "#ea5cd9",
+    "audio": { "innu-aimun": "respect.mp3" }
   }
 ]
