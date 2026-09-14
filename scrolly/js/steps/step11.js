@@ -4,11 +4,14 @@
 //
 // Rôle : Après step10, faire disparaître la Communauté et les vestiges du
 // territoire, centrer la Lune pleine (recentrée dynamiquement via getBBox(),
-// pas une valeur codée en dur), générer ~221 étoiles JAUNES autour d'elle —
-// un simple effet visuel de densité, volontairement SANS lien aux vraies
-// données de etoiles.json ni distinction de couleur par nation (voir Registre,
-// réflexion d'Isabel sur le risque de fausse proportion perçue par les
-// communautés). Révèle ensuite le bouton "Explorer les étoiles" vers univers/.
+// pas une valeur codée en dur), générer ~221 étoiles JAUNES dispersées sur
+// toute la zone-scène visible (rejet par échantillonnage, même principe que
+// univers/js/etoiles.js — positionCiel()) — un simple effet visuel de
+// densité, volontairement SANS lien aux vraies données de etoiles.json ni
+// distinction de couleur par nation (voir Registre, réflexion d'Isabel sur
+// le risque de fausse proportion perçue par les communautés). Révèle ensuite
+// le bouton "Explorer les étoiles" vers univers/, positionné dynamiquement
+// sous la Lune réellement mesurée (getBoundingClientRect(), Playbook §3.3).
 //
 // Suit le principe déjà utilisé en v1 (Isabel) : on tue tout ce qui touche au
 // step précédent et on reconstruit indépendamment dans son propre conteneur,
@@ -34,9 +37,26 @@ let step11Timeline = null;
 let isStep11Active = false;
 
 const NB_ETOILES_TOTAL = 221;
-const RAYON_MIN = 40;
-const RAYON_MAX = 130;
 const COULEUR_ETOILES = "#eadd42"; // jaune uniforme — décision du 19 août, pas de couleur par nation ici
+
+// Rayon des étoiles — Étape 0 (14 septembre) : univers/js/etoiles.js utilise
+// (2.5 + random*2.5) dans un viewBox de 1000×1000 (VUE.largeur/hauteur). Le
+// viewBox de step10_lune_etoile.svg est 471.36×268.8 — beaucoup plus petit.
+// Copier tel quel le même intervalle numérique donnerait des étoiles environ
+// 2× plus GROSSES à l'écran ici que dans univers.html (même formule, unités
+// du viewBox ~2× plus "zoomées"), l'inverse de l'intention de rapprochement
+// visuel d'Isabel. Écart documenté plutôt que copie littérale : intervalle
+// mis à l'échelle par le ratio des largeurs de viewBox (471.36/1000), pour
+// occuper une proportion comparable de la scène plutôt qu'un même nombre
+// d'unités incomparables — à ajuster à l'œil si le résultat rendu diffère.
+const RATIO_VIEWBOX_STEP11_VS_UNIVERS = 471.36 / 1000;
+const RAYON_ETOILE_MIN = +(2.5 * RATIO_VIEWBOX_STEP11_VS_UNIVERS).toFixed(2); // ≈ 1.18
+const RAYON_ETOILE_VARIATION = +(2.5 * RATIO_VIEWBOX_STEP11_VS_UNIVERS).toFixed(2); // ≈ 1.18 (donc rayon final ≈ 1.18 à 2.36)
+
+// Marges — mêmes valeurs pour le bouton (Correction 1) et l'exclusion des
+// étoiles autour de lui/de la Lune (Correction 2), en pixels d'écran réels.
+const MARGE_BOUTON_LUNE_PX = 20; // dans la fourchette 16-24px suggérée
+const MARGE_EXCLUSION_ETOILE_PX = 12; // évite qu'une étoile touche visuellement la Lune ou le bouton
 
 // Mesure la position RÉELLE à l'écran de `element` et de `conteneur`, puis convertit
 // les deux centres en coordonnées internes du SVG via getScreenCTM() (la matrice de
@@ -68,6 +88,62 @@ function calculerCentrage(element, conteneur) {
     },
     centreConteneurSVG
   };
+}
+
+// Rectangle RÉELLEMENT visible de la zone-scène, en coordonnées internes du
+// SVG — mesuré via getScreenCTM() sur les 4 coins du conteneur rendu, jamais
+// présumé depuis le viewBox seul (Playbook §3.3, même principe que
+// calculerCentrage() ci-dessus, appliqué à un rectangle plutôt qu'un point).
+// Sert de domaine d'échantillonnage pour la dispersion des étoiles
+// (Correction 2) — équivalent du calcul cielMinX/MaxX/MinY/MaxY d'univers.js,
+// mais dérivé de la mesure réelle plutôt que d'une comparaison de ratios.
+function rectangleVisibleSVG(svgRootEl, conteneur) {
+  const ctmInverse = svgRootEl.getScreenCTM().inverse();
+  const rectConteneur = conteneur.getBoundingClientRect();
+  const pt = svgRootEl.createSVGPoint();
+
+  pt.x = rectConteneur.left;
+  pt.y = rectConteneur.top;
+  const coinHautGauche = pt.matrixTransform(ctmInverse);
+
+  pt.x = rectConteneur.right;
+  pt.y = rectConteneur.bottom;
+  const coinBasDroit = pt.matrixTransform(ctmInverse);
+
+  return {
+    minX: Math.min(coinHautGauche.x, coinBasDroit.x),
+    maxX: Math.max(coinHautGauche.x, coinBasDroit.x),
+    minY: Math.min(coinHautGauche.y, coinBasDroit.y),
+    maxY: Math.max(coinHautGauche.y, coinBasDroit.y),
+  };
+}
+
+// true si le point ÉCRAN (xEcran, yEcran) tombe dans `rect` (élargi de
+// MARGE_EXCLUSION_ETOILE_PX) — `rect` est un DOMRect ou null (aucune
+// exclusion). Testé en coordonnées écran plutôt qu'internes au SVG : rect
+// vient de getBoundingClientRect() (Lune ou bouton HTML), donc comparer
+// directement en pixels évite d'avoir à convertir un rectangle HTML dans
+// l'espace interne du SVG.
+function dansRectangleExclu(xEcran, yEcran, rect) {
+  if (!rect) return false;
+  return (
+    xEcran >= rect.left - MARGE_EXCLUSION_ETOILE_PX &&
+    xEcran <= rect.right + MARGE_EXCLUSION_ETOILE_PX &&
+    yEcran >= rect.top - MARGE_EXCLUSION_ETOILE_PX &&
+    yEcran <= rect.bottom + MARGE_EXCLUSION_ETOILE_PX
+  );
+}
+
+// Positionne le bouton "Explorer les étoiles" juste sous le bas RÉEL de la
+// Lune (`rectLune`, un DOMRect déjà mesuré par l'appelant — jamais recalculé
+// ici, pour rester correct aussi bien à l'ouverture qu'au redimensionnement,
+// voir l'écouteur "resize" plus bas). Centré horizontalement via le
+// translateX(-50%) posé une fois pour toutes en CSS (scrolly/index.html).
+function positionnerBoutonExploration(rectLune) {
+  const bouton = document.getElementById("bouton-explorer-etoiles");
+  if (!bouton || !rectLune) return;
+  bouton.style.top = `${rectLune.bottom + MARGE_BOUTON_LUNE_PX}px`;
+  bouton.style.left = `${rectLune.left + rectLune.width / 2}px`;
 }
 
 export async function showStep11() {
@@ -127,24 +203,64 @@ export async function showStep11() {
   // la position RÉELLE de la Lune et du conteneur visible sur l'écran, puis on
   // convertit en coordonnées internes du SVG via sa matrice de transformation
   // (getScreenCTM). Robuste peu importe comment le fichier source est configuré.
-  const { decalage, centreConteneurSVG } = calculerCentrage(pleineLune, step11Container);
+  const { decalage } = calculerCentrage(pleineLune, step11Container);
 
-  // --- Génération procédurale des ~221 étoiles jaunes ---
+  // --- Position ANTICIPÉE de la Lune une fois centrée (Correction 1/2) ---
+  // Les étoiles (plus bas) et le placement initial du bouton ont besoin du
+  // rectangle FINAL de la Lune AVANT que l'animation ne joue réellement
+  // (l'animation ne démarre qu'à la construction de la timeline, en bas de
+  // cette fonction). Saut instantané → mesure → retour à la position de
+  // départ, entièrement synchrone (aucun repaint entre les deux gsap.set) :
+  // la vraie animation, plus bas, part bien de la position d'origine.
+  gsap.set(pleineLune, { x: decalage.x, y: decalage.y });
+  const rectLuneFinal = pleineLune.getBoundingClientRect();
+  gsap.set(pleineLune, { x: 0, y: 0 });
+
+  // --- Bouton "Explorer les étoiles" (Correction 1) ---
+  // Texte posé dès maintenant (bouton encore invisible, opacity:0 en CSS —
+  // ça ne change rien à son opacity ni à sa mise en page/mesure) pour que sa
+  // largeur réelle soit connue AVANT de calculer sa zone d'exclusion
+  // ci-dessous, plutôt que de mesurer un bouton encore vide.
+  const bouton = document.getElementById("bouton-explorer-etoiles");
+  if (bouton) bouton.textContent = t("nav.explorerEtoiles");
+  positionnerBoutonExploration(rectLuneFinal);
+  const rectBoutonFinal = bouton ? bouton.getBoundingClientRect() : null;
+
+  // --- Génération procédurale des ~221 étoiles jaunes (Correction 2) ---
   // Volontairement AUCUN lien avec etoiles.json ni les couleurs de nations.json :
   // c'est un effet de densité visuelle, pas une représentation de vraies données.
+  // Dispersion par rejet sur TOUT le rectangle visible de la zone-scène, avec
+  // exclusion autour de la Lune ET du bouton — même principe que
+  // positionCiel() dans univers/js/etoiles.js, adapté : le rejet s'y teste en
+  // coordonnées écran (dansRectangleExclu) plutôt qu'un masque terrain, mais
+  // la logique de rejet par échantillonnage uniforme est la même.
   const NS_SVG = "http://www.w3.org/2000/svg";
   const groupeEtoiles = document.createElementNS(NS_SVG, "g");
   groupeEtoiles.setAttribute("id", "step11-etoiles");
   svgRootEl.appendChild(groupeEtoiles);
 
+  const ctmEcran = svgRootEl.getScreenCTM();
+  const zoneVisible = rectangleVisibleSVG(svgRootEl, step11Container);
+
   const etoilesGenerees = [];
   for (let i = 0; i < NB_ETOILES_TOTAL; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const rayon = RAYON_MIN + Math.random() * (RAYON_MAX - RAYON_MIN);
+    let x, y, ptEcran;
+    do {
+      x = zoneVisible.minX + Math.random() * (zoneVisible.maxX - zoneVisible.minX);
+      y = zoneVisible.minY + Math.random() * (zoneVisible.maxY - zoneVisible.minY);
+      const pt = svgRootEl.createSVGPoint();
+      pt.x = x;
+      pt.y = y;
+      ptEcran = pt.matrixTransform(ctmEcran);
+    } while (
+      dansRectangleExclu(ptEcran.x, ptEcran.y, rectLuneFinal) ||
+      dansRectangleExclu(ptEcran.x, ptEcran.y, rectBoutonFinal)
+    );
+
     const cercle = document.createElementNS(NS_SVG, "circle");
-    cercle.setAttribute("cx", centreConteneurSVG.x + Math.cos(angle) * rayon);
-    cercle.setAttribute("cy", centreConteneurSVG.y + Math.sin(angle) * rayon);
-    cercle.setAttribute("r", (0.6 + Math.random() * 0.8).toFixed(2));
+    cercle.setAttribute("cx", x);
+    cercle.setAttribute("cy", y);
+    cercle.setAttribute("r", (RAYON_ETOILE_MIN + Math.random() * RAYON_ETOILE_VARIATION).toFixed(2));
     cercle.setAttribute("fill", COULEUR_ETOILES);
     cercle.setAttribute("opacity", "0");
     groupeEtoiles.appendChild(cercle);
@@ -162,7 +278,12 @@ export async function showStep11() {
     y: decalage.y,
     duration: 2,
     ease: "power2.out",
-    onStart: () => console.log("🌕 Lune pleine centrée")
+    onStart: () => console.log("🌕 Lune pleine centrée"),
+    // Reconfirme la position du bouton avec le rectangle RÉEL (pas seulement
+    // l'anticipation ci-dessus) — filet de sécurité si un redimensionnement
+    // survient pendant les 2s de l'animation, cas marginal déjà couvert
+    // sinon par l'écouteur "resize" plus bas dès l'événement suivant.
+    onComplete: () => positionnerBoutonExploration(pleineLune.getBoundingClientRect()),
   });
 
   step11Timeline.to(etoilesGenerees, {
@@ -173,9 +294,11 @@ export async function showStep11() {
   }, "-=0.5");
 
   step11Timeline.call(async () => {
+    // Texte + position déjà posés plus haut (avant même le début de la
+    // timeline, nécessaire pour mesurer sa zone d'exclusion) — ici on ne
+    // fait plus que le révéler visuellement.
     const bouton = document.getElementById("bouton-explorer-etoiles");
     if (bouton) {
-      bouton.textContent = t("nav.explorerEtoiles");
       bouton.classList.add("visible");
       console.log('🔘 Bouton "Explorer les étoiles" révélé');
     }
@@ -226,6 +349,19 @@ export function hideStep11({ soft = false } = {}) {
     });
   });
 }
+
+// Repositionne le bouton si la fenêtre change de taille pendant que le step
+// est actif — même patron que positionnerBoutonExplorer()/resize dans
+// univers/js/etoiles.js. Ajouté UNE SEULE FOIS au chargement du module (pas
+// à chaque showStep11()) : step11 peut être affiché/masqué plusieurs fois
+// dans une même session, un ajout par appel accumulerait des écouteurs en
+// double. isStep11Active évite tout travail (et toute erreur si
+// step11Container n'existe pas encore) quand le step n'est pas affiché.
+window.addEventListener("resize", () => {
+  if (!isStep11Active || !step11Container) return;
+  const pleineLune = step11Container.querySelector("#step10PleineLune");
+  if (pleineLune) positionnerBoutonExploration(pleineLune.getBoundingClientRect());
+});
 
 // Retraduisage léger du bouton si la langue change pendant que le step est
 // affiché (bouton déjà révélé) — même patron que univers/js/etoiles.js et
