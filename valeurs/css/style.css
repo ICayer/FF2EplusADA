@@ -46,8 +46,8 @@ body {
    valeursAnimation.js → mettreAJourEtiquette). font-size en calc() pour
    que le contrôle A-/A+ (--echelle-texte) agisse dessus. */
 .ligne-autochtone {
-  font-size: calc(36px * var(--echelle-texte));
+  font-size: calc(55px * var(--echelle-texte));
 }
 .ligne-secondaire {
-  font-size: calc(26px * var(--echelle-texte));
+  font-size: calc(35px * var(--echelle-texte));
 }

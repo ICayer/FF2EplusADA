@@ -29,6 +29,11 @@ import { resolve, getLanguage } from "../../shared/js/i18n.js";
 let container = null;
 let audioActif = null; // un seul audio à la fois — une nouvelle lecture arrête la précédente
 const boutonsReveles = new Map(); // boutonEl -> valeur, pour le rafraîchissement de langue
+// boutonEl -> <text>.etiquette-valeur — l'étiquette ne vit PLUS comme enfant
+// de son propre bouton (voir #etiquettes-valeurs, assurerContainer()), donc
+// on ne peut plus la retrouver par boutonEl.querySelector(). Même patron que
+// boutonsReveles ci-dessus.
+const etiquettesParBouton = new Map();
 
 function reduitMouvement() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -63,7 +68,19 @@ async function assurerContainer() {
     // rien de précis.
     const spiraleEl = groupePrincipal.querySelector("#spirale");
     const rectSpiraleInitial = spiraleEl.getBoundingClientRect();
-    const hauteurCiblePx = window.innerHeight * 0.72;
+
+    // Hauteur RÉELLEMENT disponible pour la scène — PAS window.innerHeight
+    // (hauteur totale de la fenêtre), qui inclut à tort la bande réservée
+    // en bas au rail (var(--h-rail-parcours), shared/css/variables.css).
+    // #graphic (.zone-scene-valeurs, valeurs/css/style.css) est déjà borné
+    // par top:0 / bottom:var(--h-rail-parcours) — mesurer SA hauteur rendue
+    // (container.parentElement, jamais un deuxième "#graphic" codé en dur
+    // séparément) donne directement le bon espace, à la même source que le
+    // CSS, sans dépendre du chargement asynchrone du rail lui-même
+    // (construireRailParcours() n'est pas garanti terminé à ce stade — voir
+    // valeurs/index.html, où initValeurs() n'attend pas cet appel).
+    const hauteurDisponiblePx = container.parentElement.getBoundingClientRect().height;
+    const hauteurCiblePx = hauteurDisponiblePx * 0.85;
     const facteurEchelle = hauteurCiblePx / rectSpiraleInitial.height;
 
     const bbox = groupePrincipal.getBBox();
@@ -72,9 +89,10 @@ async function assurerContainer() {
     const [vbX, vbY, vbW, vbH] = svgRoot.getAttribute("viewBox").split(" ").map(Number);
     const centreViewBoxX = vbX + vbW / 2;
     const centreViewBoxY = vbY + vbH / 2;
+    const DECALAGE_Y = 150; // + = vers le bas ; ajuste à l'œil
     groupePrincipal.setAttribute(
       "transform",
-      `translate(${centreViewBoxX - facteurEchelle * centreGroupeX}, ${centreViewBoxY - facteurEchelle * centreGroupeY}) scale(${facteurEchelle})`
+      `translate(${centreViewBoxX - facteurEchelle * centreGroupeX}, ${centreViewBoxY - facteurEchelle * centreGroupeY + DECALAGE_Y}) scale(${facteurEchelle})`
     );
 
     // loadSVG pose le conteneur à opacity:0 ET pointer-events:none (défaut
@@ -118,6 +136,19 @@ async function assurerContainer() {
         Array.from(groupe.children).forEach((enfant) => gsap.set(enfant, { opacity: 0 }));
       }
     });
+
+    // Groupe partagé pour TOUTES les étiquettes de bouton — créé une seule
+    // fois ici, ajouté en DERNIÈRE position dans groupePrincipal pour se
+    // peindre après absolument tout le reste (spirale, couple, perles,
+    // swirls, boutons). En SVG l'empilement suit l'ordre du document : une
+    // étiquette posée comme enfant de SON PROPRE bouton (ancien
+    // comportement) se faisait recouvrir par un bouton VOISIN déclaré après
+    // elle dans #boutons, même visuellement éloigné — bug rapporté par
+    // Isabel. Voir mettreAJourEtiquette() plus bas, qui y ajoute chaque
+    // <text>.
+    const groupeEtiquettes = document.createElementNS(NS_SVG, "g");
+    groupeEtiquettes.setAttribute("id", "etiquettes-valeurs");
+    groupePrincipal.appendChild(groupeEtiquettes);
   }
 
   return container;
@@ -233,12 +264,16 @@ function revelerCercleSwirl(imageEl, sens, timeline) {
 }
 
 // (Re)construit le <text> bilingue d'un bouton. Sûre à rappeler : retire
-// l'ancienne étiquette (.etiquette-valeur) avant d'en poser une nouvelle
-// — c'est ce qui permet de la rafraîchir au changement de langue sans
-// toucher aux écouteurs. font-size via classes CSS (.ligne-autochtone /
-// .ligne-secondaire) pour que A-/A+ agisse aussi dessus.
+// l'ancienne étiquette (via etiquettesParBouton) avant d'en poser une
+// nouvelle — c'est ce qui permet de la rafraîchir au changement de langue
+// sans toucher aux écouteurs. font-size via classes CSS (.ligne-autochtone /
+// .ligne-secondaire) pour que A-/A+ agisse aussi dessus. L'étiquette est
+// ajoutée à #etiquettes-valeurs (groupe partagé, PAS un enfant de boutonEl)
+// — voir assurerContainer() : en SVG l'empilement suit l'ordre du document,
+// un bouton voisin déclaré après dans #boutons recouvrait sinon l'étiquette
+// d'un bouton antérieur.
 function mettreAJourEtiquette(boutonEl, valeur) {
-  const ancienne = boutonEl.querySelector(".etiquette-valeur");
+  const ancienne = etiquettesParBouton.get(boutonEl);
   if (ancienne) ancienne.remove();
 
   const rect = boutonEl.querySelector("rect");
@@ -286,7 +321,15 @@ function mettreAJourEtiquette(boutonEl, valeur) {
 
   texte.appendChild(ligneAutochtone);
   texte.appendChild(ligneSecondaire);
-  boutonEl.appendChild(texte);
+
+  // x/y ci-dessus lus directement sur rect.getAttribute() (coordonnées
+  // locales à groupePrincipal, aucune conversion nécessaire) : ni boutonEl
+  // ni #boutons ne portent de transform propre — #etiquettes-valeurs est un
+  // AUTRE enfant direct de ce même groupePrincipal, donc dans le même
+  // repère. Si un transform était un jour ajouté à boutonEl, ces
+  // coordonnées devraient être reconverties (getScreenCTM(), Playbook §3.3).
+  container.querySelector("#etiquettes-valeurs").appendChild(texte);
+  etiquettesParBouton.set(boutonEl, texte);
 
   boutonEl.setAttribute("aria-label", `${motAutochtone} — ${motSecondaire}`);
 }
@@ -342,16 +385,18 @@ function attacherEtiquetteBouton(boutonEl, valeur) {
   boutonEl.setAttribute("role", "button");
   // aria-label : posé (et mis à jour au changement de langue) par mettreAJourEtiquette().
 
-  // Les écouteurs cherchent l'étiquette EN DIRECT via querySelector plutôt
-  // que de fermer sur une variable `texte` — indispensable maintenant
+  // Les écouteurs cherchent l'étiquette EN DIRECT via etiquettesParBouton
+  // plutôt que de fermer sur une variable `texte` — indispensable maintenant
   // qu'elle peut être remplacée par mettreAJourEtiquette() sans que ces
-  // écouteurs soient réattachés.
+  // écouteurs soient réattachés (et qu'elle ne vit plus dans boutonEl, donc
+  // boutonEl.querySelector() ne peut plus la retrouver — voir
+  // #etiquettes-valeurs, assurerContainer()).
   const montrer = () => {
-    const et = boutonEl.querySelector(".etiquette-valeur");
+    const et = etiquettesParBouton.get(boutonEl);
     if (et) et.style.opacity = "1";
   };
   const cacher = () => {
-    const et = boutonEl.querySelector(".etiquette-valeur");
+    const et = etiquettesParBouton.get(boutonEl);
     if (et) et.style.opacity = "0";
   };
   boutonEl.addEventListener("mouseenter", montrer);
