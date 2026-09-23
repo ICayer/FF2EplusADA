@@ -28,7 +28,7 @@ import { initProgression, deverrouiller } from "../../shared/js/progression.js";
 
 // Seuils de la condition de sortie — valeurs de départ, faciles à ajuster,
 // à valider avec Déline une fois le rythme réel de la partie 3 mieux connu.
-const SEUIL_TEMPS_MS = 10000; // 30 secondes
+const SEUIL_TEMPS_MS = 30000; // 30 secondes
 const SEUIL_INTERACTIONS = 4;  // 4 étoiles explorées (clics, pas juste survol)
 
 // Note : le nombre de "perles" n'est plus fixé par une constante — c'est

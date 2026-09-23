@@ -47,7 +47,7 @@ const RAYON_MAX_ETOILES = 430; // ni trop des étiquettes
 const RAYON_ETOILE_TEMOIGNAGE = 10; // était 7 codé en dur — grossie, à ajuster à l'œil
 const RAYON_ETOILE_DEFAUT = 3.5;
 
-const ORDRE_DECENNIES = ['1950s','1960s','1970s','1980s','1990s','2000s','2010s','2020s'];
+const ORDRE_DECENNIES = ['1930s','1940s','1950s','1960s','1970s','1980s','1990s','2000s','2010s','2020s'];
 
 // Coordonnées du centre de la Lune DANS le fichier lune.svg extrait
 // (calculées le 24 août à partir de step10_lune_etoile.svg — voir Registre).
@@ -168,7 +168,12 @@ export async function initUnivers(selecteurConteneur = "#univers-canvas") {
     centre: CENTRE,
     rayonMin: RAYON_MIN_ETOILES,
     rayonMax: RAYON_MAX_ETOILES,
-    ordreDecennies: ORDRE_DECENNIES
+    ordreDecennies: ORDRE_DECENNIES,
+    // Doit couvrir le rayon RÉEL affiché (RAYON_ETOILE_TEMOIGNAGE), pas le défaut de
+    // constellations.js (6, jamais mis à jour depuis qu'une seule étoile-témoignage
+    // existait — aucune collision possible avec un seul nœud). +2 = léger espace
+    // visuel entre deux étoiles adjacentes, pas seulement zéro chevauchement pile.
+    rayonCollision: RAYON_ETOILE_TEMOIGNAGE + 2
   });
 
   initTestimonyModal(selecteurConteneur);

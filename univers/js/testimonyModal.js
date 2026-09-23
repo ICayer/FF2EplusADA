@@ -20,7 +20,7 @@
 // Isabel Cayer · Atelier Love & Code · 2026
 // ==================================================
 
-import { resolve } from "../../shared/js/i18n.js";
+import { resolve, t } from "../../shared/js/i18n.js";
 
 let overlayEl = null;
 let modalEl = null;
@@ -121,8 +121,8 @@ export function showTestimony(etoile, nation) {
     </main>
 
     <footer class="tm-footer">
-      ${p.redigePar
-        ? `<span>Témoignage recueilli par ${p.redigePar}</span>`
+      ${resolve(p.redigePar)
+        ? `<span>${t("modale.temoignageDe")} ${resolve(p.redigePar)}</span>`
         : `<span class="tm-footer-placeholder">Rédaction — à déterminer avec Déline</span>`}
     </footer>
   `;
