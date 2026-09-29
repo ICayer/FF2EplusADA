@@ -88,7 +88,42 @@ La v2 est développée en solo par Isabel avec Claude comme collaborateur techni
 | 24 août | Contenu | Référence officielle pour l'orthographe des 13 langues autochtones : infographie déjà produite et validée par Isabel — nations.json en reprend l'orthographe exacte |
 | 26 août |	Contenu/Design | Bloc-titre de scène : fond opacité 0,7 (confirmé nécessaire — têtes des personnages de step7 remontent jusqu'en haut-gauche), police Agoradp_15, fondu croisé ~400ms (200ms sortie + 200ms entrée) à ajuster à l'œil et avec Déline — le projet privilégie la lenteur
 
+# Ajouts au Registre — semaine du 10 au 24 septembre 2026
 
+*À fusionner dans `docs/REGISTRE.md`, sous les tableaux existants (Architecture / Production / Contenu-Design / Gouvernance selon la colonne). Dates approximatives, à ajuster si tu as les vraies dates de commit sous la main.*
+
+---
+
+## Architecture
+
+| Date | Département | Décision |
+|---|---|---|
+| 10 sept | Architecture | Refonte du rail de navigation : `shared/svg/timeline/timeline.svg` (rail en perles, dessiné par Déline) remplace le Rail à 12 boutons DOM/CSS (Bloc 1). Positions des perles lues directement du SVG, **pas calculées par formule** — renverse la décision du 26 août ("position calculée par formule selon epoque, jamais codée en dur"). |
+| 10 sept | Architecture | Distinction visuelle blanc/noir par epoque retirée sur le rail — une seule couleur pour toutes les perles (choix artistique de Déline, simplification volontaire). |
+| 10 sept | Architecture | Le marqueur "univers" (perle_step10) est maintenant cliquable comme les 9 autres perles — renverse le comportement non-cliquable établi le 26 août pour l'ancien repère jaune. |
+| 10 sept | Architecture | Le curseur plume (`perle_noire1-3`) vit maintenant dans le même document SVG que le rail (`timeline.svg`), plutôt que dans un fichier séparé positionné par-dessus en CSS. Son déplacement devient une transformation SVG interne (translate dans le même référentiel de coordonnées) — simplification directe permise par la fusion des deux fichiers. L'ancien système (`shared/js/railPlume.js`, `shared/svg/timeline/plume.svg`) est conservé intentionnellement comme référence/code mort, pas supprimé. |
+| 21 sept | Architecture | Les cercles de valeurs du step "Lié·es à leurs valeurs" (scrolly, step D) sont maintenant dessinés à la main dans `scrolly.svg` (groupe `#cercles-valeurs`), disposés en arc de chaque côté de la spirale (5 de chaque côté, volontairement pas un cercle complet pour éviter le rognage en haut/bas de la zone-scène) — plutôt que positionnés/générés par calcul JS. Même principe de conception que le rail (positions dessinées dans le fichier source plutôt que calculées). |
+| 21 sept | Architecture | L'ancienne étiquette "Ishpenitamun"/"Respect" affichée séparément sous la timeline (script original de Déline, step D) est retirée — fusionnée dans le même système interactif (survol + traduction) que les 9 autres cercles de valeurs. `shared/data/valeurs.json` passe de 9 à 10 entrées ("respect" ajouté) — traduction innu-aimun déjà validée et en production ailleurs sur le site, donc consolidation technique d'une donnée déjà approuvée, pas une nouvelle décision de contenu créatif. |
+| 24 sept | Architecture | Lors d'un réexport Illustrator d'un fichier existant après une retouche ponctuelle (ex. remplacement d'un seul calque), **toujours vérifier/fixer les dimensions du plan de travail ET cocher "Utiliser les plans de travail"** avant l'export SVG — sinon le `viewBox` peut se recalculer silencieusement sur la boîte englobante du contenu visible, décalant l'origine des coordonnées de TOUS les autres calques, même ceux jamais touchés intentionnellement. Constaté sur `valeurs.svg` après remplacement de `swirl9` par `swirl9v2` (décalage uniforme de +114,78 sur 10 éléments non modifiés). Voir Playbook §7.4. |
+| 24 sept | Architecture | `ORDRE_DECENNIES` (`univers/js/etoiles.js`) étendu à partir de `"1930s"` (était `"1950s"`). Le champ avait été conçu à l'origine pour une date de **décès**, puis réutilisé pour une date de **naissance** sans que cette dépendance soit revue — une étoile née avant 1950 (ex. Gladys Tolley, née 1940) tombait silencieusement dans le mauvais secteur de décennie de la constellation, sans erreur visible. |
+| 24 sept | Architecture | `rayonCollision` (paramètre de `calculerDisposition()`, `univers/js/constellations.js`) doit toujours être dérivé du rayon RÉEL de l'étoile-témoignage (+ marge de sécurité), jamais laissé à une valeur par défaut non vérifiée — un défaut sous-dimensionné (6 au lieu de 12) est resté invisible tant qu'une seule vraie étoile-témoignage existait, exposé seulement une fois 10 vraies étoiles intégrées le même jour. |
+| 24 sept | Architecture | `portrait.redigePar` (schéma `etoiles.json`) restructuré en `{fr, en}`, même format que `temoignage` — corrige le même défaut structurel (chaîne unique plutôt que paire bilingue) trouvé et corrigé deux fois la même semaine sur deux champs différents. |
+| 24 sept | Architecture | `shared/data/fallbackByLanguage.json` : ajout d'une entrée `"fr": "en"`. Le français n'avait jusqu'ici jamais de repli configuré (présumé toujours complet, puisque tout le contenu éditorial partait du français) — hypothèse rompue par l'arrivée de témoignages sourcés directement en anglais (journalisme externe, CBC/Safe Passage). |
+
+## Gouvernance
+
+| Date | Département | Décision |
+|---|---|---|
+| 24 sept | Gouvernance | **Aucune catégorie de mode de décès dans les données du projet.** Le champ `categorie` (assassinée / disparue-non-retrouvée / disparue-retrouvée / décès-suspect / autre-décès) est retiré COMPLÈTEMENT du schéma `univers/assets/etoiles.json` (221 entrées) — pas seulement laissé vide pour les vraies étoiles. Réaffirme et précise le narratif positif déjà établi (18 août : "ton positif et non-dramatique"). |
+| 24 sept | Gouvernance | Les 10 premières vraies étoiles-témoignage sont intégrées (sources : CBC *Missing & Murdered*, Safe Passage, recherche complémentaire d'Isabel sur le web). `etoile-modele` renommée `etoile-001` (Sindy Ruperthouse) — l'étoile modèle a toujours été conçue comme le premier emplacement réel, jamais un cas à part. Champ `portrait.nomComplet` ajouté au schéma (221 entrées, rempli pour les vraies étoiles seulement) — utile pour la recherche de sources et potentiellement pour la FAQ. **Recoupement avec les données FAQ à faire lors d'une future collecte**, pour éviter les doublons entre les trois sources (CBC / Safe Passage / FAQ). |
+| 24 sept | Gouvernance | Idée explorée puis explicitement écartée : faire varier légèrement le rayon visuel des étoiles-témoignage selon la décennie de naissance (métaphore : une vie plus ancienne "voyage plus loin" dans l'univers visuel). Écartée pour préserver l'accessibilité motrice — réaffirme sans exception la décision du 28 août (cibles cliquables généreuses et constantes, persona de référence : femme aînée autochtone peu familière avec la navigation web). |
+
+## Production
+
+| Date | Département | Décision |
+|---|---|---|
+| 24 sept | Production | Pipeline de couleur identifié comme cause probable de la désaturation des dessins Procreate de Boris (Display P3, l'espace de couleur par défaut de Procreate) une fois intégrés au site (sRGB, seul espace que le web/SVG comprend). Geste préventif retenu : **Boris règle le profil de couleur de sa toile Procreate à sRGB IEC61966-2.1 directement à la source**, plutôt que de corriger après coup dans Photoshop/Illustrator — il voit alors, en dessinant, la vraie plage de couleurs disponible sur le site final. |
+| 24 sept | Production | Export SVG Illustrator : l'échappement d'ID en `_x5F_` (underscore) sur des noms de calque contenant déjà un underscore semble lié au chemin **Fichier > Exporter > Exporter sous** plutôt qu'**Enregistrer sous** — confirmé empiriquement sur `timeline.svg`. Toujours utiliser "Exporter sous" pour l'export SVG. Voir Playbook §7.4 pour la technique de correction si l'échappement apparaît quand même. |
 
 
 

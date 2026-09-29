@@ -283,3 +283,72 @@ Illustrator Image Trace reste le filet de sécurité si cette approche ne suffit
 | v0.1 | 19 août 2026 | Création initiale — conventions établies durant le Sprint 1 (arborescence, i18n, steps registry, scoping SVG, symétrie show/hide) |
 | v0.2 | 24 août 2026 | Transitions toujours manuelles (jamais automatiques) ; nommage des nouveaux fichiers JS v2 (descriptif, scopé, pas de numérotation globale) ; nommage explicite des champs de données synthétiques ; centrage/mise à l'échelle SVG toujours mesuré (getScreenCTM), jamais présumé ; convention de z-index face à `loadSVG()` ; méthode d'extraction d'un calque en asset autonome ; notes de vectorisation (Illustrator vs Adobe Express) |
 | v0.3 | 25 août 2026 | Méthode complète de préparation d'un dessin de Déline (raster vs vecteur, Photoshop, export Illustrator "Lier" pas "Conserver", conversion WebP, correction des chemins, vérification par Network/DevTools) — voir aussi `docs/GUIDE_DELINE.md` pour les recommandations en amont destinées à Déline |
+
+# Ajouts au Playbook — semaine du 10 au 24 septembre 2026
+
+*À fusionner dans `docs/PLAYBOOK.md`. Inclut les deux nouvelles sections qu'Isabel avait proposées (7 sept.) et mises de côté "pour dans quelques jours" — assez de matière s'est accumulée depuis pour les remplir. Les autres ajouts complètent des sections déjà existantes.*
+
+---
+
+## Nouvelle section — Les éléments fondamentaux d'un script technique
+
+*Ce qu'un script de Déline (ou toute préparation de contenu SVG) devrait préciser avant qu'un fichier existe — pour que l'intégration ne redécouvre pas ces questions à chaque fois.*
+
+Avant de commencer à intégrer un nouveau step ou une nouvelle scène, confirmer explicitement :
+
+- **Quels éléments bougent individuellement vs en bloc** (déjà couvert au §3.2, "un groupe = une intention d'animation" — à revalider pour chaque nouveau fichier, pas présumé stable d'un asset à l'autre).
+- **Quel texte reste éditorial/i18n vs quel texte est baked-in au SVG.** Convention déjà établie : tout texte narratif ou de contenu variable (témoignages, titres de step, mots de valeurs) vit en overlay HTML/CSS avec `resolve()`, jamais dans le fichier SVG — le SVG ne porte que des éléments graphiques stables. Leçon du step D (Ishpenitamun/Respect, 21 sept.) : quand une exception à cette règle existe, la retrouver et la fusionner au système générique dès qu'on la croise, plutôt que la laisser vivre en parallèle.
+- **Dimensions cibles du plan de travail, fixées explicitement** — jamais laissées au préréglage par défaut d'Illustrator (voir §7.4, leçon `valeurs.svg`/`swirl9`). Documenter la dimension choisie quelque part (commentaire dans le fichier, ou ici même) pour qu'un futur réexport sache quoi restaurer.
+- **Quels éléments seront probablement retouchés plus tard** (asset définitif vs prototype rapide) — un élément appelé à changer souvent mérite un nom de calque stable et descriptif dès le départ (§2.3), pour que son remplacement futur ne force pas un renommage en cascade.
+- **La couleur cible du dessin (Procreate) est-elle en sRGB ?** Voir §7.5 — à vérifier à la source, avant même que le dessin commence, pas après réception.
+
+## Nouvelle section — Pipeline de production itérative d'un fichier SVG
+
+*Le cycle complet, du dessin à la vérification en navigateur, pour qu'il soit documenté une fois plutôt que redécouvert à chaque nouvel asset.*
+
+1. **Dessin** (Déline sur papier, ou Boris sur Procreate) — voir `docs/GUIDE_DELINE.md` pour les recommandations non-techniques (résolution, format, fond). Pour Procreate spécifiquement : profil de couleur de la toile réglé à sRGB IEC61966-2.1 avant de commencer (§7.5) — évite une désaturation surprise à l'intégration.
+2. **Export vers Isabel** — PNG ou TIFF, jamais JPEG (perte de transparence et de nuances). Un fichier par élément si possible.
+3. **Préparation Photoshop** (raster) — détourage, redimensionnement (~2000-2500px), export PNG-24 puis conversion WebP. **Rogner aux pixels transparents avant l'export** (Image > Rogner, référence "Pixels transparents") — une marge transparente non rognée gonfle artificiellement la boîte englobante de l'élément une fois importé dans Illustrator, ce qui peut fausser tout calcul de recentrage/mise à l'échelle basé sur `getBBox()` côté code (leçon `swirl9`, 24 sept.).
+4. **Assemblage Illustrator** — plan de travail aux dimensions cibles FIXÉES à l'avance (jamais un préréglage par défaut comme "Google pixel/Pixel 2"), calques nommés selon la convention `[zone]-[élément]-[variante]` (§2.3).
+5. **Export SVG** — **Fichier > Exporter > Exporter sous** (jamais "Enregistrer sous" — cause probable de l'échappement d'ID en `_x5F_`, confirmé empiriquement le 24 sept.). Dans la boîte de dialogue d'export : cocher **"Utiliser les plans de travail"** (verrouille le `viewBox` sur les dimensions du plan de travail plutôt que sur la boîte englobante du contenu — évite une dérive silencieuse à chaque réexport, §7.4). Dans "Options SVG" : Stylisation "Attributs de présentation", Images "Lier" (jamais "Conserver" — §7.3 déjà établi).
+6. **Correction des chemins dans VS Code** — déjà établi au §7.3 (chemins relatifs à la page, pas au fichier SVG). **Technique accélérée** : plutôt qu'une correction manuelle fichier par fichier, utiliser la recherche-remplacement en mode expression régulière de VS Code (Ctrl+H, icône `.*`) :
+   - Rechercher : `xlink:href="([a-zA-Z0-9_-]+\.(webp|png))"`
+   - Remplacer : `xlink:href="./svg/[nomStep]/$1"`
+
+   Un seul geste recolle tous les `href` d'un fichier réexporté, peu importe combien il y en a — plus fiable qu'une répétition manuelle (§7.3 met déjà en garde contre le copier-coller répété qui peut laisser une erreur invisible).
+7. **Dépôt des fichiers** — `scrolly/svg/[nomStep]/` (ou dossier équivalent selon la partie).
+8. **Vérification** — déjà établi au §7.3 Étape 6 (onglet Network, code 200, filtre vidé). **Ajout** : si le fichier remplace un calque existant plutôt que d'être un tout nouvel asset, comparer le `viewBox` avant/après (`git diff` sur la balise `<svg>` racine) — un changement inattendu de dimensions ou de décalage sur des calques non touchés est le signe d'un plan de travail non verrouillé à l'export (§7.4).
+
+## §7.4 (nouveau) — Verrouiller le plan de travail à l'export
+
+*Prolonge §7.3 — leçon du 24 septembre 2026, fichier `valeurs.svg`.*
+
+Par défaut, l'export SVG d'Illustrator calcule le `viewBox` à partir de la boîte englobante réelle de **tout le contenu visible du document** — pas des dimensions déclarées du plan de travail, sauf si l'option "Utiliser les plans de travail" est cochée à l'export ET que le plan de travail lui-même a des dimensions intentionnelles (pas un préréglage par défaut sans rapport avec le contenu).
+
+Symptôme si cette étape est oubliée : remplacer ou retoucher un seul calque peut faire grossir ou rétrécir le `viewBox` global, ce qui décale l'origine des coordonnées de **tous les autres calques** — même ceux jamais touchés intentionnellement. Le symptôme visuel typique (constaté sur `valeurs.svg`) : la composition semble "trop grande" ou "coupée" une fois affichée dans la page, alors que le code qui la met à l'échelle (`getBoundingClientRect()`, `getBBox()`) n'a pourtant pas changé — parce qu'il mesure fidèlement un fichier dont le cadrage de référence, lui, a bougé.
+
+**Geste préventif** : avant tout réexport d'un fichier existant, fixer explicitement les dimensions du plan de travail (Objet > Plan de travail > Options, ou double-clic sur l'outil Plan de travail) aux dimensions cibles connues du projet, PUIS cocher "Utiliser les plans de travail" dans la boîte de dialogue d'export SVG (Fichier > Exporter > Exporter sous).
+
+**Geste correctif si le viewBox a déjà dérivé** : comparer le fichier via `git diff` au commit précédent pour isoler précisément ce qui a changé (viewBox, décalages uniformes sur les autres calques) avant de décider si c'est une intention artistique ou un effet de bord à corriger — ne jamais présumer.
+
+**Rappel d'hygiène (leçon plus large, à part le viewBox)** : rogner tout asset raster aux pixels transparents (Photoshop, Image > Rogner) avant son export en WebP — une marge transparente non rognée gonfle la boîte englobante de l'élément une fois importé, avec le même genre de conséquence sur les calculs de recentrage basés sur `getBBox()`.
+
+## §7.5 (nouveau) — Pipeline de couleur Procreate → web
+
+*Leçon du 24 septembre 2026 — swirls de Boris "trop pastel" une fois intégrés.*
+
+Procreate dessine par défaut dans l'espace de couleur **Display P3** — une gamme plus large que **sRGB**, le seul espace que le web (et donc le SVG final) comprend nativement. Un rouge ou un vert très saturé dessiné en P3 n'a parfois tout simplement pas d'équivalent aussi vif en sRGB.
+
+Le problème n'est pas la différence de gamme en soi, mais la façon dont elle est gérée au moment de l'ouverture du fichier dans Photoshop (boîte de dialogue "Non-concordance des profils incorporés") :
+- **"Supprimer le profil incorporé (pas de gestion des couleurs)"** — garde les mêmes chiffres RGB bruts mais leur retire leur étiquette P3 ; réinterprétés sous les primaires plus ternes de sRGB, ces mêmes chiffres produisent une couleur visiblement désaturée. **Cause la plus probable d'un résultat "pastel" inattendu.**
+- **"Convertir les couleurs du document selon l'espace de travail"** — recalcule chaque pixel pour la couleur la plus proche possible en sRGB. Une perte de saturation reste possible pour les couleurs hors gamme, mais contrôlée et prévisible, pas un effondrement.
+
+**Geste préventif retenu pour ce projet** : régler le profil de couleur de la toile Procreate à **sRGB IEC61966-2.1** directement à la source (Informations sur la toile > Profil de couleur, dans Procreate), avant même de commencer à dessiner. L'artiste voit alors, en dessinant, la vraie plage de couleurs qui sera effectivement disponible sur le site — élimine le problème plutôt que de le corriger après coup.
+
+## §2.6 — Complément : champs de données réels vs synthétiques (mise à jour)
+
+Rappel du principe déjà établi : toute donnée générée/approximative porte un nom qui le dit clairement (`decennieNaissanceApprox` vs `portrait.dateNaissance`). Précision ajoutée le 24 septembre : quand une vraie donnée remplace un placeholder (ex. les 10 premières étoiles-témoignage), **auditer systématiquement les champs dérivés** qui dépendaient de l'ancienne valeur synthétique avant de considérer l'intégration terminée — dans ce cas précis, `decennieNaissanceApprox` devait être recalculé à partir de la vraie `dateNaissance`, et une dépendance oubliée (`ORDRE_DECENNIES` ne couvrant pas les décennies antérieures à 1950) est restée invisible tant qu'aucune vraie donnée ne l'avait mise à l'épreuve.
+
+## §3.5 — Complément : un mécanisme jamais mis à l'épreuve par la faible densité de données réelles
+
+Prolonge la leçon `goToStep()` déjà documentée. Deuxième instance trouvée le 24 septembre : le paramètre `rayonCollision` de `calculerDisposition()` (`univers/js/constellations.js`) avait une valeur par défaut sous-dimensionnée, invisible tant qu'une seule vraie étoile-témoignage existait — deux vraies étoiles ne pouvaient statistiquement jamais entrer en collision avec un échantillon de un. Le passage à 10 vraies étoiles l'a exposé immédiatement. **Leçon générale** : un mécanisme conçu et testé avec des données synthétiques abondantes (221 placeholders) peut cacher un défaut qui ne se révèle qu'avec un petit nombre de vraies données concentrées dans le même secteur — tester explicitement le cas "peu de vraies données, densément groupées" plutôt que présumer que "ça marchait avec 221" suffit.

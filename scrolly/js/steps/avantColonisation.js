@@ -10,7 +10,7 @@
 // fois révélé (spirale, communauté, territoire, perles) reste affiché en
 // continu même en naviguant vers un step antérieur — les hide() de
 // A/B/C sont donc volontairement vides. Les 10 cercles de valeurs
-// (#cercles-valeurs, 10 <rect> arrondis nommés cercle-valeur-[id]) vivent
+// (#cercles-valeurs, 10 taches peintes <image> nommées cercle-valeur-[id]) vivent
 // DANS scrolly.svg depuis le 14 septembre 2026 (script/asset d'Isabel) —
 // plus de génération JS ni de mot permanent séparé, voir
 // construireCerclesValeurs()/afficherCarteValeur().
@@ -167,7 +167,7 @@ async function assurerContainer() {
 
         // Les 10 cercles de valeurs (réexportés par Isabel DANS scrolly.svg,
         // Tranche du 14 septembre) : même principe que les perles ci-dessus —
-        // le GROUPE reste opacity:1, ce sont les <rect> enfants qui démarrent
+        // le GROUPE reste opacity:1, ce sont les <image> enfants qui démarrent
         // invisibles. Nécessaire dès la création du conteneur (pas seulement
         // au premier passage sur showLienValeurs()) : sans ça, les 10 cercles
         // seraient visibles par défaut (aucune opacité dans le SVG source) dès
@@ -294,7 +294,7 @@ function angleHoraireDepuisCentre(x, y, centre) {
   return angle;
 }
 
-// Les 10 cercles de valeurs (#cercles-valeurs > 10 <rect> arrondis, nommés
+// Les 10 cercles de valeurs (#cercles-valeurs > 10 taches peintes <image>, nommées
 // cercle-valeur-[id], réexportés par Isabel dans scrolly.svg) vivent
 // maintenant ENTIÈREMENT dans le fichier source — plus de génération JS ni
 // de formule de placement (même principe que la Tranche B de la timeline,
@@ -323,13 +323,23 @@ function construireCerclesValeurs() {
 
   const cercles = Array.from(groupeCercles.children);
 
+  // Centre de chaque tache mesuré sur le rendu réel puis ramené dans le
+  // repère de groupeCercles (Playbook §3.3). Pas cercle.getBBox() : depuis
+  // le réexport du 29 sept., chaque cercle est une <image> avec son propre
+  // transform translate+scale, que getBBox() IGNORE — toutes les taches
+  // renvoyaient la même boîte (0,0,w,h), donc le même angle, et le tri
+  // horaire ne triait plus rien. #spirale et #cercles-valeurs sont frères
+  // sans transform propre : même repère que le `centre` ci-dessus.
+  const svgRoot = container.querySelector("svg");
+  const ctmInverseCercles = groupeCercles.getScreenCTM().inverse();
+
   cercles.forEach((cercle) => {
-    const rectBBox = cercle.getBBox();
-    const angle = angleHoraireDepuisCentre(
-      rectBBox.x + rectBBox.width / 2,
-      rectBBox.y + rectBBox.height / 2,
-      centre
-    );
+    const rectEcran = cercle.getBoundingClientRect();
+    const pt = svgRoot.createSVGPoint();
+    pt.x = rectEcran.left + rectEcran.width / 2;
+    pt.y = rectEcran.top + rectEcran.height / 2;
+    const centreCercle = pt.matrixTransform(ctmInverseCercles);
+    const angle = angleHoraireDepuisCentre(centreCercle.x, centreCercle.y, centre);
     // Mémorisé sur l'élément (pas juste dans un tableau trié perdu au
     // prochain appel) : groupeCercles.children ci-dessus, à l'appel
     // suivant, redonnera cet ordre sans recalculer.

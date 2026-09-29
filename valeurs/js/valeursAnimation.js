@@ -263,6 +263,39 @@ function revelerCercleSwirl(imageEl, sens, timeline) {
   });
 }
 
+// Boîte de la tache peinte d'un bouton (<image id="cercle-valeur-X">, enfant
+// de <g id="boutonN">), exprimée dans le repère local de `repereEl`.
+// Mesure le rendu RÉEL (Playbook §3.3) : depuis le réexport du 29 sept.,
+// l'<image> porte un transform translate+scale (parfois non uniforme, ex.
+// bouton6/espoir) — ses attributs width/height bruts ne donnent plus sa
+// position, contrairement aux anciens <rect>. Sélection par préfixe d'id,
+// jamais par type d'élément. Conversion coin par coin valide tant qu'aucune
+// rotation ne s'interpose entre l'écran et `repereEl` (translate/scale
+// seulement, cas actuel de groupePrincipal).
+function mesurerTacheValeur(boutonEl, repereEl) {
+  const tache = boutonEl.querySelector('[id^="cercle-valeur-"]');
+  if (!tache) return null;
+
+  const rectEcran = tache.getBoundingClientRect();
+  const ctmInverse = repereEl.getScreenCTM().inverse();
+  const svgRoot = container.querySelector("svg");
+  const versRepere = (xEcran, yEcran) => {
+    const pt = svgRoot.createSVGPoint();
+    pt.x = xEcran;
+    pt.y = yEcran;
+    return pt.matrixTransform(ctmInverse);
+  };
+  const hautGauche = versRepere(rectEcran.left, rectEcran.top);
+  const basDroite = versRepere(rectEcran.right, rectEcran.bottom);
+
+  return {
+    x: hautGauche.x,
+    y: hautGauche.y,
+    width: basDroite.x - hautGauche.x,
+    height: basDroite.y - hautGauche.y,
+  };
+}
+
 // (Re)construit le <text> bilingue d'un bouton. Sûre à rappeler : retire
 // l'ancienne étiquette (via etiquettesParBouton) avant d'en poser une
 // nouvelle — c'est ce qui permet de la rafraîchir au changement de langue
@@ -276,9 +309,14 @@ function mettreAJourEtiquette(boutonEl, valeur) {
   const ancienne = etiquettesParBouton.get(boutonEl);
   if (ancienne) ancienne.remove();
 
-  const rect = boutonEl.querySelector("rect");
-  const x = parseFloat(rect.getAttribute("x")) + parseFloat(rect.getAttribute("width")) / 2;
-  const y = parseFloat(rect.getAttribute("y"));
+  const groupeEtiquettes = container.querySelector("#etiquettes-valeurs");
+  const tache = mesurerTacheValeur(boutonEl, groupeEtiquettes);
+  if (!tache) {
+    console.warn(`⚠️ Aucune tache cercle-valeur-* dans #${boutonEl.id}`);
+    return;
+  }
+  const x = tache.x + tache.width / 2;
+  const y = tache.y;
 
   const langueActive = getLanguage();
   const langueAutochtone = (langueActive === "fr" || langueActive === "en") ? null : langueActive;
@@ -322,13 +360,10 @@ function mettreAJourEtiquette(boutonEl, valeur) {
   texte.appendChild(ligneAutochtone);
   texte.appendChild(ligneSecondaire);
 
-  // x/y ci-dessus lus directement sur rect.getAttribute() (coordonnées
-  // locales à groupePrincipal, aucune conversion nécessaire) : ni boutonEl
-  // ni #boutons ne portent de transform propre — #etiquettes-valeurs est un
-  // AUTRE enfant direct de ce même groupePrincipal, donc dans le même
-  // repère. Si un transform était un jour ajouté à boutonEl, ces
-  // coordonnées devraient être reconverties (getScreenCTM(), Playbook §3.3).
-  container.querySelector("#etiquettes-valeurs").appendChild(texte);
+  // x/y ci-dessus mesurés directement dans le repère de #etiquettes-valeurs
+  // (mesurerTacheValeur) — aucune hypothèse sur les transforms de boutonEl,
+  // #boutons ou de la tache elle-même.
+  groupeEtiquettes.appendChild(texte);
   etiquettesParBouton.set(boutonEl, texte);
 
   boutonEl.setAttribute("aria-label", `${motAutochtone} — ${motSecondaire}`);
@@ -351,30 +386,32 @@ function attacherEtiquetteBouton(boutonEl, valeur) {
   // couleurs fixes (gris/bleu selon la police du système), impossible à
   // forcer en blanc via CSS — problème de contraste signalé par Isabel
   // sur les couleurs pastel des boutons.
-  const rect2 = boutonEl.querySelector("rect");
-  const rectX = parseFloat(rect2.getAttribute("x"));
-  const rectY = parseFloat(rect2.getAttribute("y"));
-  const rectW = parseFloat(rect2.getAttribute("width"));
-  const rectH = parseFloat(rect2.getAttribute("height"));
-  const centreX = rectX + rectW / 2;
-  const centreY = rectY + rectH / 2;
+  // Centre et taille mesurés sur le rendu réel de la tache peinte, dans le
+  // repère de boutonEl (où l'icône est ajoutée) — voir mesurerTacheValeur().
+  const tache = mesurerTacheValeur(boutonEl, boutonEl);
+  if (tache) {
+    const centreX = tache.x + tache.width / 2;
+    const centreY = tache.y + tache.height / 2;
 
-  // Icône "haut-parleur" (path générique 24×24, style Material Icons
-  // "volume_up") — dessinée, pas un glyphe système, donc son fill est
-  // contrôlable directement.
-  const CHEMIN_ICONE = "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z";
-  const TAILLE_CIBLE = rectW * 0.6; // 60% du diamètre du bouton
-  const ECHELLE_ICONE = TAILLE_CIBLE / 24; // le path est dessiné dans un viewBox 24×24
+    // Icône "haut-parleur" (path générique 24×24, style Material Icons
+    // "volume_up") — dessinée, pas un glyphe système, donc son fill est
+    // contrôlable directement.
+    const CHEMIN_ICONE = "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z";
+    // 60% du plus petit côté de la tache — les taches ne sont pas carrées
+    // (ex. bouton6/espoir, mise à l'échelle non uniforme).
+    const TAILLE_CIBLE = Math.min(tache.width, tache.height) * 0.6;
+    const ECHELLE_ICONE = TAILLE_CIBLE / 24; // le path est dessiné dans un viewBox 24×24
 
-  const icone = document.createElementNS(NS_SVG, "path");
-  icone.setAttribute("d", CHEMIN_ICONE);
-  icone.setAttribute("fill", "#fff");
-  icone.setAttribute(
-    "transform",
-    `translate(${centreX - 12 * ECHELLE_ICONE}, ${centreY - 12 * ECHELLE_ICONE}) scale(${ECHELLE_ICONE})`
-  );
-  icone.style.pointerEvents = "none";
-  boutonEl.appendChild(icone);
+    const icone = document.createElementNS(NS_SVG, "path");
+    icone.setAttribute("d", CHEMIN_ICONE);
+    icone.setAttribute("fill", "#fff");
+    icone.setAttribute(
+      "transform",
+      `translate(${centreX - 12 * ECHELLE_ICONE}, ${centreY - 12 * ECHELLE_ICONE}) scale(${ECHELLE_ICONE})`
+    );
+    icone.style.pointerEvents = "none";
+    boutonEl.appendChild(icone);
+  }
 
   boutonEl.style.cursor = "pointer";
   // Pas de contour de focus par défaut : la boîte englobante inclut

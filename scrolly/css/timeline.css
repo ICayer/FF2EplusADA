@@ -355,17 +355,18 @@
   line-height: 1.4;
 }
 
-/* Les 10 cercles de valeurs (#cercles-valeurs > rect dans scrolly.svg) sont
+/* Les cercles de valeurs (#cercles-valeurs dans scrolly.svg) sont
    maintenant focusables au clavier (tabindex, avantColonisation.js) — même
    patron que le rail (shared/css/railParcours.css) : outline retiré par
    défaut (Chrome affiche l'anneau par défaut même au clic souris pour tout
    élément avec tabindex), restauré UNIQUEMENT à la navigation clavier via
-   :focus-visible. */
-#cercles-valeurs rect {
+   :focus-visible. Ciblés par préfixe d'id, jamais par type d'élément :
+   anciens <rect>, taches peintes <image> depuis le réexport du 29 sept. */
+#cercles-valeurs [id^="cercle-valeur-"] {
   outline: none;
 }
 
-#cercles-valeurs rect:focus-visible {
+#cercles-valeurs [id^="cercle-valeur-"]:focus-visible {
   outline: 2px solid var(--color-scene-texte);
   outline-offset: 2px;
 }
