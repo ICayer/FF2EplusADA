@@ -185,4 +185,11 @@
     <image id="cercle-valeur-rire" width="191" height="188" transform="translate(614.67 21) scale(.67)" xlink:href="./svg/avant-colonisation/spot_rire.webp"/>
     <image id="cercle-valeur-vie" width="191" height="204" transform="translate(399.81 658.33) scale(.58)" xlink:href="./svg/avant-colonisation/spot_vie.webp"/>
   </g>
+  <g id="barres">
+    <image id="barre1" width="2000" height="2000" transform="translate(400.59 -176.73) scale(.66)" xlink:href="./svg/avant-colonisation/barre1.webp"/>
+    <image id="barre2" width="2000" height="2000" transform="translate(438.95 -145.22) scale(.58)" xlink:href="./svg/avant-colonisation/barre2.webp"/>
+    <image id="barre3" width="2000" height="2000" transform="translate(401.96 -163.03) scale(.63)" xlink:href="./svg/avant-colonisation/barre3.webp"/>
+    <image id="barre4" width="2000" height="2000" transform="translate(411.55 -202.75) scale(.66)" xlink:href="./svg/avant-colonisation/barre4.webp"/>
+    <image id="barre5" width="2000" height="2000" transform="translate(386.34 -96.45) scale(.6)" xlink:href="./svg/avant-colonisation/barre5.webp"/>
+  </g>
 </svg>
