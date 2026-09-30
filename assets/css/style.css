@@ -47,7 +47,9 @@
 /* Image décorative entre le sous-titre et l'intro (S5B1T2). */
 .landing-couple {
   display: block;
+  width: 100%;
   max-width: 600px;
+  height: auto; /* SVG sans width/height (viewBox 600×400 seul) : ratio 3:2 préservé */
   margin: 0 auto 1.5rem;
 }
 
