@@ -5,6 +5,7 @@
 .context-section { text-align: center; max-width: 700px; margin: 0 auto 2rem; }
 .context-section p { font-size: calc(1.4rem * var(--echelle-texte));margin-bottom: 1rem; }
 .remerciements-texte p {font-size: calc(1.4rem * var(--echelle-texte)); margin-bottom: 1rem; }
+.remerciements-intro { font-weight: 700; }
 /* Lien "Découvrir le récit" — texte + bouton rond chevron, centrés sur la
    spirale (position réelle calculée par assets/js/landingLienRecit.js).
    Enfant position:absolute de .landing-spirale-conteneur (sticky). */

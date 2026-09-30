@@ -48,6 +48,11 @@ function rendre() {
 
   const remerciements = document.querySelector(".thanks-section .remerciements-texte");
   remerciements.innerHTML = "";
+  // Paragraphe d'intro en gras (classe dédiée, texte via textContent)
+  const remerciementsIntro = document.createElement("p");
+  remerciementsIntro.className = "remerciements-intro";
+  remerciementsIntro.textContent = resolve(data.remerciementsIntro);
+  remerciements.appendChild(remerciementsIntro);
   remerciements.appendChild(creerParagraphes(resolve(data.remerciementsTexte)));
 
   const listeCredits = document.querySelector(".credits-liste");
