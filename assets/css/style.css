@@ -83,14 +83,24 @@ body {
   opacity: 1; /* remplace l'opacité 0.8 héritée — logos et texte doivent rester pleinement visibles */
 }
 
+/* Équipe — dans le corps de page (thème clair) : couleur héritée de body
+   (#1a1a1a), comme .context-section et .thanks-section. Pas de
+   var(--color-text) : vaut #f5f5f5 (thème sombre du reste du site). */
+/* Séparateur identique à .thanks-section (filet + espacement). */
+.credits-liste { text-align: center; border-top: 1px solid rgba(0, 0, 0, 0.15); padding-top: 2rem; margin-top: 3rem; }
 .credits-liste h4 {
   font-family: "Agoradp_15", sans-serif;
-  color: #ffffff;
   margin-bottom: 0.75rem;
-  font-size: calc(1.4rem * var(--echelle-texte));
+  font-size: calc(1.6rem * var(--echelle-texte));
 }
 .credits-liste ul { list-style: none; margin-bottom: 3rem; }
-.credits-liste li { margin-bottom: 0.4rem; font-size: 0.9rem; color: #ffffff; font-size: calc(0.9rem * var(--echelle-texte));}
+.credits-liste li { margin-bottom: 0.4rem; font-size: calc(1.4rem * var(--echelle-texte)); }
+
+/* Titres de section — même rouge que les boutons de langue / A-/A/A+
+   (#a40017 codé en dur dans shared/css/headerControls.css, pas
+   --color-primary qui vaut #a02421). */
+.thanks-section h3,
+.credits-liste h4 { color: #a40017; }
 
 .footer-section {
   text-align: center;
