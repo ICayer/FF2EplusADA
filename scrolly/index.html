@@ -45,6 +45,10 @@
 <body style="margin:0;">
   <div id="entete-controles"></div>
   <div id="graphic" class="zone-scene">
+    <!-- Bloc-titre retiré VISUELLEMENT (remplacé par les mots-clés du rail,
+         shared/js/motsSteps.js) mais gardé pour les lecteurs d'écran :
+         #titre-texte (aria-live) annonce le nom du step à chaque navigation
+         et au survol/focus d'une perle. Voir .titre-scene dans timeline.css. -->
     <div id="titre-scene" class="titre-scene">
       <div class="eyebrow" id="titre-compteur"></div>
       <h2 id="titre-texte" aria-live="polite"></h2>
@@ -57,7 +61,6 @@
       <div class="carte-valeur-definition"></div>
     </div>
   </div>
-  <div id="texteStep" class="texte-step-narratif"></div>
 
   <!-- Sobre par choix : pas d'animation d'entrée tapageuse, cohérent avec la demande "bouton sobre" -->
   <a id="bouton-explorer-etoiles" href="../univers/index.html"></a>

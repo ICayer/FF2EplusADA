@@ -24,7 +24,8 @@
 // importer nulle part : sa logique ne s'applique plus à cette architecture.
 //
 // Dépend de : shared/js/progression.js, shared/js/navigationEtat.js
-//   (reduitMouvement), shared/js/utils.js (loadSVG), GSAP (global, CDN),
+//   (reduitMouvement), shared/js/utils.js (loadSVG), shared/js/motsSteps.js
+//   (mots-clés de step du rail), GSAP (global, CDN),
 //   shared/svg/timeline/timeline.svg
 // Utilisé par : scrolly/js/script.js, univers/index.html, valeurs/index.html
 //
@@ -35,6 +36,7 @@
 import { obtenirParcours, estDeverrouille } from "./progression.js";
 import { loadSVG } from "./utils.js";
 import { reduitMouvement } from "./navigationEtat.js";
+import { initMotsSteps, afficherMotsEtape } from "./motsSteps.js";
 
 const DUREE_BULLE_MS = 1400;
 
@@ -116,6 +118,8 @@ export async function construireRailParcours(container, { pageCourante, onClicEt
     return;
   }
 
+  creerSvgSuperpose(container);
+
   Object.entries(CORRESPONDANCE_PERLE_ETAPE).forEach(([idSVG, etapeId]) => {
     const cible = resultat.querySelector(`#${idSVG}`);
     const etape = parEtapeId[etapeId];
@@ -169,6 +173,53 @@ export async function construireRailParcours(container, { pageCourante, onClicEt
   });
 
   rafraichirVerrous();
+
+  // Mots-clés de step (#mots_steps_scrolly) : le suffixe -SN de chaque mot
+  // désigne la perle_stepN de la table ci-dessus ; S11 = bouton_valeur
+  // (seul bouton au-delà de perle_step10 — "Reconnectons à nos valeurs").
+  await initMotsSteps(container, (n) =>
+    CORRESPONDANCE_PERLE_ETAPE[n === 11 ? "bouton_valeur" : `perle_step${n}`]
+  );
+}
+
+// Ordre d'empilement voulu (1er octobre 2026) : perles < mots-clés de step
+// (.mot-step, HTML) < bande de rupture < plume. Un seul <svg> ne peut pas
+// passer en partie au-dessus et en partie au-dessous d'un <div> HTML :
+// #rupture_stripe puis #curseur_plume sont donc DÉPLACÉS (appendChild,
+// jamais cloneNode — pas d'id en double, rien à synchroniser) dans un 2e
+// <svg> au MÊME viewBox, superposé exactement au principal. Même viewBox +
+// même boîte à l'écran = même système de coordonnées : deplacerCurseurPlume()
+// fonctionne sans changement (getBBox() de perle_noire1 et des perles reste
+// comparable). L'ordre d'ajout peint la plume par-dessus la bande.
+function creerSvgSuperpose(container) {
+  const svgPrincipal = container.querySelector("svg");
+  const svgSuperpose = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svgSuperpose.setAttribute("viewBox", svgPrincipal.getAttribute("viewBox"));
+  svgSuperpose.setAttribute("class", "rail-superpose");
+  svgSuperpose.setAttribute("aria-hidden", "true");
+
+  ["rupture_stripe", "curseur_plume"].forEach((id) => {
+    const groupe = svgPrincipal.querySelector(`#${id}`);
+    if (groupe) svgSuperpose.appendChild(groupe);
+    else console.error(`❌ Rail SVG : #${id} introuvable — non déplacé vers le <svg> superposé`);
+  });
+  container.appendChild(svgSuperpose);
+
+  // Boîte du <svg> superposé = boîte RÉELLE du principal, mesurée
+  // (Playbook §3.3) plutôt que présumée par un centrage CSS parallèle —
+  // et remesurée au redimensionnement (le rail se recentre).
+  const synchroniser = () => {
+    const rRail = container.getBoundingClientRect();
+    const rPrincipal = svgPrincipal.getBoundingClientRect();
+    Object.assign(svgSuperpose.style, {
+      left: `${rPrincipal.left - rRail.left}px`,
+      top: `${rPrincipal.top - rRail.top}px`,
+      width: `${rPrincipal.width}px`,
+      height: `${rPrincipal.height}px`,
+    });
+  };
+  synchroniser();
+  window.addEventListener("resize", synchroniser);
 }
 
 // Retire "actif" de toutes les perles/boutons du rail et l'ajoute à celui
@@ -181,6 +232,23 @@ export function definirEtapeActive(id) {
     b.classList.toggle("actif", b.dataset.etapeId === id);
   });
   deplacerCurseurPlume(id);
+  majIndiceClic(id);
+  afficherMotsEtape(id);
+}
+
+// Indice de clic (#curseur_plume-indice-clic, flèche dessinée à côté de
+// la plume) : visible seulement sur S1 et S2. Relu à CHAQUE navigation
+// depuis l'étape active, sans mémoire "déjà vu" — réapparaît en reculant
+// vers S1/S2. Étapes dérivées de la table perle→étape, jamais réécrites.
+const ETAPES_INDICE_CLIC = new Set([
+  CORRESPONDANCE_PERLE_ETAPE.perle_step1,
+  CORRESPONDANCE_PERLE_ETAPE.perle_step2,
+]);
+
+function majIndiceClic(id) {
+  const indiceEl = document.querySelector(".rail-parcours [id='curseur_plume-indice-clic']");
+  if (!indiceEl) return;
+  indiceEl.style.display = ETAPES_INDICE_CLIC.has(id) ? "" : "none";
 }
 
 // Centre RÉEL rendu d'un élément SVG — mesuré via getBBox() sur le GROUPE
@@ -212,19 +280,13 @@ let derniereEtapePlume = null; // évite de rejouer un déplacement vers la
   // MÊME étape (ex. languagechange qui rappelle definirEtapeActive sur le
   // step courant) — même principe que le garde goToStep, Playbook §3.5.
 
-// Le curseur plume ne doit JAMAIS apparaître sur bouton_valeur (demande
-// d'Isabel, Tranche B3 ter). Étape 0 (audit avant cette correction) :
-// bouton_accueil n'a jamais eu de plume aujourd'hui, mais PAS via une
-// exclusion codée quelque part — index.html (la page d'accueil) ne
-// construit aucun rail du tout (aucune trace de rail-parcours/
-// construireRailParcours/definirEtapeActive dans ce fichier, vérifié),
-// donc definirEtapeActive("accueil") n'est simplement JAMAIS appelée
-// nulle part dans le projet. "valeurs", lui, EST appelé légitimement une
-// fois par valeurs/index.html à son propre chargement (pour que .actif se
-// pose sur bouton_valeur) — il n'y a donc pas de mécanisme équivalent à
-// "accueil" à reproduire pour ce cas précis : une exclusion explicite est
-// nécessaire ici, il n'y en avait pas besoin ailleurs.
-const ETAPES_SANS_PLUME = new Set(["valeurs"]);
+// Plus d'exclusion de "valeurs" depuis le 1er octobre 2026 (renverse la
+// Tranche B3 ter, qui interdisait la plume sur bouton_valeur) : à
+// l'arrivée sur valeurs/index.html, la plume restait sur perle_step1
+// (position native du fichier), ce qui laissait croire qu'on débutait le
+// scrolly. valeurs/index.html appelle déjà definirEtapeActive("valeurs")
+// à son chargement — exactement comme univers/index.html avec "univers" —
+// la plume s'y place donc maintenant par le MÊME mécanisme.
 
 // Déplace #curseur_plume pour que perle_noire1 tombe exactement sur le
 // centre réel de la perle/bouton correspondant à idEtapeCible. Un seul
@@ -233,7 +295,6 @@ const ETAPES_SANS_PLUME = new Set(["valeurs"]);
 // mesure différents comme l'ancienne architecture (railPlume.js, orpheline).
 function deplacerCurseurPlume(idEtapeCible) {
   if (idEtapeCible === derniereEtapePlume) return;
-  if (ETAPES_SANS_PLUME.has(idEtapeCible)) return;
 
   const idSVG = CORRESPONDANCE_ETAPE_PERLE[idEtapeCible];
   if (!idSVG) return; // étape sans perle correspondante dans le rail (garde défensif)

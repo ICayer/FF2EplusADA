@@ -1,0 +1,13 @@
+{
+  "mot-colonisation":             { "svg": "Colonisation-VI",                     "minuteur": "aucun",        "fr": "Colonisation",                    "en": "Colonization" },
+  "mot-nuit-des-temps-1":         { "svg": "Depuis_la_nuit_des_temps-S1",         "minuteur": "chaque-step",  "fr": "Depuis la nuit des temps",        "en": "Since time immemorial" },
+  "mot-ensemble-1":               { "svg": "Ensemble-S2",                         "minuteur": "chaque-step",  "fr": "Ensemble",                        "en": "Together" },
+  "mot-territoire-1":             { "svg": "Le_territoire-S3",                    "minuteur": "chaque-step",  "fr": "Le territoire",                   "en": "The land" },
+  "mot-valeurs-unissaient-1":     { "svg": "Les_valeurs_qui_nous_unissaient-S4",  "minuteur": "chaque-step",  "fr": "Les valeurs qui nous unissaient", "en": "The values that united us" },
+  "mot-disparues-assassinees-1":  { "svg": "Disparu·es_et_assassiné·es-S5",       "minuteur": "chaque-step",  "fr": "Disparu·es et assassiné·es",      "en": "Missing and murdered" },
+  "mot-spirale-violence-1":       { "svg": "Spirale_de_la_violence-S6",           "minuteur": "chaque-step",  "fr": "Spirale de la violence",          "en": "Spiral of violence" },
+  "mot-survivantes-1":            { "svg": "Survivant·es-S7",                     "minuteur": "chaque-step",  "fr": "Survivant·es",                    "en": "Survivors" },
+  "mot-porter-memoire-1":         { "svg": "Porter_la_mémoire-S8",                "minuteur": "chaque-step",  "fr": "Porter la mémoire",               "en": "Carrying the memory" },
+  "mot-etoile-vie-1":             { "svg": "Une_étoile_une_vie-S9-S10",           "minuteur": "dernier-step", "fr": "Une étoile, une vie",             "en": "One star, one life" },
+  "mot-reconnectons-valeurs-1":   { "svg": "Reconnectons_à_nos_valeurs-S10-S11",  "minuteur": "aucun",        "fr": "Reconnectons à nos valeurs",      "en": "Let's reconnect with our values" }
+}

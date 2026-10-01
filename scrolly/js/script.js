@@ -23,13 +23,6 @@ import { construireRailParcours, definirEtapeActive, rafraichirVerrous } from ".
 
 const PAGE_COURANTE = "scrolly/index.html";
 
-async function afficherTexte(steps, stepId) {
-  const contenu = steps[stepId];
-  document.getElementById("texteStep").innerHTML = (contenu && contenu.titre)
-    ? `<h2>${resolve(contenu.titre)}</h2><p>${resolve(contenu.texte)}</p>`
-    : "";
-}
-
 async function init() {
   await initTimeline();
   await initProgression();
@@ -41,8 +34,9 @@ async function init() {
   const titreTexteEl = titreEl.querySelector("#titre-texte");
   const { allerAuStep } = initTimelineRail(railEl, titreEl);
 
-  // afficherTexte reste appelé séparément à chaque navigation — timelineRail.js
-  // ne connaît pas steps.json, il gère seulement le rail/curseur/titre/légendes
+  // La boîte "texte step narratif" (#texteStep, afficherTexte) est retirée
+  // depuis le 1er octobre 2026 — remplacée par les mots-clés du rail
+  // (shared/js/motsSteps.js, appelé via definirEtapeActive()).
   const order = getOrder();
   let indexActuel = 0;
   let libelleActif = "";
@@ -54,7 +48,6 @@ async function init() {
     const texteTitre = contenu ? resolve(contenu.nomStep) : "";
     libelleActif = texteTitre;
     allerAuStep(index, texteTitre);
-    afficherTexte(steps, stepId);
     definirEtapeActive(stepId);
     // Plus d'appel à deplacerPlume() depuis la Tranche B2 : le curseur plume
     // vit maintenant DANS timeline.svg (#curseur_plume), révélé statique par
@@ -82,7 +75,7 @@ async function init() {
   });
 
   // Exposer pour que timelineRail.js (rail hérité, masqué) reste synchronisé
-  // et déclenche afficherTexte à chaque clic/bouton via ce même pont.
+  // avec le rail de parcours à chaque clic/bouton via ce même pont.
   window.__scrollyAllerEtAfficher = allerEtAfficher;
 
   await construireRailParcours(document.getElementById("rail-parcours"), {

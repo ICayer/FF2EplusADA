@@ -150,7 +150,7 @@ function mettreAJourBoutons(index) {
 
 // Navigation interne (clic rail, boutons) : passe par le pont
 // window.__scrollyAllerEtAfficher quand il existe (posé par script.js) pour
-// que #texteStep reste synchronisé avec le rail/titre — sinon (avant que
+// que le rail de parcours reste synchronisé avec le rail/titre — sinon (avant que
 // script.js ait posé le pont, ex. pendant la construction initiale) on
 // retombe sur allerAuStep seul. Dette technique mineure assumée pour cette
 // itération (voir Registre, 26 août).

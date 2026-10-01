@@ -1,203 +1,266 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1080.25 148.65">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-90 0 1260 140" xmlns:c2pa="http://c2pa.org/manifest"><metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYToyMmZlZDQ2Ny1mMjNhLTQwN2YtOTRiNC1hZWM5ZWVmYWY5NDQAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaGnG5CVfIrXyIrZ4ushdUL4AAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDpkMjE4N2ZmOC1hMDQwLTQ2ZDktODBhOS1mZTE1MDg0YWQ1MjJscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNo5K1vs54uzizcxyZWs1ogdwAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFgghw0rIqE5by/ZV+LQTCVp11cgsxZFirnMyUH85SqX2gKkZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaEu6CU+PXKtXcyTdOEi0pOkAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRNAAAAAAAAAAAAAAAAAGRoYXNoWCAicvrB0gkslNvD9u8bTOSiahxazRLxdIG9iTrFiZ0AeWRuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBjQZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjIyZmVkNDY3LWYyM2EtNDA3Zi05NGI0LWFlYzllZWZhZjk0NC9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjMyNDQzNDNmLTAyNjMtNGIyNS05M2JjLTg5YjZjZjFiZmRmY3JjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCCHDSsioTlvL9lX4tBMJWnXVyCzFkWKuczJQfzlKpfaAqJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggFWDHMJQKuLa8gutKGDmYaswHMx7FKe/vtcE94ADJJvyiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFgg+u7rTVbmNycjfgH2v5UGhBuAQ6Y70N+ZfdMCKPSqqzd0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQGwjXEPF7N7s4CGDOwKqGPbgqi80SkcrupmkEhZ7t2fxODEQTilXVA1qyNel3ClP/dN92PpneAQl4dogZeVWkBE=</c2pa:manifest></metadata>
   <g id="fil_du_temps">
-    <polyline points="229.41 45.53 294.35 53.32 359.28 58.52 424.22 65.01 490.45 68.26 589.15 63.71 656.03 55.92 720.97 50.07 784.61 46.83 852.14 43.58" fill="none" stroke="#000" stroke-miterlimit="10"/>
+    <polyline points="229.29 40.13 294.22 47.92 359.16 53.12 424.09 59.61 490.32 62.86 589.03 58.31 655.91 50.52 720.84 44.68 784.48 41.43 852.01 38.18" fill="none" stroke="#000" stroke-miterlimit="10"/>
   </g>
   <g id="fil_de_laine">
     <g id="fil_de_laine-2" data-name="fil_de_laine">
       <g id="corde">
         <g>
-          <polyline points="136.33 35.07 244.36 43.74 378.5 63.78 474.25 65.63 596.79 65.04 713.9 49.17 841.01 42.43 944.15 34.06" fill="none" stroke="#000" stroke-linecap="round" stroke-miterlimit="10" stroke-width="5"/>
-          <path d="M940.39,34.36l-5.2-7.17.24-.19,12.7,3.89c4.36.6,8.73,1.19,13.08,1.79-4.2,1.29-8.42,2.58-12.62,3.87l-11.9,5.89-.27-.11,3.97-7.96h0Z"/>
+          <polyline points="136.2 29.67 244.24 38.34 378.37 58.38 474.12 60.23 596.66 59.65 713.78 43.77 840.89 37.03 944.03 28.66" fill="none" stroke="#000" stroke-linecap="round" stroke-miterlimit="10" stroke-width="5"/>
+          <path d="M940.27,28.96l-5.2-7.17.24-.19,12.7,3.89c4.36.6,8.73,1.19,13.08,1.79-4.2,1.29-8.42,2.58-12.62,3.87l-11.9,5.89-.27-.11,3.97-7.96h0Z"/>
         </g>
       </g>
     </g>
   </g>
   <g id="bouton_accueil">
-    <circle id="fond_accueil" cx="66.04" cy="75.18" r="20"/>
-    <polygon id="maison" points="66.04 61.01 52.54 73.78 57.1 73.78 57.1 89.35 62.59 89.35 62.59 79.39 69.49 79.39 69.49 89.35 75.36 89.35 75.36 73.78 79.54 73.78 66.04 61.01" fill="#fff"/>
+    <circle id="fond_accueil" cx="65.91" cy="69.78" r="20"/>
+    <polygon id="maison" points="65.91 55.61 52.41 68.38 56.98 68.38 56.98 83.95 62.47 83.95 62.47 73.99 69.36 73.99 69.36 83.95 75.23 83.95 75.23 68.38 79.42 68.38 65.91 55.61" fill="#fff"/>
   </g>
   <g id="bouton_valeur">
-    <circle id="fond_valeur" cx="1014.94" cy="76.29" r="20"/>
+    <circle id="fond_valeur" cx="1014.82" cy="70.89" r="20"/>
     <g id="Calque_6" data-name="Calque 6">
-      <path d="M1013.38,71.97s1.13-4.26,2.04-5.36c.86-1.04,3.25-2.84,4.6-2.81,1.88.05,6.3,1.72,6.64,3.57,1.02,5.62-4.6,22.98-4.6,22.98,0,0-4.68-1.33-6.13-2.04-3.1-1.54-8.63-5.89-10.98-8.43-1.19-1.29-3.46-4.16-3.83-5.87s.62-6.19,2.3-6.89c2.55-1.07,9.96,4.85,9.96,4.85Z" fill="#fff"/>
+      <path d="M1013.26,66.57s1.13-4.26,2.04-5.36c.86-1.04,3.25-2.84,4.6-2.81,1.88.05,6.3,1.72,6.64,3.57,1.02,5.62-4.6,22.98-4.6,22.98,0,0-4.68-1.33-6.13-2.04-3.1-1.54-8.63-5.89-10.98-8.43-1.19-1.29-3.46-4.16-3.83-5.87-.38-1.78.62-6.19,2.3-6.89,2.55-1.07,9.96,4.85,9.96,4.85Z" fill="#fff"/>
     </g>
   </g>
   <g id="perles_deco">
     <g id="perle_blanche3">
-      <circle cx="248.67" cy="46.01" r="8.96" transform="translate(202.21 294.59) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="248.54" cy="40.61" r="8.96" transform="translate(207.48 289.08) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche2">
-      <circle cx="262.28" cy="47.2" r="8.96" transform="translate(214.61 309.39) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="262.16" cy="41.8" r="8.96" transform="translate(219.89 303.88) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche1">
-      <circle cx="276.41" cy="48.46" r="8.96" transform="translate(227.45 324.78) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="276.29" cy="43.06" r="8.96" transform="translate(232.72 319.27) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche3-2" data-name="perle_blanche3">
-      <circle cx="179.3" cy="40.36" r="8.96" transform="translate(138.61 219.59) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="179.17" cy="34.97" r="8.96" transform="translate(143.88 214.07) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche2-2" data-name="perle_blanche2">
-      <circle cx="193.68" cy="41.55" r="8.96" transform="translate(151.78 235.16) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="193.56" cy="36.15" r="8.96" transform="translate(157.05 229.64) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche1-2" data-name="perle_blanche1">
-      <circle cx="209.08" cy="42.56" r="8.96" transform="translate(166.14 251.57) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="208.96" cy="37.16" r="8.96" transform="translate(171.42 246.05) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche3-3" data-name="perle_blanche3">
-      <circle cx="313.34" cy="54.92" r="8.96" transform="translate(257.85 368.16) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="313.21" cy="49.52" r="8.96" transform="translate(263.13 362.64) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche2-3" data-name="perle_blanche2">
-      <circle cx="326.96" cy="56.1" r="8.96" transform="translate(270.26 382.96) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="326.83" cy="50.71" r="8.96" transform="translate(275.54 377.44) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche1-3" data-name="perle_blanche1">
-      <circle cx="341.08" cy="57.37" r="8.96" transform="translate(283.1 398.35) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="340.96" cy="51.97" r="8.96" transform="translate(288.37 392.83) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche3-4" data-name="perle_blanche3">
-      <circle cx="379.98" cy="60.79" r="8.96" transform="translate(318.5 440.66) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="379.85" cy="55.39" r="8.96" transform="translate(323.77 435.14) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche2-4" data-name="perle_blanche2">
-      <circle cx="393.59" cy="61.98" r="8.96" transform="translate(330.91 455.46) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="393.47" cy="56.58" r="8.96" transform="translate(336.18 449.94) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche1-4" data-name="perle_blanche1">
-      <circle cx="407.72" cy="63.24" r="8.96" transform="translate(343.74 470.85) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="407.6" cy="57.84" r="8.96" transform="translate(349.02 465.33) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche3-5" data-name="perle_blanche3">
-      <circle cx="446.61" cy="64.36" r="8.96" transform="translate(381.44 510.86) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="446.49" cy="58.97" r="8.96" transform="translate(386.72 505.35) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche2-5" data-name="perle_blanche2">
-      <circle cx="460.23" cy="65.55" r="8.96" transform="translate(393.85 525.66) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="460.11" cy="60.15" r="8.96" transform="translate(399.12 520.15) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche1-5" data-name="perle_blanche1">
-      <circle cx="474.36" cy="66.82" r="8.96" transform="translate(406.68 541.05) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="474.23" cy="61.42" r="8.96" transform="translate(411.96 535.54) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche3-6" data-name="perle_blanche3">
-      <circle cx="507.12" cy="65.13" r="8.96" transform="translate(441.08 572.14) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="507" cy="59.73" r="8.96" transform="translate(446.35 566.62) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche2-6" data-name="perle_blanche2">
-      <circle cx="520.74" cy="66.32" r="8.96" transform="translate(453.48 586.94) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="520.62" cy="60.92" r="8.96" transform="translate(458.76 581.43) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche1-6" data-name="perle_blanche1">
-      <circle cx="534.87" cy="67.58" r="8.96" transform="translate(466.32 602.33) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="534.74" cy="62.18" r="8.96" transform="translate(471.59 596.81) rotate(-89.9)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche3-7" data-name="perle_blanche3">
-      <circle cx="577" cy="62.32" r="8.96" transform="translate(-.11 1.04)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="576.87" cy="56.92" r="8.96" transform="translate(-.1 1.04)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche2-7" data-name="perle_blanche2">
-      <circle cx="563.38" cy="63.51" r="8.96" transform="translate(-.11 1.02)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="563.25" cy="58.11" r="8.96" transform="translate(-.1 1.02)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche1-7" data-name="perle_blanche1">
-      <circle cx="549.25" cy="64.77" r="8.96" transform="translate(-.12 .99)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="549.13" cy="59.37" r="8.96" transform="translate(-.11 .99)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche3-8" data-name="perle_blanche3">
-      <circle cx="637.25" cy="57.73" r="8.96" transform="translate(-.1 1.15)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="637.13" cy="52.33" r="8.96" transform="translate(-.09 1.15)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche2-8" data-name="perle_blanche2">
-      <circle cx="622.13" cy="58.91" r="8.96" transform="translate(-.11 1.13)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="622.01" cy="53.51" r="8.96" transform="translate(-.1 1.13)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche1-8" data-name="perle_blanche1">
-      <circle cx="608.01" cy="61.18" r="8.96" transform="translate(-.11 1.1)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="607.88" cy="55.78" r="8.96" transform="translate(-.1 1.1)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche3-9" data-name="perle_blanche3">
-      <circle cx="703.13" cy="52.36" r="8.96" transform="translate(-.09 1.27)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="703" cy="46.97" r="8.96" transform="translate(-.08 1.27)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche2-9" data-name="perle_blanche2">
-      <circle cx="689.51" cy="53.55" r="8.96" transform="translate(-.1 1.25)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="689.38" cy="48.15" r="8.96" transform="translate(-.09 1.25)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche1-9" data-name="perle_blanche1">
-      <circle cx="673.85" cy="55.33" r="8.96" transform="translate(-.1 1.22)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="673.72" cy="49.93" r="8.96" transform="translate(-.09 1.22)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche3-10" data-name="perle_blanche3">
-      <circle cx="767.98" cy="47.51" r="8.96" transform="translate(-.08 1.39)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="767.85" cy="42.11" r="8.96" transform="translate(-.07 1.39)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche2-10" data-name="perle_blanche2">
-      <circle cx="754.36" cy="48.7" r="8.96" transform="translate(-.09 1.37)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="754.23" cy="43.3" r="8.96" transform="translate(-.08 1.37)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche1-10" data-name="perle_blanche1">
-      <circle cx="740.23" cy="49.97" r="8.96" transform="translate(-.09 1.34)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="740.11" cy="44.57" r="8.96" transform="translate(-.08 1.34)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche3-11" data-name="perle_blanche3">
-      <circle cx="833.08" cy="44.7" r="8.96" transform="translate(-.08 1.51)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="832.96" cy="39.31" r="8.96" transform="translate(-.07 1.51)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche2-11" data-name="perle_blanche2">
-      <circle cx="819.46" cy="45.89" r="8.96" transform="translate(-.08 1.48)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="819.34" cy="40.49" r="8.96" transform="translate(-.07 1.48)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche1-11" data-name="perle_blanche1">
-      <circle cx="805.34" cy="47.16" r="8.96" transform="translate(-.08 1.46)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="805.21" cy="41.76" r="8.96" transform="translate(-.07 1.46)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche3-12" data-name="perle_blanche3">
-      <circle cx="897.93" cy="40.36" r="8.96" transform="translate(-.07 1.63)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="897.81" cy="34.97" r="8.96" transform="translate(-.06 1.62)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche2-12" data-name="perle_blanche2">
-      <circle cx="884.31" cy="41.55" r="8.96" transform="translate(-.07 1.6)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="884.19" cy="36.15" r="8.96" transform="translate(-.06 1.6)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
     <g id="perle_blanche1-12" data-name="perle_blanche1">
-      <circle cx="870.19" cy="42.82" r="8.96" transform="translate(-.08 1.57)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
+      <circle cx="870.06" cy="37.42" r="8.96" transform="translate(-.07 1.57)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
   </g>
   <g id="perles_steps">
     <g id="perle_step1">
-      <circle cx="229.63" cy="44.41" r="12.5" transform="translate(184.91 273.97) rotate(-89.92)"/>
+      <circle cx="229.5" cy="39.01" r="12.5" transform="translate(190.19 268.45) rotate(-89.92)"/>
     </g>
     <g id="perle_step2">
-      <circle cx="294.71" cy="52.02" r="12.5"/>
+      <circle cx="294.59" cy="46.62" r="12.5"/>
     </g>
     <g id="perle_step3">
-      <circle cx="360.74" cy="57.99" r="12.5"/>
+      <circle cx="360.62" cy="52.6" r="12.5"/>
     </g>
     <g id="perle_step4">
-      <circle cx="426.04" cy="64.36" r="12.5"/>
+      <circle cx="425.92" cy="58.96" r="12.5"/>
     </g>
     <g id="perle_step5">
-      <circle cx="491.13" cy="65.66" r="12.5" transform="translate(421.54 556.24) rotate(-89.54)"/>
+      <circle cx="491" cy="60.26" r="12.5" transform="translate(426.81 550.76) rotate(-89.54)"/>
     </g>
     <g id="perle_step6">
-      <circle cx="589.33" cy="61.76" r="12.5" transform="translate(-.12 1.11)"/>
+      <circle cx="589.2" cy="56.36" r="12.5" transform="translate(-.1 1.11)"/>
     </g>
     <g id="perle_step7">
-      <circle cx="654.91" cy="57.22" r="12.5" transform="translate(596.64 712.04) rotate(-89.91)"/>
+      <circle cx="654.79" cy="51.82" r="12.5" transform="translate(601.92 706.52) rotate(-89.91)"/>
     </g>
     <g id="perle_step8">
-      <circle cx="720.5" cy="49.42" r="12.5" transform="translate(665.3 769.5) rotate(-89.54)"/>
+      <circle cx="720.37" cy="44.03" r="12.5" transform="translate(670.58 764.02) rotate(-89.54)"/>
     </g>
     <g id="perle_step9">
-      <circle cx="785.58" cy="45.53" r="12.5"/>
+      <circle cx="785.45" cy="40.13" r="12.5"/>
     </g>
     <g id="perle_step10">
-      <circle cx="851.11" cy="42.93" r="12.5"/>
+      <circle cx="850.99" cy="37.53" r="12.5"/>
     </g>
   </g>
   <g id="rupture_stripe">
-    <image width="516" height="2511" transform="translate(554.85) rotate(26.28) scale(.06)" xlink:href="../shared/svg/timeline/trait_rouge_rupture.webp"/>
+    <image width="516" height="2511" transform="translate(538.38 -4.38) rotate(26.28) scale(.08 .05)" xlink:href="../shared/svg/timeline/trait_rouge_rupture.webp"/>
   </g>
   <g id="curseur_plume">
     <g>
       <g id="plume">
         <g id="remplissage">
-          <polygon points="200.62 84.89 193.95 84.73 190.33 82.04 182.01 82.6 177.12 83.04 178.63 87.51 175.68 89.17 169.93 87.98 170.3 90.39 166.93 89.38 161.16 93.27 157.22 94.82 147.55 103.64 136.95 109.68 125.02 115.69 114.54 121.53 125.66 121.52 131.55 120.36 131.35 122.66 144.17 121.84 162.56 117.2 168.92 112.28 165.86 117.12 170.86 116.49 176.28 108.8 179.75 108.02 178.27 112.5 181.8 111.21 188.13 104.64 187.72 109.75 191.09 103.8 190.98 106.98 195.27 103.2 199.55 98.58 200.39 96.4 201.54 99.3 203.34 94.74 204.9 88.41 207.27 89.37 207.81 85.1 202.83 81.41 199.25 85.78 200.62 84.89" fill="#f9f7f7"/>
+          <polygon points="200.5 79.49 193.82 79.33 190.21 76.64 181.88 77.2 177 77.64 178.5 82.12 175.56 83.77 169.81 82.58 170.18 84.99 166.81 83.98 161.03 87.88 157.1 89.42 147.42 98.24 136.83 104.28 124.89 110.29 114.42 116.13 125.54 116.12 131.43 114.96 131.23 117.26 144.04 116.44 162.43 111.8 168.8 106.88 165.73 111.72 170.74 111.09 176.15 103.41 179.63 102.62 178.15 107.1 181.68 105.81 188 99.24 187.6 104.35 190.97 98.41 190.85 101.59 195.15 97.8 199.42 93.18 200.26 91 201.41 93.9 203.21 89.34 204.78 83.01 207.15 83.97 207.69 79.7 202.7 76.01 199.13 80.38 200.5 79.49" fill="#f9f7f7"/>
         </g>
         <g>
-          <path d="M200.43,79.54c.31-1.06,1.58-1.34,1.31-2.99,2.08,1.56,2.92,3.34,3.84,5.19,2.28-.8,3.65-2.81,5.28-4.54,1.72-1.84,2.27-1.75,3.39.67-1.45,1.52-3.36,2.49-5.04,3.77-.85.64-1.66,1.34-.4,2.37.52.43.25.99.16,1.49-.16.99-.6,1.99-.49,2.95.14,1.26-.4,1.94-1.38,2.32-1.25.49-1.1-1.04-1.98-1.55-.4,2-1.93,3.75-.37,5.94-1.37.59-.99,2.52-2.93,3.4.46-2.39,1.37-4.58-.31-6.56-3.88.67-1.03-2.87-2.71-4.07-2.46,1.32-5.22,2.73-7.91,4.27-6.49,3.72-12.64,8.02-19.37,11.33-3.9,1.92-7.79,3.85-11.96,5.13-.44.13-.85.43-1.76-.25,7.37-3.04,14.45-6.07,20.98-10.21,6.59-4.19,13.23-8.3,20.47-12.42-4.18.83-6.82-.85-8.92-3.74,1.97,1.16,3.92,2.27,6.61,1.99-1.54-1.39-3.37-2.32-3.42-4.54-.03-1.16,1.07-1.41,1.38-2.33,1.94,1.3.12,1.69-.4,2.46.63,1.23,1.28,2.44,3.08,2.07.13-.03.3-.08.39-.03,2.64,1.58,2.43-.34,2.45-2.13M203.07,88.39c0,.51,0,1.01-.02,1.87.89-1.98,2.25-3.47,1.49-5.65-1.69.78-1.05,2.37-1.48,3.77M205.96,84.28c1.31.88-.72,2.45.7,3.35,1.36-1,.38-2.18.25-3.25-.06-.5-.48-.82-.95-.11h0Z"/>
-          <path d="M130.07,112.53c4.1-2.27,8.13-4.36,12.01-6.7,4.75-2.87,9.06-6.38,13.24-10.02.54-.47.95-1.14,1.91-.98.62.91-.04,1.45-.62,1.97-4.75,4.33-9.79,8.27-15.45,11.35-6.16,3.35-12.36,6.63-18.59,9.85-2.12,1.1-4.39,1.93-6.56,3.35,1.78,0,3.57.08,5.35.02,1.6-.06,3.2-.29,4.79-.37.61-.03,1.53-.27,1.61.69.08.94-.82.89-1.46.96-4.99.61-10.01.62-15.01.25-1.65-.12-3.33.63-4.94-.22-.28-.15-.56-.31-.91-.51.23-.22.36-.47.48-.46,5.9.43,10.84-2.38,15.94-4.69,2.81-1.27,5.41-2.91,8.21-4.49h0Z"/>
-          <path d="M189.2,102.91c-.69,2.33-1.36,4.51-1.48,6.84-.04.79-.9,1.11-1.66,1.23-.94.15-1.22-.48-1.13-1.47-1.9,2.21-4.25,3.04-6.66,4.44-.03-1.49.66-1.77,1.21-2.04,3.56-1.73,5.38-4.93,7.08-8.26.57-1.1,1.21-2.17,2.63-.74h0Z"/>
-          <path d="M170.5,115.05c2.19-.75,2.98-2.91,4.74-4.36-1.04,5.45-4.61,8.02-10.51,7.67,1.4-2.12,3.99-1.89,5.76-3.31h0Z"/>
-          <path d="M144.52,121.01c.71.15,1.28.29.7,1.03-.39.51-.98.72-1.58.75-3.93.19-7.83.73-11.78.59-.16,0-.32-.16-.52-.72,4.34-.56,8.68-1.11,13.17-1.65h0Z"/>
-          <path d="M166.09,91.01c-2.83.47-4.71,3.07-7.88,3.11.46-1,1.13-1.31,1.76-1.58,1.53-.66,2.98-1.41,4.12-2.7.28-.32.78-.49,1.21-.63.55-.18,1.23-.49,1.63.16.47.76-.09,1.21-.84,1.63h0Z"/>
-          <path d="M168.93,88.26c-.68-1.2-.14-1.67.89-1.47,1.34.26,2.7.63,4.12,1.92-1.93.51-3.41.12-5.01-.45Z"/>
-          <path d="M178.97,83.39c-.81.1-1.42.7-2.34.16,1.64-1.66,3.57-1.6,6.03-1.65-1.2,1.44-2.47,1.2-3.69,1.48Z"/>
-          <path d="M197.11,102.84c-1.03,1-1.39,2.64-3.15,2.57.26-2.06,1.9-3.39,3.15-2.57Z"/>
+          <path d="M200.3,74.14c.31-1.06,1.58-1.34,1.31-2.99,2.08,1.56,2.92,3.34,3.84,5.19,2.28-.8,3.65-2.81,5.28-4.54,1.72-1.84,2.27-1.75,3.39.67-1.45,1.52-3.36,2.49-5.04,3.77-.85.64-1.66,1.34-.4,2.37.52.43.25.99.16,1.49-.16.99-.6,1.99-.49,2.95.14,1.26-.4,1.94-1.38,2.32-1.25.49-1.1-1.04-1.98-1.55-.4,2-1.93,3.75-.37,5.94-1.37.59-.99,2.52-2.93,3.4.46-2.39,1.37-4.58-.31-6.56-3.88.67-1.03-2.87-2.71-4.07-2.46,1.32-5.22,2.73-7.91,4.27-6.49,3.72-12.64,8.02-19.37,11.33-3.9,1.92-7.79,3.85-11.96,5.13-.44.13-.85.43-1.76-.25,7.37-3.04,14.45-6.07,20.98-10.21,6.59-4.19,13.23-8.3,20.47-12.42-4.18.83-6.82-.85-8.92-3.74,1.97,1.16,3.92,2.27,6.61,1.99-1.54-1.39-3.37-2.32-3.42-4.54-.03-1.16,1.07-1.41,1.38-2.33,1.94,1.3.12,1.69-.4,2.46.63,1.23,1.28,2.44,3.08,2.07.13-.03.3-.08.39-.03,2.64,1.58,2.43-.34,2.45-2.13M202.94,82.99c0,.51,0,1.01-.02,1.87.89-1.98,2.25-3.47,1.49-5.65-1.69.78-1.05,2.37-1.48,3.77M205.83,78.88c1.31.88-.72,2.45.7,3.35,1.36-1,.38-2.18.25-3.25-.06-.5-.48-.82-.95-.11h0Z"/>
+          <path d="M129.95,107.13c4.1-2.27,8.13-4.36,12.01-6.7,4.75-2.87,9.06-6.38,13.24-10.02.54-.47.95-1.14,1.91-.98.62.91-.04,1.45-.62,1.97-4.75,4.33-9.79,8.27-15.45,11.35-6.16,3.35-12.36,6.63-18.59,9.85-2.12,1.1-4.39,1.93-6.56,3.35,1.78,0,3.57.08,5.35.02,1.6-.06,3.2-.29,4.79-.37.61-.03,1.53-.27,1.61.69.08.94-.82.89-1.46.96-4.99.61-10.01.62-15.01.25-1.65-.12-3.33.63-4.94-.22-.28-.15-.56-.31-.91-.51.23-.22.36-.47.48-.46,5.9.43,10.84-2.38,15.94-4.69,2.81-1.27,5.41-2.91,8.21-4.49h0Z"/>
+          <path d="M189.08,97.51c-.69,2.33-1.36,4.51-1.48,6.84-.04.79-.9,1.11-1.66,1.23-.94.15-1.22-.48-1.13-1.47-1.9,2.21-4.25,3.04-6.66,4.44-.03-1.49.66-1.77,1.21-2.04,3.56-1.73,5.38-4.93,7.08-8.26.57-1.1,1.21-2.17,2.63-.74h0Z"/>
+          <path d="M170.38,109.65c2.19-.75,2.98-2.91,4.74-4.36-1.04,5.45-4.61,8.02-10.51,7.67,1.4-2.12,3.99-1.89,5.76-3.31h0Z"/>
+          <path d="M144.39,115.61c.71.15,1.28.29.7,1.03-.39.51-.98.72-1.58.75-3.93.19-7.83.73-11.78.59-.16,0-.32-.16-.52-.72,4.34-.56,8.68-1.11,13.17-1.65h0Z"/>
+          <path d="M165.96,85.61c-2.83.47-4.71,3.07-7.88,3.11.46-1,1.13-1.31,1.76-1.58,1.53-.66,2.98-1.41,4.12-2.7.28-.32.78-.49,1.21-.63.55-.18,1.23-.49,1.63.16.47.76-.09,1.21-.84,1.63h0Z"/>
+          <path d="M168.81,82.86c-.68-1.2-.14-1.67.89-1.47,1.34.26,2.7.63,4.12,1.92-1.93.51-3.41.12-5.01-.45Z"/>
+          <path d="M178.85,77.99c-.81.1-1.42.7-2.34.16,1.64-1.66,3.57-1.6,6.03-1.65-1.2,1.44-2.47,1.2-3.69,1.48Z"/>
+          <path d="M196.99,97.44c-1.03,1-1.39,2.64-3.15,2.57.26-2.06,1.9-3.39,3.15-2.57Z"/>
         </g>
       </g>
       <g id="perle">
         <g id="perle_noire3" data-name="perle noire3">
-          <circle cx="215.8" cy="71.17" r="8.02" stroke="#f9f7f7" stroke-miterlimit="10"/>
+          <circle cx="215.68" cy="65.78" r="8.02" stroke="#f9f7f7" stroke-miterlimit="10"/>
         </g>
         <g id="perle_noire2" data-name="perle noire2">
-          <circle cx="223.28" cy="58.29" r="8.02" stroke="#f9f7f7" stroke-miterlimit="10"/>
+          <circle cx="223.16" cy="52.89" r="8.02" stroke="#f9f7f7" stroke-miterlimit="10"/>
         </g>
         <g id="perle_noire1" data-name="perle noire1">
-          <circle cx="229.57" cy="44.91" r="8.02" stroke="#f9f7f7" stroke-miterlimit="10"/>
+          <circle cx="229.44" cy="39.51" r="8.02" stroke="#f9f7f7" stroke-miterlimit="10"/>
         </g>
       </g>
     </g>
-    <path d="M222.92,89.68s20.78,9.74,40.26,1.95,25.97-19.48,25.97-19.48l-14.94,3.25,12.99,8.44" fill="none" stroke="#000" stroke-miterlimit="10"/>
+    <path id="curseur_plume-indice-clic" d="M222.79,84.29s20.78,9.74,40.26,1.95,25.97-19.48,25.97-19.48l-14.94,3.25,12.99,8.44" fill="none" stroke="#000" stroke-miterlimit="10"/>
+  </g>
+  <g id="mots_steps_scrolly">
+    <g id="Visible-initiale">
+      <rect id="Colonisation-VI-boite" x="458.45" y="112.33" width="163.91" height="28.29" fill="aqua"/>
+      <circle id="Colonisation-VI-point" cx="540.36" cy="111.81" r="6.64" fill="#32ff00"/>
+      <text id="Colonisation-VI-mot" transform="translate(488.9 133.17)" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15" font-size="24"><tspan x="0" y="0">Colonisation</tspan></text>
+    </g>
+    <g id="Step1">
+      <g id="Depuis_la_nuit_des_temps-S1-boite" data-name="Depuis la nuit des temps-S1-boite">
+        <rect x="262.02" y="28.54" width="196.6" height="83.65" fill="aqua"/>
+      </g>
+      <g id="Depuis_la_nuit_des_temps-S1-point" data-name="Depuis la nuit des temps-S1-point">
+        <circle cx="261.92" cy="28.54" r="6.64" fill="#32ff00"/>
+      </g>
+      <g id="Depuis_la_nuit_des_temps-S1-mot" data-name="Depuis la nuit des temps-S1-mot">
+        <text transform="translate(281.26 63.17)" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15" font-size="24"><tspan x="0" y="0">Depuis</tspan><tspan x="56.93" y="0" letter-spacing="-.01em"> </tspan><tspan x="62.64" y="0">la </tspan><tspan x="0" y="28.8">nuit</tspan><tspan x="32.78" y="28.8" letter-spacing=".06em"> </tspan><tspan x="40.22" y="28.8">des</tspan><tspan x="67.13" y="28.8" letter-spacing="-.03em"> </tspan><tspan x="72.53" y="28.8" letter-spacing="0em">temps</tspan></text>
+      </g>
+    </g>
+    <g id="Step2">
+      <rect id="Ensemble-S2-boite" x="326.65" y="27.58" width="164.99" height="56.86" fill="aqua"/>
+      <circle id="Ensemble-S2-point" cx="327.29" cy="28.54" r="6.64" fill="#32ff00"/>
+      <text id="Ensemble-S2-mot" transform="translate(342.76 63.17)" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15" font-size="24"><tspan x="0" y="0">Ensemble</tspan></text>
+    </g>
+    <g id="Step3">
+      <rect id="Le_territoire-S3-boite" data-name="Le territoire-S3-boite" x="392.48" y="26.69" width="164.99" height="56.86" fill="aqua"/>
+      <circle id="Le_territoire-S3-point" data-name="Le territoire-S3-point" cx="393.12" cy="27.64" r="6.64" fill="#32ff00"/>
+      <text id="Le_territoire-S3-mot" data-name="Le territoire-S3-mot" transform="translate(408.59 62.27)" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15" font-size="24"><tspan x="0" y="0">Le</tspan><tspan x="21.19" y="0" letter-spacing="-.03em"> </tspan><tspan x="26.59" y="0" letter-spacing="0em">territoire</tspan></text>
+    </g>
+    <g id="Step4">
+      <rect id="Les_valeurs_qui_nous_unissaient-S4-boite" data-name="Les valeurs qui nous unissaient-S4-boite" x="229.68" y="27.4" width="165.18" height="84.62" fill="aqua"/>
+      <circle id="Les_valeurs_qui_nous_unissaient-S4-point" data-name="Les valeurs qui nous unissaient-S4-point" cx="392.57" cy="28.28" r="6.64" fill="#32ff00"/>
+      <text id="Les_valeurs_qui_nous_unissaient-S4-mot" data-name="Les valeurs qui nous unissaient-S4-mot" transform="translate(245.81 62.99)" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15" font-size="24"><tspan x="0" y="0">Les</tspan><tspan x="29.16" y="0" letter-spacing="-.04em"> </tspan><tspan x="34.27" y="0">valeurs</tspan><tspan x="97.1" y="0" letter-spacing="-.01em"> </tspan><tspan x="102.81" y="0">qui</tspan><tspan x="0" y="28.8">nous</tspan><tspan x="35.42" y="28.8" letter-spacing="-.02em"> </tspan><tspan x="40.82" y="28.8" letter-spacing="0em">unissaient</tspan></text>
+    </g>
+    <g id="Step5">
+      <rect id="Disparu·es_et_assassiné·es-S5-boite" data-name="Disparu·es et assassiné·es-S5-boite" x="293.26" y="27.66" width="165.18" height="84.62" fill="aqua"/>
+      <circle id="Disparu·es_et_assassiné·es-S5-point" data-name="Disparu·es et assassiné·es-S5-point" cx="456.15" cy="28.53" r="6.64" fill="#32ff00"/>
+      <text id="Disparu·es_et_assassiné·es-S5-mot" data-name="Disparu·es et assassiné·es-S5-mot" transform="translate(309.38 63.25)" font-size="24"><tspan x="0" y="0" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15">Disparu</tspan><tspan x="67.87" y="0" font-family="MyriadPro-Regular, &apos;Myriad Pro&apos;">·</tspan><tspan x="72.84" y="0" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15">es</tspan><tspan x="90.93" y="0" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15" letter-spacing=".06em"> </tspan><tspan x="98.37" y="0" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15">et</tspan><tspan x="0" y="28.8" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15">assassiné</tspan><tspan x="83.88" y="28.8" font-family="MyriadPro-Regular, &apos;Myriad Pro&apos;">·</tspan><tspan x="88.85" y="28.8" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15">es</tspan></text>
+    </g>
+    <g id="Step6">
+      <rect id="Spirale_de_la_violence-S6-boite" data-name="Spirale de la violence-S6-boite" x="622.62" y="27.66" width="165.18" height="84.62" fill="aqua"/>
+      <circle id="Spirale_de_la_violence-S6-point" data-name="Spirale de la violence-S6-point" cx="622.62" cy="27.51" r="6.64" fill="#32ff00"/>
+      <text id="Spirale_de_la_violence-S6-mot" data-name="Spirale de la violence-S6-mot" transform="translate(638.75 63.25)" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15" font-size="24"><tspan x="0" y="0">Spirale</tspan><tspan x="64.54" y="0" letter-spacing=".06em"> </tspan><tspan x="71.98" y="0">de</tspan><tspan x="90.91" y="0" letter-spacing="-.01em"> </tspan><tspan x="96.62" y="0">la </tspan><tspan x="0" y="28.8">violence</tspan></text>
+    </g>
+    <g id="Step7">
+      <rect id="Survivant·es-S7-boite" x="687.58" y="83.78" width="165.18" height="55.81" fill="aqua"/>
+      <circle id="Survivant·es-S7-point" cx="687.58" cy="83.63" r="6.64" fill="#32ff00"/>
+      <text id="Survivant·es-S7-mot" transform="translate(703.71 119.37)" font-size="24"><tspan x="0" y="0" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15">Survivant</tspan><tspan x="88.92" y="0" font-family="MyriadPro-Regular, &apos;Myriad Pro&apos;">·</tspan><tspan x="93.89" y="0" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15">es</tspan></text>
+    </g>
+    <g id="Step8">
+      <rect id="Porter_la_mémoire-S8-boite" data-name="Porter la mémoire-S8-boite" x="751.69" y="55.85" width="165.18" height="84.26" fill="aqua"/>
+      <circle id="Porter_la_mémoire-S8-point" data-name="Porter la mémoire-S8-point" cx="751.69" cy="55.7" r="6.64" fill="#32ff00"/>
+      <text id="Porter_la_mémoire-S8-mot" data-name="Porter la mémoire-S8-mot" transform="translate(767.82 91.43)" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15" font-size="24"><tspan x="0" y="0">Porter</tspan><tspan x="57.5" y="0" letter-spacing="-.01em"> </tspan><tspan x="63.22" y="0">la</tspan><tspan x="0" y="28.8">mémoire</tspan></text>
+    </g>
+    <g id="Step9">
+      <rect id="Une_étoile_une_vie-S9-S10-boite" data-name="Une étoile, une vie-S9-S10-boite" x="819.6" y="56.43" width="165.18" height="84.26" fill="aqua"/>
+      <circle id="Une_étoile_une_vie-S9-S10-point" data-name="Une étoile, une vie-S9-S10-point" cx="819.6" cy="56.29" r="6.64" fill="#32ff00"/>
+      <text id="Une_étoile_une_vie-S9-S10-mot" data-name="Une étoile, une vie-S9-S10-mot" transform="translate(835.73 92.02)" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15" font-size="24"><tspan x="0" y="0">Une</tspan><tspan x="33.5" y="0" letter-spacing=".06em"> </tspan><tspan x="40.94" y="0" letter-spacing="0em">étoile,</tspan><tspan x="0" y="28.8">une</tspan><tspan x="29.38" y="28.8" letter-spacing="-.04em"> </tspan><tspan x="34.49" y="28.8">vie</tspan></text>
+    </g>
+    <g id="Step10">
+      <rect id="Reconnectons_à_nos_valeurs-S10-S11-boite" data-name="Reconnectons à nos valeurs-S10-S11-boite" x="1048.11" y="27.84" width="165.18" height="84.26" fill="aqua"/>
+      <circle id="Reconnectons_à_nos_valeurs-S10-S11-point" data-name="Reconnectons à nos valeurs-S10-S11-point" cx="1047.21" cy="70" r="6.64" fill="#32ff00"/>
+      <text id="Reconnectons_à_nos_valeurs-S10-S11-mot" data-name="Reconnectons à nos valeurs-S10-S11-mot" transform="translate(1064.2419 63.4252)" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15" font-size="24"><tspan x="0" y="0">Reconnectons</tspan><tspan x="0" y="28.8">à</tspan><tspan x="10.01" y="28.8" letter-spacing="-.01em"> </tspan><tspan x="15.72" y="28.8">nos</tspan><tspan x="43.08" y="28.8" letter-spacing="-.04em"> </tspan><tspan x="48.19" y="28.8">valeurs</tspan></text>
+    </g>
   </g>
 </svg>

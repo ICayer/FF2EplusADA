@@ -4,7 +4,8 @@
 
    Rôle : Styles de la zone timeline (rail, curseur, contrôles fusionnés,
    légendes d'orientation, repères Univers/Valeurs), du bloc-titre fixe
-   en haut-gauche de la scène (#titre-scene, distinct de #texteStep), et
+   en haut-gauche de la scène (#titre-scene, masqué visuellement — lecteurs
+   d'écran seulement depuis le 1er octobre 2026), et
    des éléments propres à la séquence avant-colonisation (phrase
    progressive, sous-titre de rupture, carte de valeur). Toutes les
    couleurs de scène passent par les jetons de thème de variables.css
@@ -210,70 +211,25 @@
   background: #4a90d9;
 }
 
-/* --- Bloc-titre de scène (haut-gauche de #graphic, distinct de #texteStep) --- */
+/* --- Bloc-titre de scène — retiré VISUELLEMENT le 1er octobre 2026
+   (remplacé par les mots-clés du rail, shared/js/motsSteps.js), mais
+   gardé dans le DOM pour les lecteurs d'écran : #titre-texte porte
+   aria-live="polite" et annonce le nom du step à chaque navigation et au
+   survol/focus d'une perle (les perles n'ont encore qu'un aria-label
+   technique, l'id brut). Masquage "visually-hidden" standard — jamais
+   display:none ni visibility:hidden, qui couperaient aussi l'annonce. --- */
 .titre-scene {
   position: absolute;
-  top: 28px;
-  left: 32px;
-  max-width: 420px;
-  background: var(--color-carte-bg);
-  padding: 14px 20px;
-  border-radius: 6px;
-  z-index: 1600; /* > 1500 (loadSVG) — convention Playbook §3.4 */
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
   pointer-events: none;
-}
-
-.titre-scene .eyebrow {
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-scene-texte-att);
-  margin-bottom: 4px;
-}
-
-.titre-scene h2 {
-  font-family: "Agoradp_15", sans-serif;
-  font-size: calc(26px * var(--echelle-texte));
-  font-weight: 400;
-  color: var(--color-scene-texte);
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-.titre-scene h2.transition-sortie {
-  opacity: 0;
-  transform: translateY(6px);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .titre-scene h2 {
-    transition: none;
-  }
-}
-
-/* --- Texte narratif (#texteStep) — uniquement steps F-I (fond noir),
-   reste donc en couleurs fixes, pas besoin des jetons de thème --- */
-.texte-step-narratif {
-  position: fixed;
-  top: calc(var(--h-barre-haut) + (100vh - var(--h-barre-haut) - var(--h-zone-timeline)) / 2);
-  left: 32px;
-  transform: translateY(-50%);
-  max-width: 400px;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 16px 20px;
-  border-radius: 6px;
-  color: white;
-  font-family: sans-serif;
-  font-size: calc(1rem * var(--echelle-texte));
-}
-
-.texte-step-narratif h2 {
-  font-size: 1.5em;
-}
-
-.texte-step-narratif p {
-  font-size: 1em;
 }
 
 /* --- Phrase progressive (B/C/E) — repositionnée dynamiquement en JS par
