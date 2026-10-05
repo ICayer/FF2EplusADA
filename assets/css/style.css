@@ -116,6 +116,9 @@ body {
 }
 
 .footer-logos {
+  /* Hauteur commune des logos — source unique, redéfinie sous 768px plus
+     bas. .logo-porteur s'en sert comme base de son facteur. */
+  --hauteur-logo: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -124,7 +127,7 @@ body {
 }
 
 .footer-logos img {
-  height: 60px;
+  height: var(--hauteur-logo);
   width: auto;
   opacity: 0.85;
   transition: opacity 0.2s ease;
@@ -136,9 +139,20 @@ body {
 
 .footer-logos img:hover { opacity: 1; }
 
+/* Logo porteur (L'Agora) — VOLONTAIREMENT plus grand que les autres :
+   l'Agora a porté le projet à 100 % et son logo est une œuvre de Déline
+   (décision d'Isabel, 5 octobre 2026). Exprimé en multiple de
+   --hauteur-logo pour que la hiérarchie tienne à toutes les largeurs
+   (60px → 150px ; 45px sous 768px → 112,5px). Ajuster le facteur à
+   l'œil. Fichier NON rogné : la lune en haut à gauche fait partie de la
+   composition carrée. */
+.footer-logos img.logo-porteur {
+  --facteur-logo-porteur: 2.5;
+  height: calc(var(--hauteur-logo) * var(--facteur-logo-porteur));
+}
+
 @media screen and (max-width: 767px) {
   .footer-section { padding: 1.5rem 0; }
   .footer-section h4 { font-size: 1rem; }
-  .footer-logos { gap: 1.5rem; }
-  .footer-logos img { height: 45px; }
+  .footer-logos { gap: 1.5rem; --hauteur-logo: 45px; }
 }
