@@ -27,6 +27,11 @@ import { loadSVG } from "../../../shared/js/utils.js";
 import { resolve, getLanguage } from "../../../shared/js/i18n.js";
 import { reduitMouvement } from "../../../shared/js/navigationEtat.js";
 
+// Step C (lien-territoire) — pause entre deux groupes de perles : perlesN+1
+// démarre ECART_GROUPES_PERLES_S secondes après la FIN de la vague de
+// perlesN (pointeur GSAP ">"). Isabel ajuste le rythme ici.
+const ECART_GROUPES_PERLES_S = 2;
+
 let container = null;
 // Mémoïse le CHARGEMENT EN VOL de scrolly.svg (même principe que
 // stepsDataPromise plus bas pour steps.json) : si assurerContainer() est
@@ -506,10 +511,18 @@ export async function showLienTerritoire() {
   if (!territoireEl) return;
 
   if (!revele.territoire) {
-    timelineActuelle.to(territoireEl, { opacity: 1, duration: 1.5 }, "+=3");
-    timelineActuelle.call(() => definirPhraseParStep("lien-territoire", "gauche"), null, "<");
+    // Label au départ du fondu du territoire : perles1 s'y ancre (au lieu
+    // d'un nombre de secondes), donc reste synchronisée si ce délai change.
+    timelineActuelle.addLabel("territoire", "+=3");
+    timelineActuelle.to(territoireEl, { opacity: 1, duration: 1.5 }, "territoire");
+    timelineActuelle.call(() => definirPhraseParStep("lien-territoire", "gauche"), null, "territoire");
     for (let i = 1; i <= 5; i++) {
-      animerPerlesEnVague(c.querySelector(`#perles${i}`), timelineActuelle, "+=2");
+      // perles1 : avec le territoire. perles2-5 : ECART_GROUPES_PERLES_S
+      // après la fin de la vague précédente (">" = fin du dernier ajout —
+      // "+=" se mesurerait depuis la fin de la timeline, ici le fondu du
+      // territoire, plus long que la vague de perles1).
+      const position = i === 1 ? "territoire" : `>${ECART_GROUPES_PERLES_S}`;
+      animerPerlesEnVague(c.querySelector(`#perles${i}`), timelineActuelle, position);
     }
     // Posé après TOUTE la séquence (territoire + 5 vagues de perles), pas au
     // moment de la planifier — même précaution que showNuitDesTemps().
