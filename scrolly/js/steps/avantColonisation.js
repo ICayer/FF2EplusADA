@@ -374,6 +374,99 @@ function construireCerclesValeurs() {
   return cercles;
 }
 
+// --- Glow "sonar" des spots de valeurs (step D) ---
+// Patron RECOPIÉ (pas importé — chaque partie reste autonome, Playbook §1)
+// du glow des étoiles-témoignage (univers/js/etoiles.js) : cercle derrière
+// l'élément, pulsation infinie de r + fill-opacity (jamais opacity),
+// sine.inOut, yoyo, immobile sous prefers-reduced-motion.
+// Univers : r de base = rayon + 6, max = rayon + 16, sur une étoile de 10 —
+// des marges FIXES, qui deviennent ici des RATIOS du rayon rendu du spot
+// (un spot fait ~10× une étoile ; recopier 1,6×/2,6× ferait se chevaucher
+// les halos voisins). À ajuster à l'œil.
+const GLOW_RATIO_RAYON_BASE = 1.0;
+const GLOW_RATIO_RAYON_MAX = 1.3;
+const GLOW_FILL_OPACITE_HAUTE = 0.45; // = univers
+const GLOW_FILL_OPACITE_BASSE = 0.15; // = univers
+const GLOW_DUREE_PULSATION_S = 1.1; // = univers
+// Fondu d'entrée des spots — partagé par le tween ET le départ de chaque glow.
+const DUREE_FONDU_SPOT_S = 0.4;
+const STAGGER_SPOTS_S = 0.15;
+
+let groupeGlows = null; // <g id="glows-valeurs">, frère PRÉCÉDENT de #cercles-valeurs
+
+// Un cercle de glow par spot, dans un groupe frère inséré JUSTE AVANT
+// #cercles-valeurs (donc peint derrière TOUS les spots) — pas à
+// l'intérieur : groupeCercles.children sert au tri horaire, au cache de
+// construireCerclesValeurs() et au masquage de hideLienValeurs().
+// Centre et rayon mesurés sur le rendu (getBoundingClientRect +
+// getScreenCTM().inverse(), Playbook §3.3) — jamais getBBox(), qui ignore
+// le transform translate+scale de chaque <image>. Couleur lue dans
+// valeurs.json (champ couleur). Retourne un tableau aligné sur `cercles`
+// (null si la valeur n'a pas de couleur).
+function construireGlows(cercles) {
+  detruireGlows();
+  const NS = "http://www.w3.org/2000/svg";
+  groupeGlows = document.createElementNS(NS, "g");
+  groupeGlows.setAttribute("id", "glows-valeurs");
+  groupeGlows.setAttribute("pointer-events", "none");
+  groupeCercles.parentNode.insertBefore(groupeGlows, groupeCercles);
+
+  const svgRoot = container.querySelector("svg");
+  const ctmInverse = groupeGlows.getScreenCTM().inverse();
+  const versLocal = (x, y) => {
+    const pt = svgRoot.createSVGPoint();
+    pt.x = x;
+    pt.y = y;
+    return pt.matrixTransform(ctmInverse);
+  };
+
+  return cercles.map((cercle) => {
+    const valeur = valeurs.find((v) => v.id === cercle.dataset.valeurId);
+    if (!valeur?.couleur) {
+      console.warn(`⚠️ Glow : aucune couleur dans valeurs.json pour "${cercle.dataset.valeurId}"`);
+      return null;
+    }
+    const r = cercle.getBoundingClientRect();
+    const hautGauche = versLocal(r.left, r.top);
+    const basDroite = versLocal(r.right, r.bottom);
+    const rayonSpot = Math.max(basDroite.x - hautGauche.x, basDroite.y - hautGauche.y) / 2;
+
+    const glow = document.createElementNS(NS, "circle");
+    glow.setAttribute("class", "glow-valeur");
+    glow.setAttribute("cx", (hautGauche.x + basDroite.x) / 2);
+    glow.setAttribute("cy", (hautGauche.y + basDroite.y) / 2);
+    glow.setAttribute("r", rayonSpot * GLOW_RATIO_RAYON_BASE);
+    glow.setAttribute("fill", valeur.couleur);
+    glow.setAttribute("fill-opacity", 0); // révélé par demarrerGlow(), après le fondu de SON spot
+    glow.setAttribute("pointer-events", "none");
+    glow.dataset.rayonSpot = rayonSpot;
+    groupeGlows.appendChild(glow);
+    return glow;
+  });
+}
+
+function demarrerGlow(glow) {
+  if (!glow) return;
+  gsap.set(glow, { attr: { "fill-opacity": GLOW_FILL_OPACITE_HAUTE } });
+  if (reduitMouvement()) return; // glow statique, aucune pulsation
+  gsap.to(glow, {
+    attr: { r: glow.dataset.rayonSpot * GLOW_RATIO_RAYON_MAX, "fill-opacity": GLOW_FILL_OPACITE_BASSE },
+    duration: GLOW_DUREE_PULSATION_S,
+    ease: "sine.inOut",
+    repeat: -1,
+    yoyo: true,
+  });
+}
+
+// Tue les pulsations PUIS retire les cercles — un show() suivant reconstruit
+// à neuf (aucun doublon, quel que soit le nombre de cycles).
+function detruireGlows() {
+  if (!groupeGlows) return;
+  gsap.killTweensOf(groupeGlows.children);
+  groupeGlows.remove();
+  groupeGlows = null;
+}
+
 function afficherCarteValeur(valeurId) {
   const valeur = valeurs.find((v) => v.id === valeurId);
   const carte = document.getElementById("carte-valeur");
@@ -395,7 +488,14 @@ function afficherCarteValeur(valeurId) {
   // resolve({fr, en}) plutôt que resolve(valeur.nom) directement, pour ne
   // jamais dupliquer le mot autochtone sur les deux lignes de la carte.
   carte.querySelector(".carte-valeur-traduction").textContent = resolve({ fr: valeur.nom.fr, en: valeur.nom.en });
-  carte.querySelector(".carte-valeur-definition").textContent = resolve(valeur.definition);
+  // Pas de donnée, pas de paragraphe : sans definition (champ retiré de
+  // valeurs.json le 5 octobre 2026 — aucun texte descriptif prévu), le bloc
+  // est retiré du rendu (hidden = display:none, aucun espace résiduel). Un
+  // texte ajouté un jour dans valeurs.json s'affichera sans toucher au code.
+  const definitionEl = carte.querySelector(".carte-valeur-definition");
+  const definition = resolve(valeur.definition);
+  definitionEl.textContent = definition;
+  definitionEl.hidden = !definition;
   carte.classList.add("visible");
 }
 
@@ -538,11 +638,17 @@ export function hideLienTerritoire() {}
 export async function showLienValeurs() {
   if (timelineActuelle) timelineActuelle.kill();
   timelineActuelle = gsap.timeline();
+  const maTimeline = timelineActuelle;
   const c = await assurerContainer();
   if (!c) return;
   await chargerStepsData();
   assurerCalquesAvant("valeurs");
   await chargerValeurs();
+  // Quitté D pendant les await ci-dessus (ex. S4→S5 rapide au 1er passage,
+  // fetch de valeurs.json en cours) : un autre show() a déjà remplacé
+  // timelineActuelle et hideLienValeurs() est déjà passé — ne rien
+  // construire, sinon des glows orphelins resteraient affichés sur E.
+  if (timelineActuelle !== maTimeline) return;
 
   const cercles = construireCerclesValeurs();
   if (!cercles) return;
@@ -555,14 +661,24 @@ export async function showLienValeurs() {
   // animé (même réflexe que la plume du rail, shared/js/railParcours.js) —
   // absent de l'ancien système (jamais vérifié ici avant cette tranche),
   // ajouté en même temps que la révision du mécanisme d'apparition.
+  const glows = construireGlows(cercles);
   if (reduitMouvement()) {
     gsap.set(cercles, { opacity: 1 });
+    glows.forEach(demarrerGlow);
   } else {
-    timelineActuelle.to(cercles, { opacity: 1, duration: 0.4, stagger: 0.15 }, "+=3");
+    timelineActuelle.addLabel("spots", "+=3");
+    timelineActuelle.to(cercles, { opacity: 1, duration: DUREE_FONDU_SPOT_S, stagger: STAGGER_SPOTS_S }, "spots");
+    // Le glow de CHAQUE spot démarre à la fin du fondu de CE spot (même
+    // ordre horaire que le stagger) — appels portés par timelineActuelle,
+    // donc annulés d'office si on quitte D avant (kill() du show suivant).
+    glows.forEach((glow, i) => {
+      timelineActuelle.call(() => demarrerGlow(glow), null, `spots+=${i * STAGGER_SPOTS_S + DUREE_FONDU_SPOT_S}`);
+    });
   }
 }
 
 export function hideLienValeurs() {
+  detruireGlows(); // killTweensOf, puis retrait — disparaît avec les spots
   if (groupeCercles) gsap.set(groupeCercles.children, { opacity: 0 });
   cacherCarteValeur();
 }

@@ -303,10 +303,14 @@
 .carte-valeur-traduction {
   font-size: calc(14px * var(--echelle-texte));
   color: var(--color-scene-texte-att);
-  margin-bottom: 10px;
 }
 
+/* L'espacement vit sur la définition (margin-top), plus sous la
+   traduction (margin-bottom) : quand la définition est absente
+   (hidden, avantColonisation.js), aucun espace vide ne reste en bas de
+   la carte. */
 .carte-valeur-definition {
+  margin-top: 10px;
   font-size: calc(13px * var(--echelle-texte));
   line-height: 1.4;
 }
