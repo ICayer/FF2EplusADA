@@ -67,7 +67,7 @@ const PAS_ELARGISSEMENT_PX = 8;
 const DUREE_FONDU_MS = 400; // doit correspondre à .mot-step (railParcours.css)
 // Durée d'affichage avant disparition (champ "minuteur") — point de
 // départ, Isabel ajustera à l'œil.
-const DUREE_AFFICHAGE_MOT_MS = 4000;
+const DUREE_AFFICHAGE_MOT_MS = 6000; // milieu de la plage 5-7 s demandée
 const MINUTEURS_VALIDES = new Set(["chaque-step", "dernier-step", "aucun"]);
 
 let railEl = null;

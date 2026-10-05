@@ -10,7 +10,11 @@
   <link rel="stylesheet" href="./css/style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
-<body data-theme="clair">
+<!-- data-page : identifie la page pour les règles scopées du rail partagé
+     (timeline.svg est chargé par scrolly, univers ET valeurs) — voir
+     railParcours.css (perles noires masquées) et railParcours.js (ancrage
+     de la plume par sa pointe). -->
+<body data-theme="clair" data-page="valeurs">
   <div id="entete-controles"></div>
 
   <div id="graphic" class="zone-scene-valeurs"></div>

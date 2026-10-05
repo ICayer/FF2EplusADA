@@ -288,6 +288,91 @@ let derniereEtapePlume = null; // évite de rejouer un déplacement vers la
 // à son chargement — exactement comme univers/index.html avec "univers" —
 // la plume s'y place donc maintenant par le MÊME mécanisme.
 
+// valeurs.html SEULEMENT (data-page="valeurs" sur <body>) : la plume se
+// pose par sa POINTE — coin supérieur droit de la boîte rendue du calque
+// #plume seul (sans les perles noires, masquées sur cette page en CSS) —
+// au centre de bouton_valeur. Scrolly et univers gardent l'ancrage
+// perle_noire1 ci-dessous, inchangé.
+function ancreParPointe(idEtapeCible) {
+  return idEtapeCible === "valeurs" && document.body.dataset.page === "valeurs";
+}
+
+// ⚠️ TEMPORAIRE — point rouge au centre calculé de bouton_valeur, pour
+// valider à l'œil que la pointe de la plume le touche. Mettre à false (ou
+// retirer ce bloc) avant tout commit.
+const DEBUG_POINT_PLUME_VALEURS = true;
+
+// translate {x, y} à appliquer à #curseur_plume pour que la pointe de
+// #plume tombe au centre de cibleEl. Mesure du RENDU (getBoundingClientRect)
+// ramenée en coordonnées du <svg> qui contient la plume via
+// getScreenCTM().inverse() (Playbook §3.3) — jamais getBBox(), qui ignore
+// le transform translate posé sur #curseur_plume. La boîte du navigateur
+// est alignée sur les axes ; sur cette plume en diagonale, son coin
+// supérieur droit coïncide avec la pointe (vérifié par Isabel dans
+// Illustrator) — à confirmer à l'œil avec DEBUG_POINT_PLUME_VALEURS.
+function translatePourPointeSur(curseurPlumeEl, cibleEl) {
+  const svgPlume = curseurPlumeEl.ownerSVGElement;
+  const plumeEl = curseurPlumeEl.querySelector("#plume");
+  const ctmInverse = svgPlume.getScreenCTM().inverse();
+  const versSVG = (x, y) => {
+    const pt = svgPlume.createSVGPoint();
+    pt.x = x;
+    pt.y = y;
+    return pt.matrixTransform(ctmInverse);
+  };
+
+  const rPlume = plumeEl.getBoundingClientRect();
+  const rCible = cibleEl.getBoundingClientRect();
+  const pointe = versSVG(rPlume.right, rPlume.top);
+  const centre = versSVG(rCible.left + rCible.width / 2, rCible.top + rCible.height / 2);
+
+  if (DEBUG_POINT_PLUME_VALEURS) afficherPointDebug(svgPlume, centre);
+
+  // pointe est mesurée AVEC le translate courant (positionPlume, à jour :
+  // killTweensOf vient d'être appelé) — on ajoute l'écart restant.
+  return {
+    x: positionPlume.x + centre.x - pointe.x,
+    y: positionPlume.y + centre.y - pointe.y,
+  };
+}
+
+function afficherPointDebug(svgPlume, centre) {
+  let point = svgPlume.querySelector(".debug-point-plume");
+  if (!point) {
+    point = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    point.setAttribute("class", "debug-point-plume");
+    point.setAttribute("r", "3");
+    point.setAttribute("fill", "red");
+    svgPlume.appendChild(point);
+  }
+  point.setAttribute("cx", centre.x);
+  point.setAttribute("cy", centre.y);
+}
+
+// Recalcul de la pose "par la pointe" au redimensionnement et à A-/A/A+
+// (headerControls.js réécrit seulement --echelle-texte dans le style de
+// <html>, sans événement — même observation que motsSteps.js). Instantané,
+// sans animation. requestAnimationFrame : laisse d'abord le <svg>
+// superposé se resynchroniser sur le principal (creerSvgSuperpose).
+function reposerPlumeParPointe() {
+  if (!ancreParPointe(derniereEtapePlume)) return;
+  requestAnimationFrame(() => {
+    const curseurPlumeEl = document.querySelector(".rail-parcours #curseur_plume");
+    const cibleEl = document.querySelector(`.rail-parcours #${CORRESPONDANCE_ETAPE_PERLE[derniereEtapePlume]}`);
+    if (!curseurPlumeEl || !cibleEl) return;
+    gsap.killTweensOf(positionPlume);
+    const { x, y } = translatePourPointeSur(curseurPlumeEl, cibleEl);
+    positionPlume.x = x;
+    positionPlume.y = y;
+    curseurPlumeEl.setAttribute("transform", `translate(${x}, ${y})`);
+  });
+}
+window.addEventListener("resize", reposerPlumeParPointe);
+new MutationObserver(reposerPlumeParPointe).observe(document.documentElement, {
+  attributes: true,
+  attributeFilter: ["style"],
+});
+
 // Déplace #curseur_plume pour que perle_noire1 tombe exactement sur le
 // centre réel de la perle/bouton correspondant à idEtapeCible. Un seul
 // référentiel de coordonnées (même document SVG que les perles) : le
@@ -310,20 +395,26 @@ function deplacerCurseurPlume(idEtapeCible) {
 
   derniereEtapePlume = idEtapeCible;
 
-  const cible = centreReel(cibleEl);
-  // Position de perle_noire1 dans le référentiel LOCAL de #curseur_plume
-  // (aucun transform entre les deux dans la hiérarchie du SVG — vérifié,
-  // Étape 0 point 2) : invariante, indépendante du transform ACTUEL de
-  // #curseur_plume (celui qu'on est justement en train de recalculer).
-  const ancre = centreReel(perleNoire1El);
-
-  const dx = cible.x - ancre.x;
-  const dy = cible.y - ancre.y;
-
   // Annule un déplacement en cours si on clique une 2e perle pendant
   // l'animation (Étape 0 point 5, même patron que
-  // univers/js/transitionValeurs.js sur le glow des étoiles).
+  // univers/js/transitionValeurs.js sur le glow des étoiles). Fait AVANT le
+  // calcul : la branche "pointe" mesure la position rendue courante.
   gsap.killTweensOf(positionPlume);
+
+  let dx;
+  let dy;
+  if (ancreParPointe(idEtapeCible)) {
+    ({ x: dx, y: dy } = translatePourPointeSur(curseurPlumeEl, cibleEl));
+  } else {
+    const cible = centreReel(cibleEl);
+    // Position de perle_noire1 dans le référentiel LOCAL de #curseur_plume
+    // (aucun transform entre les deux dans la hiérarchie du SVG — vérifié,
+    // Étape 0 point 2) : invariante, indépendante du transform ACTUEL de
+    // #curseur_plume (celui qu'on est justement en train de recalculer).
+    const ancre = centreReel(perleNoire1El);
+    dx = cible.x - ancre.x;
+    dy = cible.y - ancre.y;
+  }
 
   if (reduitMouvement()) {
     positionPlume.x = dx;

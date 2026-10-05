@@ -78,6 +78,17 @@
   pointer-events: none;
 }
 
+/* valeurs.html SEULEMENT (data-page sur <body>) : la plume s'y pose par sa
+   pointe sur bouton_valeur, sans les 3 perles noires. display:none et non
+   visibility:hidden — un élément en visibility:hidden garde sa géométrie et
+   fausserait une boîte englobante mesurée sur un groupe parent. Les perles
+   restent visibles sur scrolly et univers (aucun data-page="valeurs"). */
+[data-page="valeurs"] .rail-parcours #perle_noire1,
+[data-page="valeurs"] .rail-parcours #perle_noire2,
+[data-page="valeurs"] .rail-parcours #perle_noire3 {
+  display: none;
+}
+
 /* Perles/boutons interactifs câblés par construireRailParcours() — ciblés
    par [data-etape-id] (posé en JS sur chaque #perle_stepN/#bouton_accueil/
    #bouton_valeur), jamais par une classe .etape-bouton qui n'existe plus. */
