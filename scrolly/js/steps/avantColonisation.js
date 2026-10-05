@@ -16,7 +16,7 @@
 // construireCerclesValeurs()/afficherCarteValeur().
 // Dépend de : shared/js/utils.js (loadSVG), shared/js/i18n.js (resolve),
 // shared/data/valeurs.json (10 entrées, dont "respect"), scrolly/data/steps.json
-// (phrases progressives traduites : phraseProgressive / sousTitreRupture)
+// (phrases progressives traduites : phraseProgressive)
 // Utilisé par : scrolly/js/stepsRegistry.js
 //
 // FF2EplusADA (scrollyFFADA2S v2)
@@ -104,14 +104,14 @@ const stepsDataPromise = fetch(new URL("../../data/steps.json", import.meta.url)
   .then((r) => r.json())
   .catch((err) => {
     console.error("❌ Impossible de charger scrolly/data/steps.json", err);
-    return {}; // phraseProgressive()/sousTitreRupture() retomberont sur '' — pas de plantage
+    return {}; // phraseProgressive() retombera sur '' — pas de plantage
   });
 stepsDataPromise.then((d) => { stepsData = d; });
 async function chargerStepsData() {
   if (!stepsData) stepsData = await stepsDataPromise;
 }
 
-// Phrase progressive / sous-titre d'un step dans la langue active (repli
+// Phrase progressive d'un step dans la langue active (repli
 // fr via resolve). Lecture SYNCHRONE de stepsData : chaque show...() fait
 // `await chargerStepsData()` juste après assurerContainer(), donc
 // stepsData est déjà là quand ces helpers sont appelés — y compris depuis
@@ -119,9 +119,6 @@ async function chargerStepsData() {
 // (stepsData a forcément été chargé au premier passage sur B/C/D/E).
 function phraseProgressive(stepId) {
   return resolve(stepsData?.[stepId]?.phraseProgressive);
-}
-function sousTitreRupture() {
-  return resolve(stepsData?.["rupture-coloniale"]?.sousTitreRupture);
 }
 
 async function assurerContainer() {
@@ -695,8 +692,6 @@ export async function showRuptureColoniale() {
   definirPhraseParStep("rupture-coloniale", "gauche");
 
   const barres = [1, 2, 3, 4, 5].map((i) => c.querySelector(`#barre${i}`));
-  const sousTitre = document.getElementById("sous-titre-rupture");
-  if (sousTitre) sousTitre.textContent = sousTitreRupture();
 
   // clip-path plutôt qu'opacity (décision Sprint 3) — chaque barre alterne
   // de sens (gauche→droite / droite→gauche), pas de stagger.
@@ -718,9 +713,6 @@ export async function showRuptureColoniale() {
       { clipPath: "inset(0% 0% 0% 0%)", duration: 1.2, ease: "power2.out" },
       "<"
     );
-    if (i === 1 && sousTitre) {
-      timelineActuelle.call(() => sousTitre.classList.add("visible"), null, "<");
-    }
   });
 }
 
@@ -729,13 +721,6 @@ export function hideRuptureColoniale() {
     const barre = container?.querySelector(`#barre${i}`);
     if (barre) gsap.set(barre, { opacity: 0, clipPath: "inset(0% 100% 0% 0%)" });
   }
-
-  // Le sous-titre n'est jamais animé directement par GSAP (show() ne fait
-  // qu'ajouter la classe .visible, laissée au CSS) — symétrie show/hide
-  // (Playbook §3.1) : hide() retire la même classe plutôt que d'écrire un
-  // opacity inline qui figerait l'élément invisible même après réajout de
-  // .visible au prochain passage sur E.
-  document.getElementById("sous-titre-rupture")?.classList.remove("visible");
 
   // Si on recule de E vers D, D ne touche pas à la phrase — elle doit
   // refléter C (le dernier step qui l'a définie), pas rester à la version

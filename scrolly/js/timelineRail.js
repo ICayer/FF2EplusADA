@@ -193,7 +193,6 @@ export function allerAuStep(index, texteTitre) {
     // conteneur au complet (calques internes ET overlays HTML).
     masquerSceneComplete();
     document.getElementById("phrase-progressive")?.classList.remove("aligne-gauche", "aligne-centre");
-    document.getElementById("sous-titre-rupture")?.classList.remove("visible");
     document.getElementById("carte-valeur")?.classList.remove("visible");
   }
 

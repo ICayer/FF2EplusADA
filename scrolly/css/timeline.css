@@ -7,7 +7,7 @@
    en haut-gauche de la scène (#titre-scene, masqué visuellement — lecteurs
    d'écran seulement depuis le 1er octobre 2026), et
    des éléments propres à la séquence avant-colonisation (phrase
-   progressive, sous-titre de rupture, carte de valeur). Toutes les
+   progressive, carte de valeur). Toutes les
    couleurs de scène passent par les jetons de thème de variables.css
    (--color-scene-*, --color-rail-piste, etc.) — jamais de couleur codée
    en dur ici, le thème clair/sombre bascule automatiquement selon
@@ -248,23 +248,6 @@
 
 .phrase-progressive.aligne-gauche,
 .phrase-progressive.aligne-centre {
-  opacity: 1;
-}
-
-/* --- Sous-titre de rupture (E uniquement, "Spirale de la violence") --- */
-.sous-titre-rupture {
-  position: absolute;
-  top: calc(28px + 70px); /* juste sous .titre-scene, ajuster à l'œil */
-  left: 32px;
-  color: var(--color-scene-texte-att);
-  font-family: "Agoradp_15", sans-serif;
-  font-size: calc(16px * var(--echelle-texte));
-  opacity: 0;
-  transition: opacity 0.6s ease;
-  pointer-events: none;
-}
-
-.sous-titre-rupture.visible {
   opacity: 1;
 }
 

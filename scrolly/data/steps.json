@@ -16,8 +16,7 @@
   },
   "rupture-coloniale": {
     "nomStep": { "fr": "Déconnexion du territoire", "en": "Disconnection from the land" },
-    "phraseProgressive": { "fr": "Femmes, filles et\npersonnes bispirituelles\nautochtones\ndisparu·es et assassiné·es", "en": "Women, girls, and\nTwo-Spirit people,\nIndigenous,\nmissing and murdered" },
-    "sousTitreRupture": { "fr": "Spirale de la violence", "en": "Spiral of violence" }
+    "phraseProgressive": { "fr": "Femmes, filles et\npersonnes bispirituelles\nautochtones\ndisparu·es et assassiné·es", "en": "Women, girls, and\nTwo-Spirit people,\nIndigenous,\nmissing and murdered" }
   },
   "hommage-victimes": {
     "nomStep": { "fr": "Hommage aux victimes", "en": "Tribute to the victims" },
