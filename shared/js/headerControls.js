@@ -3,7 +3,7 @@
 // Zone d'en-tête partagée — sélecteur de langue + taille de texte (A-/A/A+)
 //
 // Rôle : Construire et brancher les contrôles d'en-tête communs aux 4
-// parties du site (13 langues, échelle de texte à 3 niveaux). N'importe
+// parties du site (langues filtrées par afficherDansMenu, échelle de texte à 3 niveaux). N'importe
 // rien de scrolly/, univers/ ni valeurs/ — après un changement de langue,
 // émet un événement DOM global "languagechange" pour que chaque partie se
 // rafraîchisse elle-même (ce module ne sait pas quoi rafraîchir).
@@ -15,25 +15,50 @@
 // ==================================================
 
 import { setLanguage, getLanguage } from "./i18n.js";
-import { sauvegarderLangue, echelleSauvegardee, sauvegarderEchelle } from "./preferences.js";
+import { langueSauvegardee, sauvegarderLangue, echelleSauvegardee, sauvegarderEchelle } from "./preferences.js";
 
 // Orthographe exacte : infographie officielle d'Isabel (voir Registre, 24 août).
 // Codes alignés sur les clés de shared/data/fallbackByLanguage.json.
+//
+// afficherDansMenu — décision de gouvernance du 6 octobre : seuls le
+// français et l'anglais sont offerts dans le menu. Les 11 langues
+// autochtones restent listées ici (aucune suppression) mais ne sont pas
+// proposées : ne pas créer de demande pour une langue tant que personne
+// ne porte le projet dans cette langue. Pour réactiver une langue, passer
+// son afficherDansMenu à true — son bouton réapparaît dans le menu et
+// langueInitiale() accepte de nouveau la valeur mémorisée.
 const LANGUES = [
-  { code: "fr", nom: "Français" },
-  { code: "en", nom: "English" },
-  { code: "w8banaki", nom: "Aln8ba8dwaw8gan" },
-  { code: "anishinaabe", nom: "Anishinaabemowin" },
-  { code: "atikamekw", nom: "Atikamekw" },
-  { code: "eeyou", nom: "Iiyiyuu ayimuun" },
-  { code: "innu-aimun", nom: "Innu-aimun" },
-  { code: "kanienkeha", nom: "Kanien'kéhà" },
-  { code: "mikmaq", nom: "Migmaq/Mi'kmaq" },
-  { code: "naskapi", nom: "Naskapi Iyuw-Iyimuun" },
-  { code: "inuktitut", nom: "Inuktitut" },
-  { code: "wendat", nom: "Wendat" },
-  { code: "wolastoqiyik", nom: "Wolastoqey Latuwewakon" },
+  { code: "fr", nom: "Français", afficherDansMenu: true },
+  { code: "en", nom: "English", afficherDansMenu: true },
+  { code: "w8banaki", nom: "Aln8ba8dwaw8gan", afficherDansMenu: false },
+  { code: "anishinaabe", nom: "Anishinaabemowin", afficherDansMenu: false },
+  { code: "atikamekw", nom: "Atikamekw", afficherDansMenu: false },
+  { code: "eeyou", nom: "Iiyiyuu ayimuun", afficherDansMenu: false },
+  { code: "innu-aimun", nom: "Innu-aimun", afficherDansMenu: false },
+  { code: "kanienkeha", nom: "Kanien'kéhà", afficherDansMenu: false },
+  { code: "mikmaq", nom: "Migmaq/Mi'kmaq", afficherDansMenu: false },
+  { code: "naskapi", nom: "Naskapi Iyuw-Iyimuun", afficherDansMenu: false },
+  { code: "inuktitut", nom: "Inuktitut", afficherDansMenu: false },
+  { code: "wendat", nom: "Wendat", afficherDansMenu: false },
+  { code: "wolastoqiyik", nom: "Wolastoqey Latuwewakon", afficherDansMenu: false },
 ];
+
+// Seules ces langues reçoivent un bouton — les masquées n'existent pas
+// dans le DOM (donc ni visibles ni atteignables au clavier).
+const LANGUES_MENU = LANGUES.filter((l) => l.afficherDansMenu);
+
+// Langue à passer à initI18n() au chargement de chaque page. Si la langue
+// mémorisée n'est pas offerte dans le menu (langue masquée ou valeur
+// inconnue), on applique le français et on remplace la valeur mémorisée —
+// sinon l'en-tête afficherait une langue absente du menu (navigateurs de
+// test qui avaient choisi une langue autochtone avant le 6 octobre).
+export function langueInitiale() {
+  const memorisee = langueSauvegardee();
+  if (memorisee === null) return "fr";
+  if (LANGUES_MENU.some((l) => l.code === memorisee)) return memorisee;
+  sauvegarderLangue("fr");
+  return "fr";
+}
 
 // 3 niveaux (pas plus, voir Design doc) — aucune valeur de référence
 // trouvée ailleurs au moment d'écrire ceci : proposées en cohérence avec
@@ -56,7 +81,7 @@ function construireBlocLangue() {
   boutonLangue.setAttribute("aria-haspopup", "true");
   boutonLangue.setAttribute("aria-expanded", "false");
 
-  const langueActuelle = LANGUES.find((l) => l.code === getLanguage()) || LANGUES[0];
+  const langueActuelle = LANGUES_MENU.find((l) => l.code === getLanguage()) || LANGUES_MENU[0];
   boutonLangue.innerHTML = `${langueActuelle.nom} <span aria-hidden="true">▾</span>`;
 
   const panneau = document.createElement("div");
@@ -71,7 +96,7 @@ function construireBlocLangue() {
     boutonLangue.setAttribute("aria-expanded", "false");
   }
 
-  const boutonsLangue = LANGUES.map(({ code, nom }) => {
+  const boutonsLangue = LANGUES_MENU.map(({ code, nom }) => {
     const item = document.createElement("button");
     item.type = "button";
     item.className = "langue-item";

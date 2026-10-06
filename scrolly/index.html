@@ -80,11 +80,10 @@
 
   <script type="module">
     import { initI18n } from "../shared/js/i18n.js";
-    import { langueSauvegardee } from "../shared/js/preferences.js";
-    import { initHeaderControls } from "../shared/js/headerControls.js";
+    import { initHeaderControls, langueInitiale } from "../shared/js/headerControls.js";
     import { init } from "./js/script.js";
 
-    await initI18n(langueSauvegardee() || 'fr');
+    await initI18n(langueInitiale());
     initHeaderControls(document.getElementById("entete-controles"));
     init();
   </script>

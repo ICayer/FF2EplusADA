@@ -115,13 +115,12 @@
 
   <script type="module">
     import { initI18n } from "./shared/js/i18n.js";
-    import { langueSauvegardee } from "./shared/js/preferences.js";
-    import { initHeaderControls } from "./shared/js/headerControls.js";
+    import { initHeaderControls, langueInitiale } from "./shared/js/headerControls.js";
     import { initLandingScroll } from "./assets/js/landingScroll.js";
     import { initLandingContent } from "./assets/js/landingContent.js";
     import { initLandingLienRecit } from "./assets/js/landingLienRecit.js";
 
-    await initI18n(langueSauvegardee() || 'fr');
+    await initI18n(langueInitiale());
     initHeaderControls(document.getElementById("entete-controles"));
     await initLandingContent();
     initLandingScroll();
