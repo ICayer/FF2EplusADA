@@ -13,6 +13,7 @@
 // d'interface) — décision du 19 août : honorer chaque femme dans sa langue, peu
 // importe la langue de navigation choisie. Une traduction secondaire suit la
 // langue d'interface, seulement si elle diffère du texte primaire.
+// SUSPENDU le 6 octobre (voir AFFICHER_TEXTE_LANGUE_NATION ci-dessous).
 // Dépend de : shared/js/i18n.js (resolve)
 // Utilisé par : univers/js/etoiles.js
 //
@@ -21,6 +22,13 @@
 // ==================================================
 
 import { resolve, t } from "../../shared/js/i18n.js";
+
+// Décision du 6 octobre : le texte dans la langue de la nation (et son
+// étiquette de langue) est masqué pour l'instant — suspend la décision du
+// Registre du 21 août. À false, la modale n'affiche que le témoignage dans
+// la langue d'interface (resolve()). Pour réactiver l'affichage bilingue,
+// passer à true : tout le code ci-dessous est conservé tel quel.
+const AFFICHER_TEXTE_LANGUE_NATION = false;
 
 let overlayEl = null;
 let modalEl = null;
@@ -79,7 +87,7 @@ export function showTestimony(etoile, nation) {
   const temoignage = p?.temoignage;
   if (!temoignage) return; // étoile vide par conception — pas d'action, pas d'erreur
 
-  const langueNation = nation?.langue || null;
+  const langueNation = AFFICHER_TEXTE_LANGUE_NATION ? (nation?.langue || null) : null;
   const texteNation = langueNation ? temoignage[langueNation] : null;
   const texteInterface = resolve(temoignage);
 

@@ -2,72 +2,84 @@
   {
     "id": "anishinaabe",
     "nom": "Anishinaabe",
+    "nomPersonne": { "fr": null, "en": null },
     "couleur": "#FFB74D",
     "langue": "Anishinaabemowin"
   },
   {
     "id": "atikamekw",
     "nom": "Atikamekw Nehirowisiw",
+    "nomPersonne": { "fr": null, "en": null },
     "couleur": "#FFE082",
     "langue": "Atikamekw"
   },
   {
     "id": "eeyou",
     "nom": "Eeyou",
+    "nomPersonne": { "fr": null, "en": null },
     "couleur": "#A5D6A7",
     "langue": "Iiyiyuu ayimuun"
   },
   {
     "id": "huronne-wendat",
     "nom": "Huronne-Wendat",
+    "nomPersonne": { "fr": null, "en": null },
     "couleur": "#BCAAA4",
     "langue": "Wendat"
   },
   {
     "id": "innu",
     "nom": "Innu/Ilnu",
+    "nomPersonne": { "fr": "Innu", "en": "Innu" },
     "couleur": "#90CAF9",
     "langue": "Innu-aimun"
   },
   {
     "id": "inuit",
     "nom": "Inuit",
+    "nomPersonne": { "fr": "Inuk", "en": "Inuk" },
     "couleur": "#80DEEA",
     "langue": "Inuktitut"
   },
   {
     "id": "kanienkeha",
     "nom": "Kanien'kehá:ka",
+    "nomPersonne": { "fr": null, "en": null },
     "couleur": "#CE93D8",
     "langue": "Kanien'kéhà"
   },
   {
     "id": "metis-ouest",
     "nom": "Métis de l'Ouest",
+    "nomPersonne": { "fr": null, "en": null },
     "couleur": "#9FA8DA",
     "langue": null
   },
   {
     "id": "mikmaq",
     "nom": "Mi'gmaq",
+    "nomPersonne": { "fr": null, "en": null },
     "couleur": "#F48FB1",
     "langue": "Migmaq, Mi'kmaq"
   },
   {
     "id": "naskapi",
     "nom": "Naskapi",
+    "nomPersonne": { "fr": null, "en": null },
     "couleur": "#80CBC4",
     "langue": "Naskapi Iyuw-Iyimuun"
   },
   {
     "id": "w8banaki",
     "nom": "W8banaki",
+    "nomPersonne": { "fr": null, "en": null },
     "couleur": "#FF9E80",
     "langue": "Aln8ba8dwaw8gan"
   },
   {
     "id": "wolastoqey",
     "nom": "Wolastoqey",
+    "nomPersonne": { "fr": null, "en": null },
     "couleur": "#EF9A9A",
     "langue": "Wolastoqey Latuwewakon"
   },

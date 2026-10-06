@@ -17,7 +17,7 @@
 import { calculerDisposition, cheminArc } from "./constellations.js";
 import { initTestimonyModal, showTestimony } from "./testimonyModal.js";
 import { initConditionSortie, lancerTransitionValeurs } from "./transitionValeurs.js";
-import { t } from "../../shared/js/i18n.js";
+import { t, resolve } from "../../shared/js/i18n.js";
 
 // Positionne le bouton juste à l'extérieur du cercle des mémoires (bord droit, 3h),
 // converti en coordonnées d'écran réelles via la matrice de transformation du SVG —
@@ -48,6 +48,14 @@ const RAYON_ETOILE_TEMOIGNAGE = 10; // était 7 codé en dur — grossie, à aju
 const RAYON_ETOILE_DEFAUT = 3.5;
 
 const ORDRE_DECENNIES = ['1930s','1940s','1950s','1960s','1970s','1980s','1990s','2000s','2010s','2020s'];
+
+// --- Infobulle des étoiles (pixels d'écran, pas du viewBox) ---
+// Délai avant fermeture quand le pointeur quitte l'étoile ou l'infobulle :
+// laisse le temps de glisser de l'une à l'autre (WCAG 1.4.13, contenu
+// survolable). Annulé dès que le pointeur entre dans l'infobulle.
+const DELAI_FERMETURE_INFOBULLE = 300; // ms
+const ECART_INFOBULLE = 12; // espace entre l'étoile et l'infobulle
+const MARGE_FENETRE_INFOBULLE = 8; // l'infobulle reste à au moins 8px des bords
 
 // Coordonnées du centre de la Lune DANS le fichier lune.svg extrait
 // (calculées le 24 août à partir de step10_lune_etoile.svg — voir Registre).
@@ -217,6 +225,87 @@ export async function initUnivers(selecteurConteneur = "#univers-canvas") {
   }
 
   console.log(`🌌 Univers : ${noeuds.length} étoile(s)-témoignage dans ${nations.length} constellations, ${nbEtoilesCiel} étoiles anonymes dans le ciel.`);
+}
+
+// Échappe une valeur venant des données avant de l'insérer en innerHTML
+// (infobulle) — le texte s'affiche tel quel, aucune balise n'est interprétée.
+function echapperHtml(texte) {
+  return String(texte)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// --- Couleurs du bouton « Lire le témoignage → » (décision du 6 octobre) ---
+// Le bouton prend la couleur de la nation de l'étoile (le rouge du site est
+// associé à la rupture coloniale). Le texte est noir ou blanc selon le
+// meilleur contraste WCAG avec cette couleur — calculé, jamais choisi à la main.
+const NOIR_SITE = "#0d0d0d"; // --color-bg (shared/css/variables.css)
+const BLANC = "#ffffff";
+
+// "#FFB74D" ou "#FB4" → [r, g, b] (0-255), ou null si le format est inconnu.
+function hexVersRgb(hex) {
+  const m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(hex || "").trim());
+  if (!m) return null;
+  const h = m[1].length === 3 ? m[1].replace(/./g, c => c + c) : m[1];
+  return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16));
+}
+
+// Luminance relative WCAG 2.x (0 = noir, 1 = blanc).
+function luminanceRelative([r, g, b]) {
+  const lin = c => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+
+// Ratio de contraste WCAG entre deux couleurs [r, g, b] (de 1 à 21).
+function ratioContraste(a, b) {
+  const [claire, foncee] = [luminanceRelative(a), luminanceRelative(b)].sort((x, y) => y - x);
+  return (claire + 0.05) / (foncee + 0.05);
+}
+
+// Couleur de texte la plus lisible sur `fond` : compare le noir du site et
+// le blanc, garde celui qui donne le meilleur ratio WCAG.
+function couleurTexteLisible(fond) {
+  const rgb = hexVersRgb(fond);
+  const surNoir = ratioContraste(rgb, hexVersRgb(NOIR_SITE));
+  const surBlanc = ratioContraste(rgb, hexVersRgb(BLANC));
+  return surNoir >= surBlanc
+    ? { couleur: NOIR_SITE, ratio: surNoir }
+    : { couleur: BLANC, ratio: surBlanc };
+}
+
+// Assombrit une couleur hexadécimale (facteur 0.8 = 20 % plus sombre).
+function assombrir(hex, facteur) {
+  const rgb = hexVersRgb(hex);
+  return "#" + rgb.map(c => Math.round(c * facteur).toString(16).padStart(2, "0")).join("");
+}
+
+// Bordure : la couleur de la nation, assombrie juste assez pour rester nette
+// sur le fond de l'infobulle — ratio ≥ 3:1 (WCAG 1.4.11, contour d'un
+// composant). Les couleurs pastel (ex. Atikamekw #FFE082) demandent plus
+// d'assombrissement que les plus soutenues.
+const CONTRASTE_MIN_BORDURE = 3;
+function bordureNette(couleur, fondRgb) {
+  let facteur = 0.85;
+  while (facteur > 0.3 && ratioContraste(hexVersRgb(assombrir(couleur, facteur)), fondRgb) < CONTRASTE_MIN_BORDURE) {
+    facteur -= 0.05;
+  }
+  return assombrir(couleur, facteur);
+}
+
+// Applique la couleur de la nation au bouton via des variables CSS (voir
+// univers/css/style.css, .infobulle-cta). Nation « Inconnue » ou sans couleur
+// valide : aucune variable posée → le bouton garde son style neutre.
+// `fondRgb` : fond réel de l'infobulle (lu dans le CSS, pas recopié ici).
+function colorerBoutonNation(bouton, nation, fondRgb) {
+  const couleur = nation && nation.id !== "inconnue" ? nation.couleur : null;
+  if (!hexVersRgb(couleur)) return;
+  bouton.style.setProperty("--cta-fond", couleur);
+  bouton.style.setProperty("--cta-fond-survol", assombrir(couleur, 0.88));
+  bouton.style.setProperty("--cta-bordure", bordureNette(couleur, fondRgb));
+  bouton.style.setProperty("--cta-texte", couleurTexteLisible(couleur).couleur);
 }
 
 async function dessiner({ nations, secteurs, noeuds, liens, nbEtoilesCiel }) {
@@ -413,27 +502,181 @@ async function dessiner({ nations, secteurs, noeuds, liens, nbEtoilesCiel }) {
 
   // --- Les étoiles ---
   const couleurParNation = Object.fromEntries(nations.map(n => [n.id, n.couleur]));
-  const nomParNation = Object.fromEntries(nations.map(n => [n.id, n.nom]));
   const nationParId = Object.fromEntries(nations.map(n => [n.id, n]));
 
+  // Infobulle (décision du 6 octobre) : une phrase factuelle en appositions,
+  // prénom en gras — « Gladys, Anishinaabe de Kitigan Zibi, né·e en 1940 ».
+  // Seuls les segments présents dans les données sont gardés. L'ordre des mots
+  // vit dans les gabarits de shared/data/i18n/{lang}.json (infobulle.phrase_*),
+  // un gabarit par combinaison : N = nation, C = communauté, A = année.
   function contenuTooltip(d) {
     const p = d.data.portrait;
-    const nomNation = nomParNation[d.data.nation];
-    const aDuContenu = p.prenom || p.communaute || p.motRevelateur;
+    if (!p.prenom) return "";
 
-    if (!aDuContenu) {
-      return `<strong>${nomNation}</strong><br/>` +
-             `Décennie (approx.) : ${d.data.decennieNaissanceApprox}<br/>` +
-             `<em>Récit à venir</em>`;
+    const nation = nationParId[d.data.nation];
+    // Nation « Inconnue » ou absente : segment omis. nomPersonne (forme au
+    // singulier, ex. Inuk) est optionnel — repli sur le nom de la nation.
+    const nomNation = nation && nation.id !== "inconnue"
+      ? (resolve(nation.nomPersonne) || nation.nom)
+      : "";
+    const communaute = p.communaute || "";
+    const annee = p.dateNaissance || "";
+
+    const cle = "infobulle.phrase" +
+      (nomNation || communaute || annee ? "_" : "") +
+      (nomNation ? "N" : "") + (communaute ? "C" : "") + (annee ? "A" : "");
+    // Élision : « d'Uashat » — voyelle, accentuée comprise (NFD sépare l'accent)
+    const commenceParVoyelle = /^[aeiouy]/i.test(communaute.normalize("NFD"));
+
+    // Valeurs échappées : aucun HTML venant des données n'est interprété.
+    const valeurs = {
+      prenom: `<strong>${echapperHtml(p.prenom)}</strong>`,
+      nation: echapperHtml(nomNation),
+      de: echapperHtml(t(commenceParVoyelle ? "infobulle.deVoyelle" : "infobulle.de")),
+      communaute: echapperHtml(communaute),
+      annee: echapperHtml(annee)
+    };
+
+    // Aucune coupure à l'intérieur d'un segment. Le gabarit est découpé en
+    // segments aux virgules (« Gladys, » / « Anishinaabe de Kitigan Zibi, » /
+    // « né·e en 1940 ») : chacun est un bloc insécable (.infobulle-segment) et
+    // le retour à la ligne ne tombe qu'entre deux segments. Dans un segment,
+    // les unités (« Anishinaabe » / « de Kitigan Zibi ») — séparées dans le
+    // gabarit par une espace entre deux {clés} — sont elles aussi insécables :
+    // si un segment entier dépasse la largeur de l'infobulle, il se coupe
+    // seulement entre ses unités, jamais dans « d'Uashat mak Mani-Utenam ».
+    const remplir = (gabarit) =>
+      gabarit.replace(/\{(\w+)\}/g, (brut, cle) => (cle in valeurs ? valeurs[cle] : brut));
+    const segments = t(cle).split(", ");
+    const phrase = segments.map((segment, i) => {
+      const unites = segment.replace(/\} \{/g, "}\u0000{").split("\u0000")
+        .map(unite => `<span class="infobulle-unite">${remplir(unite)}</span>`);
+      const virgule = i < segments.length - 1 ? "," : "";
+      return `<span class="infobulle-segment">${unites.join(" ")}${virgule}</span>`;
+    }).join(" ");
+
+    // Appel à l'action seulement si un témoignage existe dans la langue
+    // résolue — sinon aucune ligne. Vrai bouton : ouvre la modale de cette
+    // étoile (branché dans ouvrirInfobulle()).
+    const aTemoignage = resolve(p.temoignage).trim() !== "";
+    return `<p class="infobulle-phrase">${phrase}</p>` + (aTemoignage
+      ? `<button type="button" class="infobulle-cta">${echapperHtml(t("infobulle.lireTemoignage"))}</button>`
+      : "");
+  }
+
+  // --- Ouverture / fermeture de l'infobulle (WCAG 1.4.13) ---
+  // Ancrée à côté de l'étoile, à position fixe tant qu'elle est ouverte (ne
+  // suit plus le curseur — persona du 28 août : positions fixes, comportement
+  // prévisible). Survolable : le pointeur peut glisser de l'étoile à
+  // l'infobulle sans qu'elle disparaisse. Fermée quand le pointeur a quitté
+  // les deux (après DELAI_FERMETURE_INFOBULLE), au clic/toucher ailleurs, à
+  // Échap. Souris et toucher distingués par pointerType, pas par détection
+  // d'appareil.
+  let etoileOuverte = null;    // donnée de l'étoile dont l'infobulle est ouverte
+  let etoileOuverteEl = null;  // son <circle>, pour positionner l'infobulle
+  let minuterieFermeture = null;
+  let dernierTypePointeur = "mouse"; // pointerType du dernier pointerdown sur une étoile
+
+  function ouvrirTemoignage(d) {
+    showTestimony(d.data, nationParId[d.data.nation]);
+    if (signalerInteractionFn) signalerInteractionFn();
+  }
+
+  function annulerFermeture() {
+    clearTimeout(minuterieFermeture);
+    minuterieFermeture = null;
+  }
+
+  function fermerInfobulle() {
+    annulerFermeture();
+    etoileOuverte = null;
+    etoileOuverteEl = null;
+    if (tooltip) tooltip.style.display = "none";
+  }
+
+  function planifierFermeture() {
+    annulerFermeture();
+    minuterieFermeture = setTimeout(fermerInfobulle, DELAI_FERMETURE_INFOBULLE);
+  }
+
+  // À droite de l'étoile par défaut ; bascule à gauche si elle déborderait à
+  // droite, vers le haut si elle déborderait en bas. Mesure réelle de l'étoile.
+  function positionnerInfobulle() {
+    // Remise à 0 avant la mesure : une ancienne position près du bord droit
+    // réduirait la largeur disponible, donc la largeur mesurée.
+    tooltip.style.left = "0px";
+    tooltip.style.top = "0px";
+    const etoile = etoileOuverteEl.getBoundingClientRect();
+    const boite = tooltip.getBoundingClientRect();
+    const marge = MARGE_FENETRE_INFOBULLE;
+
+    let gauche = etoile.right + ECART_INFOBULLE;
+    if (gauche + boite.width > window.innerWidth - marge) {
+      gauche = etoile.left - ECART_INFOBULLE - boite.width;
+    }
+    let haut = etoile.top;
+    if (haut + boite.height > window.innerHeight - marge) {
+      haut = etoile.bottom - boite.height;
     }
 
-    return [
-      p.prenom ? `<strong>${p.prenom}</strong>` : `<strong>${nomNation}</strong>`,
-      p.dateNaissance || null,
-      p.communaute || null,
-      p.motRevelateur ? `« ${p.motRevelateur} »` : null
-    ].filter(Boolean).join("<br/>");
+    tooltip.style.left = Math.max(marge, gauche) + "px";
+    tooltip.style.top = Math.max(marge, haut) + "px";
   }
+
+  // (Re)construit le contenu pour l'étoile ouverte — aussi appelée au
+  // changement de langue, pour retraduire l'infobulle sans la fermer.
+  function rendreInfobulle() {
+    // Fond réel de l'infobulle ("rgb(242, 237, 226)") → [r, g, b]. Lu AVANT
+    // d'insérer le bouton : lire un style après l'insertion forcerait un
+    // premier rendu du bouton en style neutre (noir), puis un fondu visible
+    // vers la couleur de la nation (transition CSS).
+    const fondRgb = getComputedStyle(tooltip).backgroundColor.match(/\d+/g).slice(0, 3).map(Number);
+    tooltip.innerHTML = contenuTooltip(etoileOuverte);
+    const bouton = tooltip.querySelector(".infobulle-cta");
+    if (bouton) {
+      const d = etoileOuverte;
+      colorerBoutonNation(bouton, nationParId[d.data.nation], fondRgb);
+      bouton.addEventListener("click", () => {
+        fermerInfobulle();
+        ouvrirTemoignage(d);
+      });
+    }
+    positionnerInfobulle();
+  }
+
+  function ouvrirInfobulle(d, el) {
+    if (!tooltip) return;
+    annulerFermeture();
+    if (!contenuTooltip(d)) return;
+    etoileOuverte = d;
+    etoileOuverteEl = el;
+    tooltip.style.display = "block"; // avant la mesure : une boîte masquée mesure 0
+    rendreInfobulle();
+  }
+
+  if (tooltip) {
+    tooltip.addEventListener("pointerenter", annulerFermeture);
+    tooltip.addEventListener("pointerleave", (event) => {
+      if (event.pointerType !== "touch") planifierFermeture();
+    });
+  }
+  // Clic ou toucher ailleurs que sur l'infobulle ou une étoile : fermeture.
+  // (Une étoile gère elle-même son pointerdown/click.)
+  document.addEventListener("pointerdown", (event) => {
+    if (!etoileOuverte) return;
+    if (tooltip.contains(event.target) || event.target.closest?.("circle.etoile")) return;
+    fermerInfobulle();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && etoileOuverte) fermerInfobulle();
+  });
+  // L'étoile se déplace avec le SVG au redimensionnement : l'infobulle,
+  // ancrée en pixels d'écran, serait décalée — on la ferme.
+  window.addEventListener("resize", fermerInfobulle);
+  // dessiner() n'est appelée qu'une fois : l'écouteur ne s'empile pas.
+  window.addEventListener("languagechange", () => {
+    if (etoileOuverte) rendreInfobulle();
+  });
 
   // Glow derrière l'étoile-témoignage — APPENDÉ AVANT groupeEtoilesEl pour peindre
   // derrière elle. Filtré sur estModele : si plusieurs étoiles ont un vrai témoignage
@@ -475,22 +718,25 @@ async function dessiner({ nations, secteurs, noeuds, liens, nbEtoilesCiel }) {
     // valider avec Déline et les artistes (S2B1T3).
     .attr("stroke", d => d.data.estModele ? "#fff" : "none")
     .attr("stroke-width", d => d.data.estModele ? 1.5 : 0)
-    .on("mouseenter", (event, d) => {
-      if (!tooltip) return;
-      tooltip.style.display = "block";
-      tooltip.innerHTML = contenuTooltip(d);
+    // Souris (et stylet) : survol = infobulle, clic = modale directement.
+    // Toucher : pas de survol — un toucher = infobulle, le bouton « Lire le
+    // témoignage → » ouvre la modale (voir ouvrirInfobulle() plus haut).
+    .on("pointerenter", (event, d) => {
+      if (event.pointerType !== "touch") ouvrirInfobulle(d, event.currentTarget);
     })
-    .on("mousemove", (event) => {
-      if (!tooltip) return;
-      tooltip.style.left = (event.clientX + 14) + "px";
-      tooltip.style.top = (event.clientY + 14) + "px";
+    .on("pointerleave", (event) => {
+      if (event.pointerType !== "touch") planifierFermeture();
     })
-    .on("mouseleave", () => {
-      if (tooltip) tooltip.style.display = "none";
+    .on("pointerdown", (event) => {
+      dernierTypePointeur = event.pointerType;
     })
     .on("click", (event, d) => {
-      showTestimony(d.data, nationParId[d.data.nation]);
-      if (signalerInteractionFn) signalerInteractionFn();
+      if (dernierTypePointeur === "touch") {
+        ouvrirInfobulle(d, event.currentTarget);
+        return;
+      }
+      fermerInfobulle();
+      ouvrirTemoignage(d);
     });
 
   // --- Entrée en scène progressive : la voie lactée seule d'abord, puis la

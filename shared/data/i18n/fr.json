@@ -10,5 +10,16 @@
   "lang.francais": "Français",
   "lang.anglais": "English",
   "lang.innu-aimun": "Innu-aimun",
-  "modale.temoignageDe": "Témoignage de :"
+  "modale.temoignageDe": "Témoignage de :",
+  "infobulle.de": "de ",
+  "infobulle.deVoyelle": "d'",
+  "infobulle.phrase": "{prenom}",
+  "infobulle.phrase_N": "{prenom}, {nation}",
+  "infobulle.phrase_C": "{prenom}, {de}{communaute}",
+  "infobulle.phrase_A": "{prenom}, né·e en {annee}",
+  "infobulle.phrase_NC": "{prenom}, {nation} {de}{communaute}",
+  "infobulle.phrase_NA": "{prenom}, {nation}, né·e en {annee}",
+  "infobulle.phrase_CA": "{prenom}, {de}{communaute}, né·e en {annee}",
+  "infobulle.phrase_NCA": "{prenom}, {nation} {de}{communaute}, né·e en {annee}",
+  "infobulle.lireTemoignage": "Lire le témoignage →"
 }

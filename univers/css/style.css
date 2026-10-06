@@ -87,9 +87,10 @@
   letter-spacing: 1px;
 }
 
+/* Survolable (WCAG 1.4.13) : reçoit les événements pointeur — plus de
+   pointer-events: none. Positionnée à côté de l'étoile par etoiles.js. */
 #univers-tooltip {
   position: fixed;
-  pointer-events: none;
   display: none;
   background: #f2ede2; /* pâle, pas blanc pur — lisible sur fond noir sans éblouir */
   color: #1a1a1a;
@@ -97,10 +98,66 @@
   border-radius: 6px;
   font-family: var(--font-body, sans-serif);
   font-size: calc(1rem * var(--echelle-texte));
-  max-width: 280px;
+  /* était 280px — élargi le 6 octobre : les segments sont maintenant
+     insécables (.infobulle-segment) ; « Jocelyne, Innu from Uashat mak
+     Mani-Utenam, born in 1968 » passait à 3 lignes sous 380px. 400px garde
+     une marge ; jamais plus large que la fenêtre (marges de 8px). */
+  max-width: min(400px, calc(100vw - 16px));
   line-height: 1.5;
   z-index: 9999;
   box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* Segments de la phrase (séparés par les virgules du gabarit) : un bloc
+   insécable chacun — le retour à la ligne ne tombe qu'entre deux segments.
+   inline-block : un segment trop large pour l'infobulle se coupe seulement
+   entre ses unités, jamais à l'intérieur d'une unité. */
+#univers-tooltip .infobulle-segment {
+  display: inline-block;
+}
+/* Unité : valeur + sa préposition (« de Pessamit », « né·e en 1963 »). */
+#univers-tooltip .infobulle-unite {
+  white-space: nowrap;
+}
+
+/* « Lire le témoignage → » : vrai bouton, présent seulement si un témoignage
+   existe ; ouvre la modale de l'étoile. Cible tactile d'au moins 44px de
+   haut, focus visible. Gras, taille légèrement réduite par rapport à la
+   phrase.
+   Couleur (décision du 6 octobre) : celle de la nation de l'étoile, jamais le
+   rouge du site (associé à la rupture coloniale). etoiles.js
+   (colorerBoutonNation) pose --cta-fond / --cta-fond-survol / --cta-bordure /
+   --cta-texte depuis nations.json, texte noir ou blanc selon le meilleur
+   contraste WCAG. Sans ces variables (nation « Inconnue » ou sans couleur) :
+   style neutre des boutons du site — fond noir, texte blanc cassé, comme
+   .bouton-langue. */
+#univers-tooltip .infobulle-cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border: 1.5px solid var(--cta-bordure, var(--color-bg, #0d0d0d));
+  border-radius: 4px;
+  background: var(--cta-fond, var(--color-bg, #0d0d0d));
+  font-family: inherit;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--cta-texte, var(--color-text, #f5f5f5));
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+/* Survol : léger assombrissement de la couleur de la nation (ou gris foncé
+   pour le bouton neutre) — jamais le rouge. */
+#univers-tooltip .infobulle-cta:hover {
+  background: var(--cta-fond-survol, #333);
+}
+/* Anneau de focus noir, décalé : net sur le fond crème de l'infobulle quelle
+   que soit la couleur de la nation. */
+#univers-tooltip .infobulle-cta:focus-visible {
+  outline: 3px solid #1a1a1a;
+  outline-offset: 2px;
 }
 
 /* --- Modale de récit (testimonyModal.js) ---

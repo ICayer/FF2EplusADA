@@ -2,8 +2,9 @@
 // assets/js/landingContent.js
 // Landing — peuplement du contenu réel (FR/EN) via resolve()
 //
-// Rôle : Remplir titre, sous-titre, intro, bouton, remerciements et
-// crédits de la page d'accueil à partir de shared/data/landing.json, dans
+// Rôle : Remplir titre, sous-titre, intro, bouton, remerciements, crédits,
+// titres du pied de page et alt du logo Agora de la page d'accueil à
+// partir de shared/data/landing.json, dans
 // la langue active (même patron resolve() que scrolly/data/steps.json et
 // shared/data/valeurs.json). Se rafraîchit si la langue change en cours
 // de visite.
@@ -67,6 +68,11 @@ function rendre() {
     ul.appendChild(li);
   });
   listeCredits.appendChild(ul);
+
+  document.querySelector(".footer-titre-produit").textContent = resolve(data.footerProduitPar);
+  document.querySelector(".footer-titre-partenaires").textContent = resolve(data.footerPartenaires);
+  // Attribut alt (lu par les lecteurs d'écran) : suit la langue comme le texte visible
+  document.querySelector(".logo-porteur").alt = resolve(data.altLogoAgora);
 }
 
 export async function initLandingContent() {

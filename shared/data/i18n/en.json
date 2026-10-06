@@ -10,5 +10,16 @@
   "lang.francais": "Français",
   "lang.anglais": "English",
   "lang.innu-aimun": "Innu-aimun",
-  "modale.temoignageDe": "Testimony from:"
+  "modale.temoignageDe": "Testimony from:",
+  "infobulle.de": "from ",
+  "infobulle.deVoyelle": "from ",
+  "infobulle.phrase": "{prenom}",
+  "infobulle.phrase_N": "{prenom}, {nation}",
+  "infobulle.phrase_C": "{prenom}, {de}{communaute}",
+  "infobulle.phrase_A": "{prenom}, born in {annee}",
+  "infobulle.phrase_NC": "{prenom}, {nation} {de}{communaute}",
+  "infobulle.phrase_NA": "{prenom}, {nation}, born in {annee}",
+  "infobulle.phrase_CA": "{prenom}, {de}{communaute}, born in {annee}",
+  "infobulle.phrase_NCA": "{prenom}, {nation} {de}{communaute}, born in {annee}",
+  "infobulle.lireTemoignage": "Read the testimony →"
 }

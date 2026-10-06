@@ -41,5 +41,17 @@
       { "fr": "Annie Trépanier, collaboratrice", "en": "Annie Trépanier, contributor" },
       { "fr": "Maurie Girard-Gadreau, collaboratrice", "en": "Maurie Girard-Gadreau, contributor" }
     ]
+  },
+  "footerProduitPar": {
+    "fr": "Produit par",
+    "en": "Produced by"
+  },
+  "footerPartenaires": {
+    "fr": "Partenaires financiers",
+    "en": "Funding partners"
+  },
+  "altLogoAgora": {
+    "fr": "L'Agora, votre accélérateur de la transformation",
+    "en": "L'Agora, your transformation accelerator"
   }
 }
