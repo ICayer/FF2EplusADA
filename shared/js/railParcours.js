@@ -94,6 +94,60 @@ const CORRESPONDANCE_ETAPE_PERLE = Object.fromEntries(
   Object.entries(CORRESPONDANCE_PERLE_ETAPE).map(([idSVG, etapeId]) => [etapeId, idSVG])
 );
 
+// --- Continuité de la plume entre les pages (6 octobre 2026) ---
+// Les pages sont des documents séparés (une partie = un dossier autonome) :
+// la plume repartirait de sa position native à chaque chargement. Juste
+// avant une navigation par le rail vers une AUTRE page, on mémorise l'étape
+// de départ, la page visée et l'étape visée ; au premier placement sur la
+// page d'arrivée, la plume est posée sur l'étape de départ puis glisse vers
+// l'étape d'arrivée avec la même animation qu'à l'intérieur du scrolly. Le
+// scrolly s'ouvre aussi directement à l'étape visée (scrolly/js/script.js).
+// Une seule clé, effacée dès sa lecture : un rechargement ne rejoue rien.
+// La page visée est vérifiée par chaque lecteur : une clé laissée par un
+// clic vers l'accueil (sans rail) n'agit pas sur la page suivante.
+const CLE_PLUME_ETAPE_DEPART = "ff2eplusada_plume_etape_depart";
+let pageCouranteRail = null; // pageCourante reçue par construireRailParcours()
+let plumePlacee = false;     // false jusqu'au premier definirEtapeActive() de la page
+
+// Mémorise le clic qui va changer de page : étape de départ (la plume),
+// page visée et étape VISÉE (le scrolly s'ouvre directement à cette étape,
+// voir scrolly/js/script.js).
+function memoriserNavigationRail(etapeVisee) {
+  try {
+    sessionStorage.setItem(CLE_PLUME_ETAPE_DEPART, JSON.stringify({
+      etapeDepart: derniereEtapePlume,
+      pageVisee: etapeVisee.page,
+      etapeVisee: etapeVisee.id,
+    }));
+  } catch { /* stockage indisponible : arrivée normale, sans continuité */ }
+}
+
+// SEULE lecture de la clé : lue et effacée UNE fois par page, résultat
+// gardé en mémoire et rendu à chaque appelant — la plume (placerPlume) et
+// le scrolly (étape de départ) lisent la même donnée ; s'ils lisaient
+// chacun la clé, le premier effacerait celle de l'autre. Rend
+// { etapeDepart, pageVisee, etapeVisee } ou null (pas de clic mémorisé :
+// rechargement, signet, arrivée depuis la landing). Chaque appelant vérifie
+// lui-même que pageVisee est bien sa page.
+let navigationRailLue; // undefined = clé pas encore lue sur cette page
+export function lireNavigationRail() {
+  if (navigationRailLue !== undefined) return navigationRailLue;
+  navigationRailLue = null;
+  try {
+    const brut = sessionStorage.getItem(CLE_PLUME_ETAPE_DEPART);
+    sessionStorage.removeItem(CLE_PLUME_ETAPE_DEPART);
+    const memo = brut ? JSON.parse(brut) : null;
+    if (memo && typeof memo === "object") {
+      navigationRailLue = {
+        etapeDepart: memo.etapeDepart ?? null,
+        pageVisee: memo.pageVisee ?? null,
+        etapeVisee: memo.etapeVisee ?? null,
+      };
+    }
+  } catch { /* clé illisible : traitée comme absente */ }
+  return navigationRailLue;
+}
+
 // Construit le rail dans `container` en y chargeant timeline.svg, puis
 // câble chaque perle/bouton de CORRESPONDANCE_PERLE_ETAPE sur le même
 // contrat qu'avant (Tranche B1 et versions DOM antérieures) :
@@ -119,6 +173,12 @@ export async function construireRailParcours(container, { pageCourante, onClicEt
   }
 
   creerSvgSuperpose(container);
+
+  // Plume masquée jusqu'à son premier placement (placerPlume()) — sinon elle
+  // apparaîtrait un instant à sa position native (perle_step1).
+  pageCouranteRail = pageCourante;
+  const curseurPlumeEl = container.querySelector("#curseur_plume");
+  if (curseurPlumeEl) curseurPlumeEl.style.visibility = "hidden";
 
   Object.entries(CORRESPONDANCE_PERLE_ETAPE).forEach(([idSVG, etapeId]) => {
     const cible = resultat.querySelector(`#${idSVG}`);
@@ -148,6 +208,9 @@ export async function construireRailParcours(container, { pageCourante, onClicEt
         afficherBulleVerrouillee(container, cible);
         return;
       }
+      // Navigation vers une autre page (l'appelant change window.location) :
+      // mémoriser d'où part la plume, pour la continuité à l'arrivée.
+      if (etape.page !== pageCourante) memoriserNavigationRail(etape);
       if (onClicEtape) onClicEtape(etape);
     };
 
@@ -231,9 +294,32 @@ export function definirEtapeActive(id) {
   document.querySelectorAll(".rail-parcours [data-etape-id]").forEach((b) => {
     b.classList.toggle("actif", b.dataset.etapeId === id);
   });
-  deplacerCurseurPlume(id);
+  placerPlume(id);
   majIndiceClic(id);
   afficherMotsEtape(id);
+}
+
+// Premier placement de la page : continuité depuis l'étape de départ
+// mémorisée (si elle existe et diffère de l'étape d'arrivée) — pose
+// instantanée sur le départ, plume rendue visible, puis glissement vers
+// l'arrivée avec l'animation habituelle de deplacerCurseurPlume(). Sinon
+// (ou prefers-reduced-motion) : placement direct. Placements suivants :
+// deplacerCurseurPlume() seul, comme avant.
+function placerPlume(id) {
+  if (plumePlacee) {
+    deplacerCurseurPlume(id);
+    return;
+  }
+  plumePlacee = true;
+
+  const navigation = lireNavigationRail();
+  const depart = navigation && navigation.pageVisee === pageCouranteRail ? navigation.etapeDepart : null;
+  const animer = Boolean(depart) && depart !== id && Boolean(CORRESPONDANCE_ETAPE_PERLE[depart]) && !reduitMouvement();
+
+  deplacerCurseurPlume(animer ? depart : id, { instantane: true });
+  const curseurPlumeEl = document.querySelector(".rail-parcours #curseur_plume");
+  if (curseurPlumeEl) curseurPlumeEl.style.visibility = "";
+  if (animer) deplacerCurseurPlume(id);
 }
 
 // Indice de clic (#curseur_plume-indice-clic, flèche dessinée à côté de
@@ -293,14 +379,20 @@ let derniereEtapePlume = null; // évite de rejouer un déplacement vers la
 // #plume seul (sans les perles noires, masquées sur cette page en CSS) —
 // au centre de bouton_valeur. Scrolly et univers gardent l'ancrage
 // perle_noire1 ci-dessous, inchangé.
-function ancreParPointe(idEtapeCible) {
-  return idEtapeCible === "valeurs" && document.body.dataset.page === "valeurs";
+// Dépend de la PAGE seulement (6 octobre 2026, continuité entre les pages) :
+// sur valeurs.html, la pose instantanée sur l'étape de départ (ex. perle
+// univers) se fait aussi par la pointe — l'ancrage propre à la page
+// d'arrivée. Équivalent à l'ancienne condition (étape "valeurs" ET page
+// valeurs) pour tous les appels existants : cette page ne place jamais la
+// plume ailleurs que sur "valeurs".
+function ancreParPointe() {
+  return document.body.dataset.page === "valeurs";
 }
 
 // ⚠️ TEMPORAIRE — point rouge au centre calculé de bouton_valeur, pour
 // valider à l'œil que la pointe de la plume le touche. Mettre à false (ou
 // retirer ce bloc) avant tout commit.
-const DEBUG_POINT_PLUME_VALEURS = true;
+const DEBUG_POINT_PLUME_VALEURS = false;
 
 // translate {x, y} à appliquer à #curseur_plume pour que la pointe de
 // #plume tombe au centre de cibleEl. Mesure du RENDU (getBoundingClientRect)
@@ -355,7 +447,7 @@ function afficherPointDebug(svgPlume, centre) {
 // sans animation. requestAnimationFrame : laisse d'abord le <svg>
 // superposé se resynchroniser sur le principal (creerSvgSuperpose).
 function reposerPlumeParPointe() {
-  if (!ancreParPointe(derniereEtapePlume)) return;
+  if (!derniereEtapePlume || !ancreParPointe()) return;
   requestAnimationFrame(() => {
     const curseurPlumeEl = document.querySelector(".rail-parcours #curseur_plume");
     const cibleEl = document.querySelector(`.rail-parcours #${CORRESPONDANCE_ETAPE_PERLE[derniereEtapePlume]}`);
@@ -378,7 +470,9 @@ new MutationObserver(reposerPlumeParPointe).observe(document.documentElement, {
 // référentiel de coordonnées (même document SVG que les perles) : le
 // calcul est direct — plus besoin de traduire entre deux systèmes de
 // mesure différents comme l'ancienne architecture (railPlume.js, orpheline).
-function deplacerCurseurPlume(idEtapeCible) {
+// { instantane: true } : pose sans animation (premier placement de la page,
+// voir placerPlume()).
+function deplacerCurseurPlume(idEtapeCible, { instantane = false } = {}) {
   if (idEtapeCible === derniereEtapePlume) return;
 
   const idSVG = CORRESPONDANCE_ETAPE_PERLE[idEtapeCible];
@@ -403,7 +497,7 @@ function deplacerCurseurPlume(idEtapeCible) {
 
   let dx;
   let dy;
-  if (ancreParPointe(idEtapeCible)) {
+  if (ancreParPointe()) {
     ({ x: dx, y: dy } = translatePourPointeSur(curseurPlumeEl, cibleEl));
   } else {
     const cible = centreReel(cibleEl);
@@ -416,7 +510,7 @@ function deplacerCurseurPlume(idEtapeCible) {
     dy = cible.y - ancre.y;
   }
 
-  if (reduitMouvement()) {
+  if (instantane || reduitMouvement()) {
     positionPlume.x = dx;
     positionPlume.y = dy;
     curseurPlumeEl.setAttribute("transform", `translate(${dx}, ${dy})`);

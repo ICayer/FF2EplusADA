@@ -11,6 +11,24 @@
 
   --container-max-width: 1000px;
   --container-padding: 40px;
+
+  /* Fondu enchaîné entre les pages (voir @view-transition plus bas) —
+     à ajuster à l'œil. */
+  --duree-transition-page: 600ms;
+}
+
+/* Fondu enchaîné entre les 4 pages (navigation par window.location.href) :
+   transition de vue entre documents, CSS seulement — aucun délai ajouté au
+   clic, aucun JavaScript, bouton Retour inchangé. Les deux pages doivent
+   l'activer : cette feuille est chargée par les 4. Navigateurs sans
+   support : navigation normale. Désactivé si la personne a demandé moins
+   de mouvement (prefers-reduced-motion). */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: var(--duree-transition-page);
+  }
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

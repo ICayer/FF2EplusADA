@@ -18,8 +18,8 @@
 import { resolve } from "../../shared/js/i18n.js";
 import { initTimeline, getOrder } from "./timeline.js";
 import { initTimelineRail } from "./timelineRail.js";
-import { initProgression, deverrouiller } from "../../shared/js/progression.js";
-import { construireRailParcours, definirEtapeActive, rafraichirVerrous } from "../../shared/js/railParcours.js";
+import { initProgression, deverrouiller, estDeverrouille } from "../../shared/js/progression.js";
+import { construireRailParcours, definirEtapeActive, rafraichirVerrous, lireNavigationRail } from "../../shared/js/railParcours.js";
 
 const PAGE_COURANTE = "scrolly/index.html";
 
@@ -101,7 +101,18 @@ async function init() {
     },
   });
 
-  allerEtAfficher(0);
+  // Step de départ : celui de la perle cliquée sur une autre page (ex. perle
+  // 9 depuis univers), lu par lireNavigationRail() — la seule lecture de la
+  // clé, partagée avec la plume. Index trouvé dans stepsOrder.json (order),
+  // jamais codé en dur. Step 1 si : pas de clic mémorisé (rechargement,
+  // signet, landing), clic visant une autre page, étape inconnue du scrolly
+  // ou verrouillée.
+  const navigation = lireNavigationRail();
+  const etapeVisee = navigation && navigation.pageVisee === PAGE_COURANTE ? navigation.etapeVisee : null;
+  const indexVise = etapeVisee && estDeverrouille(etapeVisee)
+    ? order.findIndex((e) => e.id === etapeVisee)
+    : -1;
+  allerEtAfficher(indexVise >= 0 ? indexVise : 0);
 }
 
 export { init };

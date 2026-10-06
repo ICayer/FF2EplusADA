@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>scrollyFFADA2S — test Tranche A</title>
+  <!-- En ligne, AVANT les feuilles de style (et les scripts bloquants) :
+       couleur de fond appliquée dès le premier affichage, avant le
+       chargement du CSS — évite le flash entre deux pages. Blanc = fond du
+       premier step (époque « avant », thème clair, --color-scene-bg). -->
+  <style>html { background-color: #ffffff; }</style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://unpkg.com/flubber@0.3.0"></script>
   <link rel="stylesheet" href="../shared/css/variables.css">
