@@ -16,7 +16,9 @@
 
 import { calculerDisposition, cheminArc } from "./constellations.js";
 import { initTestimonyModal, showTestimony } from "./testimonyModal.js";
-import { initConditionSortie, lancerTransitionValeurs } from "./transitionValeurs.js";
+import { initConditionSortie } from "./transitionValeurs.js";
+import { memoriserNavigationRail } from "../../shared/js/railParcours.js";
+import { obtenirParcours } from "../../shared/js/progression.js";
 import { t, resolve } from "../../shared/js/i18n.js";
 import {
   echapperHtml, valeursPersonne, cleGabarit, rendreGabarit,
@@ -210,21 +212,16 @@ export async function initUnivers(selecteurConteneur = "#univers-canvas") {
   });
   signalerInteractionFn = signalerInteraction;
 
+  // Clic : MÊME chemin que le bouton valeurs du rail (railParcours.js) —
+  // mémoriser la navigation (départ "univers", page et étape "valeurs", via
+  // la fonction du rail, jamais un format de clé recopié ici), puis laisser
+  // le lien <a href="../valeurs/index.html"> naviguer normalement : le fondu
+  // de page CSS (@view-transition, variables.css) s'applique de lui-même et
+  // la plume glisse de la perle 10 au bouton valeurs à l'arrivée.
   if (boutonTransition) {
-    boutonTransition.addEventListener("click", (e) => {
-      e.preventDefault();
-      boutonTransition.classList.remove("visible"); // évite un double-clic pendant l'animation
-      lancerTransitionValeurs({
-        svg: resultats.svg,
-        groupeLune: resultats.groupeLune,
-        echelleLuneActuelle: resultats.echelle,
-        luneCentreSource: LUNE_CENTRE_SOURCE,
-        selectionEtoiles: resultats.selectionEtoiles,
-        groupeEtiquettes: resultats.groupeEtiquettes,
-        groupeGlow: resultats.groupeGlow,
-        canvasEl: universContainer,
-        centre: CENTRE
-      });
+    boutonTransition.addEventListener("click", () => {
+      const etapeValeurs = obtenirParcours().find((e) => e.id === "valeurs");
+      if (etapeValeurs) memoriserNavigationRail(etapeValeurs);
     });
   }
 
@@ -722,7 +719,8 @@ async function dessiner({ nations, secteurs, noeuds, liens, nbEtoilesCiel }) {
     });
   }
 
-  // Références renvoyées à initUnivers() pour piloter la transition de sortie
-  // (S2B3T3) sans que ce fichier ait besoin de connaître cette logique lui-même.
-  return { svg, groupeLune, echelle, selectionEtoiles, groupeEtiquettes, groupeGlow };
+  // <svg> renvoyé à initUnivers() pour positionner le bouton « Explorer les
+  // valeurs ». (Lune, échelle, étoiles, étiquettes et glow étaient aussi
+  // renvoyés pour l'ancienne animation de sortie, retirée le 6 octobre.)
+  return { svg };
 }

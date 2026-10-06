@@ -373,9 +373,10 @@
 }
 
 /* --- Bouton de sortie vers la Partie 4 (transitionValeurs.js) ---
-   Apparaît AVANT la transition (sur le ciel étoilé encore sombre) — c'est le
-   clic dessus qui déclenche l'animation, pas l'inverse. Palette pâle, cohérente
-   avec le tooltip/la modale, pour rester lisible sur fond sombre. */
+   Révélé par la condition de sortie (30 s ou 4 étoiles explorées) — c'est le
+   clic dessus qui mène aux valeurs, comme le bouton valeurs du rail (fondu de
+   page CSS). APPARENCE : classe partagée .bouton-passage
+   (shared/css/variables.css). Ici : position et comportement seulement. */
 #bouton-explorer-valeurs {
   position: fixed;
   top: 0; /* recalculé par positionnerBoutonExplorer() — bord droit du cercle des mémoires */
@@ -383,19 +384,6 @@
   transform: translate(0, -50%); /* centré verticalement sur le point visé, pas
                                      horizontalement — le bouton s'étend vers la
                                      droite depuis le bord du cercle */
-  padding: 0.9rem 2.2rem;
-  font-family: "Agoradp_15", sans-serif; /* convention Registre 26 août — mots-titres
-                                             hors timeline/rail, @font-face dans
-                                             shared/css/variables.css (déjà chargé ici) */
-  font-size: calc(1rem * var(--echelle-texte)); /* préexistant, jamais branché au
-                                                     contrôle A-/A/A+ (headerControls.js)
-                                                     — 1rem gardé comme valeur de
-                                                     départ au niveau A neutre */
-  letter-spacing: 0.04em;
-  color: #1a1a1a;
-  background-color: #f2ede2;
-  border-radius: 4px;
-  text-decoration: none;
   opacity: 0;
   pointer-events: none;
   transition: opacity 1.2s ease;

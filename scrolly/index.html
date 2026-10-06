@@ -28,14 +28,9 @@
          qui la chevauchait (bug rapporté par Isabel, 14 septembre 2026).
          Seul le centrage horizontal reste ici, posé une fois pour toutes. */
       transform: translateX(-50%);
-      padding: 0.9rem 2.2rem;
-      font-family: sans-serif;
-      font-size: 1rem;
-      letter-spacing: 0.04em;
-      color: #111;
-      background-color: #eadd42; /* même jaune que les étoiles de step11 */
-      border-radius: 4px;
-      text-decoration: none;
+      /* APPARENCE : classe partagée .bouton-passage (shared/css/variables.css),
+         la même que « Explorer les valeurs » d'univers/ — remplace l'ancien
+         style jaune en police système. Ici : position et comportement seulement. */
       opacity: 0;
       pointer-events: none;
       transition: opacity 1.2s ease;
@@ -67,7 +62,7 @@
   </div>
 
   <!-- Sobre par choix : pas d'animation d'entrée tapageuse, cohérent avec la demande "bouton sobre" -->
-  <a id="bouton-explorer-etoiles" href="../univers/index.html"></a>
+  <a id="bouton-explorer-etoiles" class="bouton-passage" href="../univers/index.html"></a>
 
   <div id="zone-timeline" class="zone-timeline">
     <div class="zone-rail">

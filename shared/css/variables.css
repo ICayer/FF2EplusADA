@@ -40,6 +40,24 @@ body {
   line-height: 1.6;
 }
 
+/* Bouton de passage entre les parties (« Explorer les étoiles » du scrolly,
+   « Explorer les valeurs » d'univers/) — APPARENCE seulement, un seul
+   composant visuel pour tous les boutons de passage (6 octobre 2026).
+   Comportement (opacité, .visible, pointer-events, transition) et position
+   restent dans le CSS de chaque bouton. Fond crème + texte foncé : lisible
+   sur fond sombre, cohérent avec l'infobulle et la modale d'univers/. */
+.bouton-passage {
+  padding: 0.9rem 2.2rem;
+  font-family: "Agoradp_15", sans-serif; /* convention Registre 26 août — mots-titres
+                                             hors timeline/rail, @font-face ci-dessous */
+  font-size: calc(1rem * var(--echelle-texte)); /* suit le contrôle A-/A/A+ */
+  letter-spacing: 0.04em;
+  color: #1a1a1a;
+  background-color: #f2ede2;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
 @font-face {
   font-family: "Agoradp_15";
   src: url("../../assets/fonts/Agoradp_15-Regular.ttf") format("truetype");

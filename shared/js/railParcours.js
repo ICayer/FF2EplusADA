@@ -111,8 +111,10 @@ let plumePlacee = false;     // false jusqu'au premier definirEtapeActive() de l
 
 // Mémorise le clic qui va changer de page : étape de départ (la plume),
 // page visée et étape VISÉE (le scrolly s'ouvre directement à cette étape,
-// voir scrolly/js/script.js).
-function memoriserNavigationRail(etapeVisee) {
+// voir scrolly/js/script.js). Exportée : le bouton « Explorer les valeurs »
+// d'univers/ (etoiles.js) l'appelle pour naviguer exactement comme le rail.
+// `etapeVisee` : objet de parcours.json ({ id, page, ... }).
+export function memoriserNavigationRail(etapeVisee) {
   try {
     sessionStorage.setItem(CLE_PLUME_ETAPE_DEPART, JSON.stringify({
       etapeDepart: derniereEtapePlume,
@@ -359,7 +361,7 @@ function centreReel(el) {
 // jamais l'élément DOM directement (un attribut SVG "transform" ne
 // s'interpole pas nativement comme une propriété CSS — on anime ce proxy
 // numérique et on réécrit l'attribut à chaque frame, même patron que
-// univers/js/transitionValeurs.js, proxyEchelle). {x:0,y:0} = position
+// l'ancienne animation de sortie d'univers/, retirée le 6 octobre 2026). {x:0,y:0} = position
 // native du fichier (aucun transform), donc perle_step1 au chargement.
 const positionPlume = { x: 0, y: 0 };
 let derniereEtapePlume = null; // évite de rejouer un déplacement vers la
@@ -491,7 +493,7 @@ function deplacerCurseurPlume(idEtapeCible, { instantane = false } = {}) {
 
   // Annule un déplacement en cours si on clique une 2e perle pendant
   // l'animation (Étape 0 point 5, même patron que
-  // univers/js/transitionValeurs.js sur le glow des étoiles). Fait AVANT le
+  // l'ancienne animation de sortie d'univers/ sur le glow des étoiles). Fait AVANT le
   // calcul : la branche "pointe" mesure la position rendue courante.
   gsap.killTweensOf(positionPlume);
 
