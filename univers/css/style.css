@@ -99,7 +99,7 @@
   font-family: var(--font-body, sans-serif);
   font-size: calc(1rem * var(--echelle-texte));
   /* était 280px — élargi le 6 octobre : les segments sont maintenant
-     insécables (.infobulle-segment) ; « Jocelyne, Innu from Uashat mak
+     insécables (.segment-phrase) ; « Jocelyne, Innu from Uashat mak
      Mani-Utenam, born in 1968 » passait à 3 lignes sous 380px. 400px garde
      une marge ; jamais plus large que la fenêtre (marges de 8px). */
   max-width: min(400px, calc(100vw - 16px));
@@ -108,15 +108,16 @@
   box-shadow: 0 4px 16px rgba(0,0,0,0.4);
 }
 
-/* Segments de la phrase (séparés par les virgules du gabarit) : un bloc
-   insécable chacun — le retour à la ligne ne tombe qu'entre deux segments.
-   inline-block : un segment trop large pour l'infobulle se coupe seulement
-   entre ses unités, jamais à l'intérieur d'une unité. */
-#univers-tooltip .infobulle-segment {
+/* Segments de présentation d'une personne (presentationPersonne.js —
+   infobulle ET modale de témoignage), séparés par les virgules du gabarit :
+   un bloc insécable chacun, le retour à la ligne ne tombe qu'entre deux
+   segments. inline-block : un segment trop large pour la place disponible
+   se coupe seulement entre ses unités, jamais à l'intérieur d'une unité. */
+.segment-phrase {
   display: inline-block;
 }
 /* Unité : valeur + sa préposition (« de Pessamit », « né·e en 1963 »). */
-#univers-tooltip .infobulle-unite {
+.unite-phrase {
   white-space: nowrap;
 }
 
@@ -273,31 +274,36 @@
   gap: 6px;
 }
 
+/* Vignette « Anishinaabe de Pikugan » — inline-block (plus inline-flex) pour
+   que ses segments (.segment-phrase) passent à la ligne entre eux si elle
+   dépasse la largeur disponible. Texte noir ou blanc selon le meilleur
+   contraste WCAG avec la couleur de la nation (--nation-texte, posé par
+   testimonyModal.js) — plus de blanc imposé. */
 .tm-badge {
-  display: inline-flex;
+  display: inline-block;
   align-self: flex-start;
+  max-width: 100%;
   padding: 3px 10px;
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.06em;
+  line-height: 1.5;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--nation-texte, #0d0d0d);
   background-color: var(--nation-color, #888);
 }
 
+/* Titre « Sindy, né·e en 1970 » : prénom mis en valeur (graisse 600, comme
+   avant), « , né·e en 1970 » en graisse normale. */
 .tm-title {
   font-size: 1.7rem;
-  font-weight: 600;
+  font-weight: 400;
   color: #111;
   margin: 0;
 }
-
-.tm-meta {
-  font-size: 0.95rem;
-  letter-spacing: 0.03em;
-  color: rgba(0,0,0,0.55);
-  margin: 0;
+.tm-title strong {
+  font-weight: 600;
 }
 
 /* ── CORPS ── */

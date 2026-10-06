@@ -5,7 +5,9 @@
 // Rôle : Afficher/masquer le récit d'une femme au clic sur son étoile.
 // Mise en page inspirée de serviceModal.js (projet "de la classe au territoire") :
 // couleur injectée via variable CSS (--nation-color au lieu de --service-color),
-// en-tête (photo, prénom, date de naissance, nation, communauté), corps (témoignage),
+// en-tête (photo, vignette « nation de communauté », titre « prénom, né·e en
+// année » — segments construits par presentationPersonne.js, comme l'infobulle
+// des étoiles), corps (témoignage),
 // pied de page (personne qui a recueilli le témoignage — structure à valider avec
 // Déline, présente ici pour donner un aperçu du rendu visuel final).
 //
@@ -14,7 +16,7 @@
 // importe la langue de navigation choisie. Une traduction secondaire suit la
 // langue d'interface, seulement si elle diffère du texte primaire.
 // SUSPENDU le 6 octobre (voir AFFICHER_TEXTE_LANGUE_NATION ci-dessous).
-// Dépend de : shared/js/i18n.js (resolve)
+// Dépend de : shared/js/i18n.js (resolve, t), univers/js/presentationPersonne.js
 // Utilisé par : univers/js/etoiles.js
 //
 // FF2EplusADA (scrollyFFADA2S v2)
@@ -22,6 +24,7 @@
 // ==================================================
 
 import { resolve, t } from "../../shared/js/i18n.js";
+import { valeursPersonne, cleGabarit, rendreGabarit, hexVersRgb, couleurTexteLisible } from "./presentationPersonne.js";
 
 // Décision du 6 octobre : le texte dans la langue de la nation (et son
 // étiquette de langue) est masqué pour l'instant — suspend la décision du
@@ -34,6 +37,8 @@ let overlayEl = null;
 let modalEl = null;
 let contentEl = null;
 let dernierElementFocus = null; // pour redonner le focus à l'étoile après fermeture (accessibilité clavier)
+let etoileAffichee = null; // étoile + nation de la modale ouverte — pour la
+let nationAffichee = null; // retraduire si la langue change pendant la lecture
 
 export function initTestimonyModal(selecteurConteneur = "#univers-canvas") {
   const parent = document.querySelector(selecteurConteneur);
@@ -50,7 +55,9 @@ export function initTestimonyModal(selecteurConteneur = "#univers-canvas") {
   modalEl.id = "testimony-modal";
   modalEl.setAttribute("role", "dialog");
   modalEl.setAttribute("aria-modal", "true");
-  modalEl.setAttribute("aria-label", "Récit d'une femme honorée");
+  // Nom accessible = le titre « Sindy, né·e en 1970 » (h1#tm-titre), dans la
+  // langue choisie — remplace l'aria-label fixe en français.
+  modalEl.setAttribute("aria-labelledby", "tm-titre");
   modalEl.setAttribute("tabindex", "-1"); // permet de recevoir le focus au clavier à l'ouverture
 
   const closeBtn = document.createElement("button");
@@ -71,6 +78,14 @@ export function initTestimonyModal(selecteurConteneur = "#univers-canvas") {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && modalEl.classList.contains("open")) hideTestimony();
   });
+
+  // Changement de langue avec la modale ouverte : tout se retraduit sur
+  // place (vignette, titre, témoignage, pied de page), sans déplacer le focus.
+  window.addEventListener("languagechange", () => {
+    if (modalEl.classList.contains("open") && etoileAffichee) {
+      rendreModale(etoileAffichee, nationAffichee);
+    }
+  });
 }
 
 /**
@@ -83,23 +98,49 @@ export function showTestimony(etoile, nation) {
     return;
   }
 
+  if (!rendreModale(etoile, nation)) return; // rien à montrer — pas d'action, pas d'erreur
+
+  overlayEl.classList.add("open");
+  modalEl.classList.add("open");
+  document.body.style.overflow = "hidden";
+
+  // Accessibilité clavier : mémorise l'élément actif (l'étoile cliquée) pour lui
+  // redonner le focus à la fermeture, et déplace le focus dans la modale.
+  dernierElementFocus = document.activeElement;
+  modalEl.focus();
+}
+
+// Construit le contenu de la modale dans la langue active. Retourne false
+// s'il n'y a rien à montrer. Appelée à l'ouverture ET au changement de langue.
+function rendreModale(etoile, nation) {
   const p = etoile?.portrait;
   const temoignage = p?.temoignage;
-  if (!temoignage) return; // étoile vide par conception — pas d'action, pas d'erreur
+  if (!temoignage) return false; // étoile vide par conception
 
   const langueNation = AFFICHER_TEXTE_LANGUE_NATION ? (nation?.langue || null) : null;
   const texteNation = langueNation ? temoignage[langueNation] : null;
   const texteInterface = resolve(temoignage);
 
-  if (!texteNation && !texteInterface) return; // rien à montrer encore
+  if (!texteNation && !texteInterface) return false; // rien à montrer encore
 
   const afficherSecondaire = Boolean(texteNation) && Boolean(texteInterface) && texteNation !== texteInterface;
 
   // Couleur de la nation injectée comme variable CSS — même pattern que
   // --service-color dans serviceModal.js, appliqué à --nation-color ici.
-  modalEl.style.setProperty("--nation-color", nation?.couleur || "#888");
+  // Texte de la vignette : noir ou blanc selon le meilleur contraste WCAG.
+  const couleurNation = hexVersRgb(nation?.couleur) ? nation.couleur : "#888888";
+  modalEl.style.setProperty("--nation-color", couleurNation);
+  modalEl.style.setProperty("--nation-texte", couleurTexteLisible(couleurNation).couleur);
 
-  const meta = [p.dateNaissance, nation?.nom, p.communaute].filter(Boolean).join(" · ");
+  // Vignette « Anishinaabe de Pikugan » (nation Inconnue → communauté seule ;
+  // ni nation ni communauté → pas de vignette) et titre « Sindy, né·e en
+  // 1970 » (année absente → prénom seul) : mêmes segments que l'infobulle,
+  // valeurs échappées (presentationPersonne.js).
+  const { presents, html } = valeursPersonne(p, nation);
+  const vignette = presents.N || presents.C
+    ? rendreGabarit(t(cleGabarit("modale.vignette", "NC", presents)), html)
+    : "";
+  const titre = rendreGabarit(t(cleGabarit("modale.titre", "A", presents)), html);
 
   contentEl.innerHTML = `
     <header class="tm-header">
@@ -109,9 +150,8 @@ export function showTestimony(etoile, nation) {
           : `<div class="tm-photo-placeholder"></div>`}
       </div>
       <div class="tm-header-meta">
-        <span class="tm-badge">${nation?.nom || ""}</span>
-        <h1 class="tm-title">${p.prenom || ""}</h1>
-        <p class="tm-meta">${meta}</p>
+        ${vignette ? `<span class="tm-badge">${vignette}</span>` : ""}
+        <h1 class="tm-title" id="tm-titre">${titre}</h1>
       </div>
     </header>
 
@@ -135,14 +175,9 @@ export function showTestimony(etoile, nation) {
     </footer>
   `;
 
-  overlayEl.classList.add("open");
-  modalEl.classList.add("open");
-  document.body.style.overflow = "hidden";
-
-  // Accessibilité clavier : mémorise l'élément actif (l'étoile cliquée) pour lui
-  // redonner le focus à la fermeture, et déplace le focus dans la modale.
-  dernierElementFocus = document.activeElement;
-  modalEl.focus();
+  etoileAffichee = etoile;
+  nationAffichee = nation;
+  return true;
 }
 
 export function hideTestimony() {

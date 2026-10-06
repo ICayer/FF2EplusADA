@@ -6,8 +6,8 @@
 // puis dessiner le tout (Lune, étoiles, traits, arcs-étiquettes). Gère aussi
 // le survol ; le clic vers le récit complet arrive en S2B3T1 (testimonyModal.js).
 // Dépend de : univers/js/constellations.js, univers/data/etoiles.json,
-//             univers/data/nations.json, shared/js/i18n.js (t),
-//             d3 (global, CDN)
+//             univers/data/nations.json, shared/js/i18n.js (t, resolve),
+//             univers/js/presentationPersonne.js, d3 (global, CDN)
 // Utilisé par : univers/index.html
 //
 // FF2EplusADA (scrollyFFADA2S v2)
@@ -18,6 +18,10 @@ import { calculerDisposition, cheminArc } from "./constellations.js";
 import { initTestimonyModal, showTestimony } from "./testimonyModal.js";
 import { initConditionSortie, lancerTransitionValeurs } from "./transitionValeurs.js";
 import { t, resolve } from "../../shared/js/i18n.js";
+import {
+  echapperHtml, valeursPersonne, cleGabarit, rendreGabarit,
+  hexVersRgb, couleurTexteLisible, assombrir, bordureNette
+} from "./presentationPersonne.js";
 
 // Positionne le bouton juste à l'extérieur du cercle des mémoires (bord droit, 3h),
 // converti en coordonnées d'écran réelles via la matrice de transformation du SVG —
@@ -227,73 +231,9 @@ export async function initUnivers(selecteurConteneur = "#univers-canvas") {
   console.log(`🌌 Univers : ${noeuds.length} étoile(s)-témoignage dans ${nations.length} constellations, ${nbEtoilesCiel} étoiles anonymes dans le ciel.`);
 }
 
-// Échappe une valeur venant des données avant de l'insérer en innerHTML
-// (infobulle) — le texte s'affiche tel quel, aucune balise n'est interprétée.
-function echapperHtml(texte) {
-  return String(texte)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-// --- Couleurs du bouton « Lire le témoignage → » (décision du 6 octobre) ---
+// --- Couleur du bouton « Lire le témoignage → » (décision du 6 octobre) ---
 // Le bouton prend la couleur de la nation de l'étoile (le rouge du site est
-// associé à la rupture coloniale). Le texte est noir ou blanc selon le
-// meilleur contraste WCAG avec cette couleur — calculé, jamais choisi à la main.
-const NOIR_SITE = "#0d0d0d"; // --color-bg (shared/css/variables.css)
-const BLANC = "#ffffff";
-
-// "#FFB74D" ou "#FB4" → [r, g, b] (0-255), ou null si le format est inconnu.
-function hexVersRgb(hex) {
-  const m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(hex || "").trim());
-  if (!m) return null;
-  const h = m[1].length === 3 ? m[1].replace(/./g, c => c + c) : m[1];
-  return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16));
-}
-
-// Luminance relative WCAG 2.x (0 = noir, 1 = blanc).
-function luminanceRelative([r, g, b]) {
-  const lin = c => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
-  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
-}
-
-// Ratio de contraste WCAG entre deux couleurs [r, g, b] (de 1 à 21).
-function ratioContraste(a, b) {
-  const [claire, foncee] = [luminanceRelative(a), luminanceRelative(b)].sort((x, y) => y - x);
-  return (claire + 0.05) / (foncee + 0.05);
-}
-
-// Couleur de texte la plus lisible sur `fond` : compare le noir du site et
-// le blanc, garde celui qui donne le meilleur ratio WCAG.
-function couleurTexteLisible(fond) {
-  const rgb = hexVersRgb(fond);
-  const surNoir = ratioContraste(rgb, hexVersRgb(NOIR_SITE));
-  const surBlanc = ratioContraste(rgb, hexVersRgb(BLANC));
-  return surNoir >= surBlanc
-    ? { couleur: NOIR_SITE, ratio: surNoir }
-    : { couleur: BLANC, ratio: surBlanc };
-}
-
-// Assombrit une couleur hexadécimale (facteur 0.8 = 20 % plus sombre).
-function assombrir(hex, facteur) {
-  const rgb = hexVersRgb(hex);
-  return "#" + rgb.map(c => Math.round(c * facteur).toString(16).padStart(2, "0")).join("");
-}
-
-// Bordure : la couleur de la nation, assombrie juste assez pour rester nette
-// sur le fond de l'infobulle — ratio ≥ 3:1 (WCAG 1.4.11, contour d'un
-// composant). Les couleurs pastel (ex. Atikamekw #FFE082) demandent plus
-// d'assombrissement que les plus soutenues.
-const CONTRASTE_MIN_BORDURE = 3;
-function bordureNette(couleur, fondRgb) {
-  let facteur = 0.85;
-  while (facteur > 0.3 && ratioContraste(hexVersRgb(assombrir(couleur, facteur)), fondRgb) < CONTRASTE_MIN_BORDURE) {
-    facteur -= 0.05;
-  }
-  return assombrir(couleur, facteur);
-}
+// associé à la rupture coloniale). Fonctions de contraste : presentationPersonne.js.
 
 // Applique la couleur de la nation au bouton via des variables CSS (voir
 // univers/css/style.css, .infobulle-cta). Nation « Inconnue » ou sans couleur
@@ -509,51 +449,14 @@ async function dessiner({ nations, secteurs, noeuds, liens, nbEtoilesCiel }) {
   // Seuls les segments présents dans les données sont gardés. L'ordre des mots
   // vit dans les gabarits de shared/data/i18n/{lang}.json (infobulle.phrase_*),
   // un gabarit par combinaison : N = nation, C = communauté, A = année.
+  // Segments, élision, échappement et coupures : presentationPersonne.js
+  // (partagé avec la modale de témoignage).
   function contenuTooltip(d) {
     const p = d.data.portrait;
     if (!p.prenom) return "";
 
-    const nation = nationParId[d.data.nation];
-    // Nation « Inconnue » ou absente : segment omis. nomPersonne (forme au
-    // singulier, ex. Inuk) est optionnel — repli sur le nom de la nation.
-    const nomNation = nation && nation.id !== "inconnue"
-      ? (resolve(nation.nomPersonne) || nation.nom)
-      : "";
-    const communaute = p.communaute || "";
-    const annee = p.dateNaissance || "";
-
-    const cle = "infobulle.phrase" +
-      (nomNation || communaute || annee ? "_" : "") +
-      (nomNation ? "N" : "") + (communaute ? "C" : "") + (annee ? "A" : "");
-    // Élision : « d'Uashat » — voyelle, accentuée comprise (NFD sépare l'accent)
-    const commenceParVoyelle = /^[aeiouy]/i.test(communaute.normalize("NFD"));
-
-    // Valeurs échappées : aucun HTML venant des données n'est interprété.
-    const valeurs = {
-      prenom: `<strong>${echapperHtml(p.prenom)}</strong>`,
-      nation: echapperHtml(nomNation),
-      de: echapperHtml(t(commenceParVoyelle ? "infobulle.deVoyelle" : "infobulle.de")),
-      communaute: echapperHtml(communaute),
-      annee: echapperHtml(annee)
-    };
-
-    // Aucune coupure à l'intérieur d'un segment. Le gabarit est découpé en
-    // segments aux virgules (« Gladys, » / « Anishinaabe de Kitigan Zibi, » /
-    // « né·e en 1940 ») : chacun est un bloc insécable (.infobulle-segment) et
-    // le retour à la ligne ne tombe qu'entre deux segments. Dans un segment,
-    // les unités (« Anishinaabe » / « de Kitigan Zibi ») — séparées dans le
-    // gabarit par une espace entre deux {clés} — sont elles aussi insécables :
-    // si un segment entier dépasse la largeur de l'infobulle, il se coupe
-    // seulement entre ses unités, jamais dans « d'Uashat mak Mani-Utenam ».
-    const remplir = (gabarit) =>
-      gabarit.replace(/\{(\w+)\}/g, (brut, cle) => (cle in valeurs ? valeurs[cle] : brut));
-    const segments = t(cle).split(", ");
-    const phrase = segments.map((segment, i) => {
-      const unites = segment.replace(/\} \{/g, "}\u0000{").split("\u0000")
-        .map(unite => `<span class="infobulle-unite">${remplir(unite)}</span>`);
-      const virgule = i < segments.length - 1 ? "," : "";
-      return `<span class="infobulle-segment">${unites.join(" ")}${virgule}</span>`;
-    }).join(" ");
+    const { presents, html } = valeursPersonne(p, nationParId[d.data.nation]);
+    const phrase = rendreGabarit(t(cleGabarit("infobulle.phrase", "NCA", presents)), html);
 
     // Appel à l'action seulement si un témoignage existe dans la langue
     // résolue — sinon aucune ligne. Vrai bouton : ouvre la modale de cette
