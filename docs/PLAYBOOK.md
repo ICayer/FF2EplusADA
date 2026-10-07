@@ -3,12 +3,15 @@
 **Isabel Cayer · Atelier Love & Code · 2026**
 *Document vivant — conventions réutilisables, alimentées par le vécu réel du projet (pas décidées à l'avance).*
 
+**Sommaire :** 1 Architecture générale · 2 Conventions de code et de données · 3 Animation et positionnement GSAP/SVG · 4 Règle d'audit · 5 Gouvernance et workflow · 6 Méthodologie de validation · 7 Production d'assets SVG · 8 Accessibilité · 9 Déploiement (GitHub Pages) · 10 Règles de rédaction
+
 ---
 
 ## 1 — Architecture générale
 
 **Séparation des dossiers** (voir Registre pour le détail complet) :
-- `shared/` — ce qui traverse les 3 parties (i18n, tokens visuels, utilitaires)
+- `shared/` — ce qui traverse les parties (i18n, tokens visuels, rail, utilitaires)
+- `index.html` + `assets/` — Partie 1 (landing)
 - `scrolly/` — Partie 2 uniquement
 - `univers/` — Partie 3 uniquement
 - `valeurs/` — Partie 4 uniquement
@@ -18,33 +21,36 @@
 - `t(clé)` — pour le chrome d'interface (dictionnaires plats dans `shared/data/i18n/{lang}.json`)
 - `resolve(champ)` — pour le contenu éditorial langue-clé (récits, textes de step, valeurs), avec repli automatique via `fallbackByLanguage.json`
 - Le repli n'est **pas** un français universel — chaque langue autochtone a son propre repli selon la réalité linguistique de sa communauté (ex: innu-aimun→français, mi'gmaq→anglais).
-- **`t()` et `resolve()` partagent maintenant la même logique de repli**
-  (corrigé le 2 septembre — `t()` n'avait aucun repli avant ça, une
-  langue sans dictionnaire propre affichait des clés brutes comme
-  `"nav.explorerValeurs"`). `shared/data/i18n/` contient `fr.json` ET
-  `en.json` — toute nouvelle langue autochtone documentée retombe
-  proprement sur sa langue de repli pour le chrome ET le contenu
-  éditorial, pas seulement l'un des deux.
-- **Patron établi pour tout nouveau contenu bilingue statique**
-  (landing page, futurs textes de valeurs) : un fichier
-  `shared/data/*.json` avec des champs `{fr, en, ...}` par clé, un
-  script d'initialisation qui peuple le DOM via `resolve()` au
-  chargement ET réécoute `"languagechange"` pour retraduire sans
-  recharger la page — voir `shared/data/landing.json` +
-  `assets/js/landingContent.js` comme référence.
+- **`t()` et `resolve()` partagent la même logique de repli** (corrigé le 2 septembre — `t()` n'avait aucun repli avant ça, une langue sans dictionnaire propre affichait des clés brutes comme `"nav.explorerValeurs"`).
+- **Patron établi pour tout nouveau contenu bilingue statique** : un fichier `shared/data/*.json` avec des champs `{fr, en, ...}` par clé, un script d'initialisation qui peuple le DOM via `resolve()` au chargement ET réécoute `"languagechange"` pour retraduire sans recharger la page — voir `shared/data/landing.json` + `assets/js/landingContent.js` comme référence. Les attributs traduisibles (`alt`, titres) passent par le même mécanisme que le texte, jamais par un second système.
+- **Phrases variables : des gabarits complets, jamais des morceaux collés** *(6 oct)*. `t(clé, params)` remplace des `{clés}` dans un gabarit. Une phrase qui combine plusieurs données (« Gladys, Anishinaabe de Kitigan Zibi, né·e en 1940 ») vit en gabarits complets dans `fr.json`/`en.json`, un par combinaison de données présentes : l'ordre des mots diffère d'une langue à l'autre, et un gabarit entier se traduit sans toucher au code. Les règles propres à une langue (élision « d' » devant une voyelle) sont portées par des clés dédiées (`personne.de`, `personne.deVoyelle`).
 
 **Steps — moteur générique, jamais de logique par nom** (`scrolly/js/timeline.js` + `stepsRegistry.js` + `stepsOrder.json`) :
 - `timeline.js` ne connaît jamais un step par son nom — il cherche dans `stepsRegistry` par la clé lue dans `stepsOrder.json`.
 - Ajouter/retirer/réordonner un step = modifier `stepsOrder.json` (et `stepsRegistry.js` si nouveau) — **jamais** `timeline.js`.
 - La clé du registre est **descriptive du contenu**, jamais de la position (`"hommage-victimes"`, pas `"step7"`) — un step peut être réordonné sans jamais être renommé.
 
-**Transitions entre parties — toujours un geste explicite** *(leçon transitionValeurs.js, 24 août)* :
-- Une condition automatique (temps écoulé, nombre d'interactions) peut **révéler** un bouton, mais ne doit **jamais** déclencher elle-même l'animation de sortie ni la navigation.
-- La personne doit toujours poser un clic volontaire pour avancer d'une partie à l'autre — aucune transition ne doit "partir toute seule".
+**Transitions entre parties — toujours un geste explicite** *(leçon transitionValeurs.js, 24 août ; réaffirmé le 6 oct)* :
+- Une condition automatique (temps écoulé, nombre d'interactions) peut **révéler** un bouton, mais ne doit **jamais** déclencher elle-même la navigation.
+- La personne doit toujours poser un clic volontaire pour avancer d'une partie à l'autre.
+
+**Navigation entre les pages — simuler la continuité sans fusionner les pages** *(6 oct)* :
+- Les 4 parties sont des documents séparés (choix d'architecture). Les transformer en une seule application serait une refonte ; on simule plutôt la continuité.
+- **Fondu natif du navigateur** : `@view-transition { navigation: auto; }` dans une feuille chargée par les 4 pages, à l'intérieur de `@media (prefers-reduced-motion: no-preference)`, avec la durée dans une variable (`--duree-transition-page`). Navigateurs sans support : navigation normale, rien ne casse.
+- **Pas de flash blanc** : une petite balise `<style>` en ligne dans le `<head>` de chaque page, avant les feuilles de style, fixe la couleur de fond de `html`.
+- **Mémoire de navigation** : juste avant de quitter une page, `memoriserNavigationRail()` (`railParcours.js`, exportée) écrit dans `sessionStorage` l'étape de départ, la page visée et l'étape visée. À l'arrivée, **une seule fonction** lit et efface la clé, puis rend les trois valeurs à tous ses appelants (plume, scrolly). Si deux modules lisaient la clé chacun de leur côté, le premier effacerait la donnée de l'autre. La clé effacée à la lecture garantit qu'un rechargement ou un signet ouvre la page normalement.
+- **Réutiliser, jamais recopier** : tout lien qui navigue comme le rail (ex. bouton « Explorer les valeurs ») appelle la fonction exportée ; le format de la clé n'existe qu'à un seul endroit.
+- **Piège des modules partagés** : deux fichiers partagent l'état d'un module (ex. l'étape active de `railParcours.js`) seulement s'ils l'importent à la même adresse. Ajouter `?v=2` à un seul des imports crée deux instances distinctes, sans erreur visible.
+
+**Réglages de gouvernance dans les données, pas en règle automatique** *(6 oct)* :
+- Quand une décision relève de la gouvernance (ex. n'offrir que FR/EN tant que personne ne porte le projet), la traduire par un réglage explicite et nommé (`afficherDansMenu`, `AFFICHER_TEXTE_LANGUE_NATION`), avec un commentaire juste au-dessus : la date, la raison, et comment réactiver. Une règle automatique (« afficher les langues qui ont un dictionnaire ») confondrait une condition technique avec une décision humaine.
+- Un élément masqué par réglage ne doit pas exister dans le DOM (pas de masquage CSS) : il ne doit ni recevoir le focus ni être lu par un lecteur d'écran.
+
+**Scoper du CSS à une page : `data-page` sur `<body>`** *(5 oct)* — ex. `<body data-page="valeurs">` puis `[data-page="valeurs"] #perle_noire1 { display: none }`. Utile pour un fichier partagé (`timeline.svg`) qui doit se comporter différemment sur une seule page.
 
 ---
 
-## 2 — Conventions de code
+## 2 — Conventions de code et de données
 
 ### 2.1 En-tête de fichier
 
@@ -76,7 +82,7 @@ Tout fichier `.js` du projet porte cet en-tête :
 
 Format : `[zone]-[élément]-[variante]` (ex: `step3-etoile-01`, `lune-valeur-respect`).
 
-**Non-négociable pour tout nouvel asset créé pour v2** (Lune, étoiles, nouveaux steps de Déline). **Ne s'applique pas rétroactivement aux steps hérités de la v1** (voir 2.4) — pas de renommage de masse dans Illustrator pour ceux-là.
+**Non-négociable pour tout nouvel asset créé pour v2** (Lune, étoiles, nouveaux steps de Déline). **Ne s'applique pas rétroactivement aux steps hérités de la v1** (voir 2.4). Exception documentée : les ids de la plume (`plume`, `perle_noire1/2/3`), auxquels le script de Déline fait référence nommément.
 
 ### 2.4 Steps hérités de la v1 — la sécurité vient du scoping, pas du nommage
 
@@ -87,27 +93,47 @@ step7Container.querySelector(sel)   // ✅ toujours comme ça
 document.querySelector(sel)          // ❌ jamais, pour un élément animé par ID
 ```
 
-**Règle non-négociable** : toute nouvelle fonction `showStepX()`/`hideStepX()` doit scoper ses requêtes au conteneur du step, jamais au document global. C'est ce scoping — pas l'unicité des noms — qui empêche les collisions entre steps chargés simultanément dans le DOM.
+**Règle non-négociable** : toute nouvelle fonction `showStepX()`/`hideStepX()` doit scoper ses requêtes au conteneur du step, jamais au document global.
 
 ### 2.5 Nommage des fichiers JS — **nouveau contenu v2 seulement** *(24 août)*
 
-Le système `stepN.js` numérique est réservé aux steps **hérités de la v1** (step7, step9, step10) — jamais étendu à du contenu neuf, même dans `scrolly/`.
+Le système `stepN.js` numérique est réservé aux steps **hérités de la v1** (step7, step9, step10) — jamais étendu à du contenu neuf.
 
-**Tout nouveau fichier v2** (nouveau step de Déline, transition, animation propre à une partie) porte un **nom descriptif**, scopé au dossier `js/` de sa propre partie, aligné sur sa clé de registre quand applicable — jamais un numéro qui laisse croire à une continuité avec le système `stepsRegistry.js` de `scrolly/`.
+**Tout nouveau fichier v2** porte un **nom descriptif**, scopé au dossier `js/` de sa propre partie, aligné sur sa clé de registre quand applicable.
 
 | ❌ À éviter | ✅ À la place |
 |---|---|
 | `scrolly/js/steps/step12.js` (nouveau contenu, pas hérité) | `scrolly/js/steps/[nomDescriptif].js` |
 | `univers/js/step12.js` | `univers/js/transitionValeurs.js` |
 
-*(Aveu du 24 août : `step11.js` lui-même est un léger écart à cette règle, nommé par habitude avant qu'elle soit formalisée — laissé tel quel, rien d'autre n'en dépend directement, mais la règle s'applique strictement à partir de maintenant.)*
+*(Aveu du 24 août : `step11.js` lui-même est un léger écart à cette règle, nommé par habitude avant qu'elle soit formalisée — laissé tel quel.)*
 
 ### 2.6 Champs de données synthétiques — toujours nommés explicitement
 
-Toute donnée générée/approximative (pas une vraie donnée individuelle) porte un nom qui le dit clairement, pour qu'on ne la confonde jamais avec une vraie donnée reçue plus tard :
+Toute donnée générée/approximative porte un nom qui le dit clairement, pour qu'on ne la confonde jamais avec une vraie donnée reçue plus tard :
 
 - `decennieNaissanceApprox` (synthétique) vs `portrait.dateNaissance` (réel, vide tant qu'inconnu)
 - Répartition par nation dans `etoiles.json` : générique/illustrative, documentée comme telle au Registre — jamais présentée comme une vraie proportion.
+
+**Complément du 24 septembre** : quand une vraie donnée remplace un placeholder, **auditer systématiquement les champs dérivés** qui dépendaient de l'ancienne valeur synthétique. Exemple : `ORDRE_DECENNIES` ne couvrait pas les décennies antérieures à 1950 (champ conçu pour une date de décès, réutilisé pour la naissance), dépendance restée invisible tant qu'aucune vraie donnée ne l'avait mise à l'épreuve.
+
+### 2.7 Pas de donnée, pas d'élément — retirer à la source *(5-6 oct)*
+
+- Un texte d'attente (« [Texte à venir des artistes] ») se retire **dans les données**, pas en CSS. Le code applique la règle « champ absent ou vide = aucun élément, aucun espace résiduel » : si la donnée arrive un jour, elle s'affiche sans toucher au code.
+- Un élément masqué en CSS mais encore construit et animé reste de la dette pour la personne qui reprendra le projet. Exception : un texte qui est la seule annonce d'une information pour les lecteurs d'écran (voir §8).
+- Tout champ optionnel qui n'apparaît plus dans aucune entrée (ex. `definition` de `valeurs.json`, `nomPersonne` de `nations.json`) doit être documenté au README de legs, sinon personne ne saura qu'il existe.
+
+### 2.8 Échapper toute valeur insérée en HTML *(6 oct)*
+
+Dès qu'une donnée est insérée avec `innerHTML` (ex. un prénom en `<strong>` dans une phrase), elle passe par une fonction d'échappement (`echapperHtml()`). Les données seront un jour saisies par une tierce personne ; un caractère `<` ou `&` ne doit jamais être interprété comme du HTML.
+
+### 2.9 Une seule source quand deux composants présentent la même information *(6 oct)*
+
+L'infobulle et la modale présentent la même personne : la construction des segments et les fonctions de contraste vivent dans un module de la partie (`univers/js/presentationPersonne.js`), importé par les deux. Sinon, la première correction (ex. la forme du nom de nation) fera diverger les deux affichages.
+
+### 2.10 Collecte de données par une tierce personne
+
+Colonnes recommandées : `id, nomComplet, prenom, dateNaissance, nation, communaute, temoignage, langueTemoignage, redigePar, sourceUrl, photo, traduction faite?`. Listes déroulantes pour `nation` (ids de `nations.json`). Prévoir l'uniformisation typographique (« œ », apostrophes) et le dédoublonnage entre sources.
 
 ---
 
@@ -117,7 +143,7 @@ Toute donnée générée/approximative (pas une vraie donnée individuelle) port
 
 Quand `show()` anime une propriété (opacité, couleur, position) au niveau d'un **groupe**, `hide()` doit réinitialiser cette même propriété **au même niveau** — jamais plus profond dans l'arbre DOM.
 
-Réinitialiser individuellement des enfants (ex: chaque `<circle>` d'un groupe) alors que seul le parent est animé au `show` crée un état qui fonctionne au premier passage, mais casse silencieusement au deuxième cycle show→hide→show.
+Réinitialiser individuellement des enfants alors que seul le parent est animé au `show` crée un état qui fonctionne au premier passage, mais casse silencieusement au deuxième cycle show→hide→show.
 
 ```javascript
 // ❌ Piège : reset trop profond, désynchronisé du show (qui anime seulement le groupe)
@@ -126,21 +152,23 @@ gsap.set(circles, { opacity: 0, fill: "#c9cbc3" });
 // ✅ clearProps laisse le style CSS d'origine reprendre le dessus automatiquement
 gsap.set(circles, { clearProps: "opacity,fill" });
 ```
-**Piège plus large découvert le 26 août (step7, step10) :** `clearProps: "all"` ne nettoie pas seulement les propriétés que GSAP a lui-même animées — il vide l'attribut `style` au complet, y compris un style inline écrit à même le SVG source (ex: `fill` d'un export Illustrator) que GSAP n'a jamais touché. Un élément dont la couleur vit en style inline la perd au premier `hide()`, retombe sur le noir par défaut du SVG — invisible tant qu'on ne teste pas un vrai cycle show→hide→show, pas juste un chargement frais.
+**Piège plus large découvert le 26 août (step7, step10) :** `clearProps: "all"` vide l'attribut `style` au complet, y compris un style inline écrit à même le SVG source (ex: `fill` d'un export Illustrator) que GSAP n'a jamais touché. Invisible tant qu'on ne teste pas un vrai cycle show→hide→show.
 
 Ne jamais utiliser `"all"` par réflexe :
 - soit nommer explicitement les propriétés que GSAP a animées (`clearProps: "opacity,visibility"`)
-- soit vérifier si `show()` réinitialise déjà tout ce qui compte au départ de chaque appel — auquel cas `clearProps` en sortie n'est souvent pas nécessaire du tout.
+- soit vérifier si `show()` réinitialise déjà tout ce qui compte au départ de chaque appel.
 
 ### 3.2 Un groupe = une intention d'animation
 
-Si des sous-éléments (ex: les perles d'un personnage) ne sont **jamais** ciblés individuellement par GSAP, ils n'ont pas besoin d'ID uniques — l'opacité du groupe parent suffit à les afficher/masquer tous ensemble. Réserver le nommage individuel aux éléments réellement animés un par un (ex: les 67 étoiles de step10, chacune déplacée individuellement).
+Si des sous-éléments ne sont **jamais** ciblés individuellement par GSAP, ils n'ont pas besoin d'ID uniques — l'opacité du groupe parent suffit. Réserver le nommage individuel aux éléments réellement animés un par un.
+
+**Corollaire (6 oct)** : quand le code parcourt les enfants d'un groupe (`groupe.children` pour trier, masquer, mémoriser), ne jamais y ajouter d'éléments d'une autre nature (ex. des halos). Les placer dans un groupe frère, peint avant (derrière) ou après (devant).
 
 ### 3.3 Centrage et mise à l'échelle SVG — toujours mesurer, jamais présumer *(leçon step11, 24 août)*
 
-Un calcul de centrage basé uniquement sur les coordonnées internes du `viewBox` (en assumant que le SVG se centre automatiquement dans son conteneur) est **fragile** — ça dépend de détails du fichier source (dimensions fixes vs pourcentage sur la balise `<svg>`) qui varient d'un export à l'autre et cassent silencieusement.
+Un calcul de centrage basé uniquement sur les coordonnées internes du `viewBox` est **fragile** — ça dépend de détails du fichier source qui varient d'un export à l'autre.
 
-**La méthode robuste** : mesurer la position **réellement rendue à l'écran** (`getBoundingClientRect()`), puis convertir en coordonnées internes du SVG via sa matrice de transformation courante (`getScreenCTM()` / `getScreenCTM().inverse()`). Ça fonctionne peu importe la configuration du fichier source, parce que ça mesure le résultat réel plutôt que de présumer un comportement.
+**La méthode robuste** : mesurer la position **réellement rendue à l'écran** (`getBoundingClientRect()`), puis convertir en coordonnées internes du SVG via sa matrice de transformation courante (`getScreenCTM().inverse()`).
 
 ```javascript
 const ctmInverse = element.getScreenCTM().inverse();
@@ -151,28 +179,23 @@ pt.y = rect.top + rect.height / 2;
 const centreReelEnCoordonneesSVG = pt.matrixTransform(ctmInverse);
 ```
 
-Même principe pour une croissance ciblée (ex: "grossir à 80% de la hauteur de l'écran") : mesurer la hauteur actuelle en pixels réels, calculer le facteur par rapport à la cible en pixels, appliquer ce facteur à l'échelle SVG — jamais déduire une taille cible à partir du seul `viewBox`.
+Même principe pour une croissance ciblée : mesurer la hauteur actuelle en pixels réels, calculer le facteur par rapport à la cible en pixels.
+
+**Complément** :
+- `getBBox()` ignore le transform propre à l'élément mesuré : il ne donne la bonne réponse que si l'élément n'a pas de transform. Préférer la mesure du rendu réel.
+- Une boîte de `getBoundingClientRect()` est **alignée sur les axes**, contrairement à la boîte pivotée qu'affiche Illustrator. Pour ancrer un point précis d'un dessin incliné (ex. la pointe de la plume au coin supérieur droit), vérifier visuellement avec un point de contrôle temporaire (drapeau `DEBUG_...`, à remettre à `false` avant le commit).
 
 ### 3.4 Convention de z-index — éviter la collision récurrente avec `loadSVG()`
 
-`loadSVG()` (dans `shared/js/utils.js`) donne à chaque conteneur de step/asset un `z-index: 1500`, pour permettre l'empilement propre entre steps successifs. **Ce chiffre a causé le même bug à répétition** (curseur de test caché, bouton caché derrière la Lune, voile de transition mal empilé) — toujours vérifier qu'un élément d'interface censé rester au-dessus (bouton, curseur, overlay UI) a un `z-index` **supérieur à 1500**, et qu'un élément censé former un **fond** (voile de transition, overlay coloré) a un `z-index` **inférieur** à celui du contenu SVG qu'il est censé mettre en valeur, pas au-dessus.
+`loadSVG()` (dans `shared/js/utils.js`) donne à chaque conteneur de step/asset un `z-index: 1500`. **Ce chiffre a causé le même bug à répétition** — toujours vérifier qu'un élément d'interface censé rester au-dessus a un `z-index` **supérieur à 1500**, et qu'un élément de **fond** a un `z-index` **inférieur** au contenu SVG qu'il met en valeur.
 
-Repère à garder en tête : fond de page < overlay de fond (voile, assombrissement) < contenu SVG animé (steps, Lune, étoiles) < interface de contrôle (boutons, curseur).
+Repère : fond de page < overlay de fond (voile, assombrissement) < contenu SVG animé (steps, Lune, étoiles) < interface de contrôle (boutons, curseur).
+
+**Un SVG est atomique pour le z-index face à du HTML externe** *(~1 oct)* : on ne peut pas glisser un élément HTML « entre » deux calques d'un même SVG. Pour placer du HTML entre deux couches (ex. les mots de la trame poétique entre le rail et la plume), déplacer la couche du dessus dans un second `<svg>` superposé, de même viewBox.
 
 ### 3.5 Ne jamais rejouer hide+show sur une navigation vers le MÊME step *(leçon goToStep, 2 septembre 2026)*
 
-Toute fonction qui orchestre une transition entre deux états (ici,
-`goToStep()` appelant `hide()` du step qu'on quitte puis `show()` du
-step qu'on rejoint) doit vérifier que l'état cible est RÉELLEMENT
-différent de l'état courant avant de déclencher quoi que ce soit.
-Sans ce garde, naviguer vers le step où l'on est déjà (ex. : un
-changement de langue qui rappelle la navigation sur le même index pour
-forcer un nouveau `resolve()`) déclenche un hide() suivi immédiatement
-d'un show() du même step — et si hide() nettoie son DOM à l'intérieur
-d'un callback GSAP asynchrone (`onComplete`, comme c'est le cas pour
-step7/9/10/11 et avantColonisation.js), ce nettoyage tardif peut
-s'exécuter APRÈS que show() ait déjà reconstruit la scène, l'effaçant
-silencieusement.
+Toute fonction qui orchestre une transition entre deux états doit vérifier que l'état cible est RÉELLEMENT différent de l'état courant avant de déclencher quoi que ce soit. Sans ce garde, un changement de langue qui rappelle la navigation sur le même index déclenche un hide() suivi d'un show() du même step — et si hide() nettoie son DOM dans un callback GSAP asynchrone (`onComplete`), ce nettoyage tardif peut effacer la scène que show() vient de reconstruire.
 
 ```javascript
 // ❌ Piège : aucune vérification, hide()+show() se rejouent même si rien ne change
@@ -191,11 +214,35 @@ export function goToStep(index) {
 }
 ```
 
-Ce correctif protège TOUS les steps d'un coup (la cause est en amont,
-dans l'orchestrateur, pas dans chaque step individuellement) — un signe
-qu'un bug qui semble propre à un seul endroit (ici, découvert sur
-seuil-univers/step11) mérite de vérifier s'il vient en fait d'une
-fonction partagée plus haut dans la chaîne d'appel.
+Ce correctif protège TOUS les steps d'un coup — un bug qui semble propre à un seul endroit mérite de vérifier s'il vient d'une fonction partagée plus haut dans la chaîne d'appel.
+
+### 3.6 `opacity: 0` n'enlève pas les clics *(~fin sept)*
+
+Un élément transparent intercepte toujours les clics et le survol (cas des `<image id="barre1-5">` du step D, qui rendaient les cercles de valeurs muets). Tout élément invisible ou décoratif posé par-dessus du contenu interactif reçoit `pointer-events: none`.
+
+Pour masquer un élément qui ne doit plus compter dans aucune mesure, préférer `display: none` à `visibility: hidden` : un élément en `visibility: hidden` garde sa géométrie et peut fausser la boîte englobante d'un groupe parent.
+
+### 3.7 Timelines GSAP : synchroniser par labels *(5 oct)*
+
+- Pour faire démarrer deux animations ensemble (ex. les perles avec le territoire), poser un label (`tl.addLabel("territoire", "+=3")`) et positionner les deux sur ce label, plutôt que de recalculer des secondes : si l'un change de délai, l'autre suit.
+- `"+=2"` compte depuis la **fin de toute la timeline** ; `">"` compte depuis la **fin de l'animation précédente**. Après un retour en arrière sur un label, `"+="` peut décaler toute la suite.
+- Les rythmes qu'Isabel voudra ajuster à l'œil vivent dans des constantes nommées en tête de fichier (`ECART_GROUPES_PERLES_S`, `DUREE_AFFICHAGE_MOT_MS`).
+
+### 3.8 Effets continus (halos, pulsations) *(univers, puis step D le 5 oct)*
+
+- Animer `r` et `fill-opacity`, **jamais** `opacity` : l'opacité reste libre pour les fondus de groupe, sans conflit entre deux animations.
+- Démarrer l'effet d'un élément à la fin de son propre fondu d'entrée.
+- `hide()` appelle `killTweensOf()` puis retire les éléments créés ; un `show()` suivant reconstruit sans doublon (compter les éléments après plusieurs cycles).
+- Sous `prefers-reduced-motion` : effet statique, aucune pulsation.
+- Proportions plutôt que marges fixes quand l'effet est réutilisé sur des éléments de tailles différentes (un halo d'étoile de 10 px ne se transpose pas à un spot de valeur).
+
+### 3.9 Un `show()` qui attend une ressource doit vérifier qu'il est encore actif *(5 oct)*
+
+Si `show()` attend un chargement (`await` d'un JSON), la personne peut avoir quitté le step entre-temps. Après chaque `await`, vérifier que le step est toujours le step actif avant de construire quoi que ce soit, sinon des éléments orphelins restent affichés sur le step suivant.
+
+### 3.10 Guides dessinés dans le SVG, éléments HTML positionnés par mesure *(~1 oct)*
+
+Quand un élément HTML doit se placer exactement à un endroit d'une illustration (mots de la trame poétique), Isabel dessine dans Illustrator des **calques guides** (point d'ancrage, boîte, texte témoin) ; le code les masque en CSS, mesure leur rendu réel et y positionne le HTML. Le placement reste une décision visuelle prise dans l'outil de dessin, et il suit automatiquement les redimensionnements et A-/A/A+.
 
 ---
 
@@ -204,7 +251,9 @@ fonction partagée plus haut dans la chaîne d'appel.
 ```bash
 grep -rn "[nom de l'export ou de la fonction concernée]" [dossier]
 ```
-Avant toute modification qui touche un export existant utilisé ailleurs — voir gabarit de prompt Claude Code pour l'intégration systématique de cette règle.
+Avant toute modification qui touche un export existant utilisé ailleurs — voir le gabarit de prompt Claude Code pour l'intégration systématique de cette règle.
+
+**Rappel** : un nom construit dynamiquement (`` `#perles${i}` ``) n'apparaît pas tel quel au grep ; chercher aussi le motif de construction.
 
 ---
 
@@ -214,13 +263,40 @@ Avant toute modification qui touche un export existant utilisé ailleurs — voi
 - **Claude Code** : exécute, **ne commit jamais** — Isabel valide avec Claude.ai puis commit manuellement.
 - **Commits** au format `S[n]B[n]T[n] - description courte`.
 - **Effort réel** : jamais estimé — toujours demandé après coup pour le Kanban.
-- **Gouvernance du contenu** : le projet se fait *avec et pour* les femmes et artistes autochtones impliquées — la gouvernance créative et les données sensibles (récits, données FAQ) restent sous leur autorité, jamais traitées comme un jeu de données neutre.
+- **Gouvernance du contenu** : le projet se fait *avec et pour* les femmes et artistes autochtones impliquées — la gouvernance créative et les données sensibles restent sous leur autorité. Une question qui touche la façon de nommer les personnes ou les nations peut dépasser l'équipe de recherche-création : la soumettre à la personne responsable des projets de réconciliation (cas du nom de nation au singulier, 6 oct).
+
+### 5.1 Structure d'un prompt Claude Code *(pratique consolidée, oct.)*
+
+- **Étape 0 — Audit en lecture seule**, avant toute correction : où vit le code, comment il fonctionne, ce qui en dépend. Claude.ai ne voit pas le dépôt ; les corrections décrivent donc le **comportement attendu**, et c'est l'audit qui trouve le code.
+- **Conditions d'arrêt explicites** : « si l'audit montre X, arrête-toi et propose ». Un arrêt de Claude Code faute de contexte est un bon signe, pas un échec.
+- **Toujours envoyer un prompt complet.** Un bloc de remplacement envoyé seul (sans le prompt d'origine) laisse Claude Code sans contexte (leçon du 6 oct).
+- **Creuser la vraie cause** plutôt que patcher le symptôme localement : la cause est souvent en amont, dans une fonction partagée.
+- **Niveau de vérification choisi selon le risque** *(5 oct)* :
+  - vert (rapide) : lignes modifiées et erreurs console ; Isabel teste à l'œil ;
+  - orange : en plus, deux ou trois vérifications ciblées, sans captures ;
+  - rouge (structure) : cas limites, non-régression, tests poussés.
+  
+  Ligne type pour le vert et l'orange : « Vérifications légères : ne pas écrire de suite de tests automatisés ni de captures. Isabel teste visuellement. » Sans elle, Claude Code construit des environnements de test complets à chaque tâche, ce qui coûte beaucoup de tokens.
+- **Site en ligne** : ajouter « tester en local uniquement, aucun push ».
+
+### 5.2 Planification
+
+Calibrage observé sur la semaine « Version finale » (6 oct) : budget de Claude ~13,9 h, réel 8,5 h, en absorbant au moins 7 tâches imprévues. Pour le prochain projet : diviser les budgets de Claude par 2 pour le travail prévu, garder une marge explicite pour l'imprévu (environ la moitié du travail réel), et classer les tâches par risque (vert/orange/rouge) plutôt que par durée. Les budgets restent un outil de planification, jamais une valeur pour la colonne « Effort ».
 
 ---
 
-## 6 — Méthodologie de validation (vertical slice)
+## 6 — Méthodologie de validation
 
-Découper un vertical slice risqué en **tranches isolées** plutôt qu'une seule grosse validation d'un coup — si quelque chose casse, on sait quelle variable est en cause plutôt que de devoir tout re-décortiquer. Exemple du 19 août : Tranche A (mécanique timeline/registry/i18n sur un step) validée avant Tranche B (navigation inter-parties).
+**Vertical slice** : découper une validation risquée en **tranches isolées** — si quelque chose casse, on sait quelle variable est en cause. Exemple du 19 août : Tranche A (mécanique timeline/registry/i18n sur un step) validée avant Tranche B (navigation inter-parties).
+
+**Toujours tester, pour tout step touché** :
+- un vrai cycle show→hide→show, en avançant et en reculant (jamais seulement un chargement frais, §3.1) ;
+- un changement de langue en plein step (§3.5) ;
+- `prefers-reduced-motion`.
+
+**Données peu nombreuses et denses** *(24 sept)* : un mécanisme testé avec 221 données synthétiques peut cacher un défaut qui n'apparaît qu'avec quelques vraies données groupées dans le même secteur (`rayonCollision`). Tester explicitement ce cas.
+
+**Rechargement forcé avant tout diagnostic** (Ctrl+Maj+R) : un « bug » visible peut n'être qu'un ancien CSS en cache (§9).
 
 ---
 
@@ -230,125 +306,140 @@ Découper un vertical slice risqué en **tranches isolées** plutôt qu'une seul
 
 Méthode utilisée pour `lune.svg` (extrait de `step10_lune_etoile.svg`) :
 
-1. Vérifier qu'aucune dépendance externe n'existe (`<style>`, `<defs>` partagés) — chaque `path` doit porter son propre style en ligne pour que l'extraction soit sûre à 100%.
-2. Calculer la vraie boîte englobante du contenu avec `svgpathtools` (Python) plutôt que de deviner à partir du fichier brut — un recadrage à l'œil risque de couper un détail.
-3. Ajouter une marge de sécurité (~15%) si une partie des paths n'a pas pu être mesurée par l'outil.
+1. Vérifier qu'aucune dépendance externe n'existe (`<style>`, `<defs>` partagés) — chaque `path` doit porter son propre style en ligne.
+2. Calculer la vraie boîte englobante du contenu avec `svgpathtools` (Python) plutôt que de deviner.
+3. Ajouter une marge de sécurité (~15%) si une partie des paths n'a pas pu être mesurée.
 4. Envelopper le contenu extrait dans un nouveau `<g id="...">` nommé clairement, avec son propre `viewBox` recadré.
 
 ### 7.2 Vectorisation (Illustrator Image Trace vs Adobe Express) *(24 août)*
 
-Adobe Express "Convert to SVG" n'expose **aucun réglage** (pas de seuil, de nombre de couleurs, de lissage) — le seul levier disponible est l'image source elle-même. Pour préserver le détail d'un coup de pinceau scanné (plus pauvre en nuances de gris qu'une photo, qui elle captait la lumière directionnelle) : rajouter du grain/texture dans Photoshop (Bruit, Texturizer) avant de vectoriser, plutôt que de changer d'outil — garde la cohérence visuelle avec les assets déjà produits par le même pipeline.
+Adobe Express « Convert to SVG » n'expose **aucun réglage** — le seul levier disponible est l'image source elle-même. Pour préserver le détail d'un coup de pinceau scanné : rajouter du grain/texture dans Photoshop (Bruit, Texturizer) avant de vectoriser.
 
-Illustrator Image Trace reste le filet de sécurité si cette approche ne suffit pas : de vrais curseurs (Seuil, Bruit, Tracés), avec le préréglage "Noir et Blanc" recommandé plutôt que "Photo" pour ce type d'illustration.
+Illustrator Image Trace reste le filet de sécurité : de vrais curseurs (Seuil, Bruit, Tracés), avec le préréglage « Noir et Blanc » plutôt que « Photo » pour ce type d'illustration.
 
 ### 7.3 Méthode complète — de la réception d'un dessin de Déline à son intégration *(25 août, leçon S3B1T1)*
 
-**Étape 0 — Décider ce qui doit être animé individuellement.** Pour chaque élément du dessin, une seule question : est-ce que ce morceau doit bouger **indépendamment** à l'écran (ex: les perles d'un collier, un personnage isolé) ? Si oui → vecteur (étape 1a). Si l'élément bouge toujours **comme un seul bloc** (fond de territoire, spirale, grandes surfaces texturées) → raster (étape 1b). Les deux cohabitent dans un même fichier final sans problème.
+**Étape 0 — Décider ce qui doit être animé individuellement.** Est-ce que ce morceau doit bouger **indépendamment** à l'écran ? Si oui → vecteur (étape 1a). S'il bouge toujours **comme un seul bloc** → raster (étape 1b).
 
-**Étape 1a — Élément à animer individuellement → vectoriser.** Tracé à la main dans Illustrator (ou Image Trace, §7.2), en nommant chaque calque selon la convention `[zone]-[élément]-[variante]` (§2.3) — ce nom devient l'`id` que le code ira chercher.
+**Étape 1a — Élément à animer individuellement → vectoriser.** Tracé dans Illustrator (ou Image Trace, §7.2), en nommant chaque calque selon la convention `[zone]-[élément]-[variante]` (§2.3).
 
 **Étape 1b — Élément qui bouge comme un bloc → traiter en raster.**
-1. Dans Photoshop, après détourage du fond : **Image > Taille de l'image**, largeur cible **~2000-2500 px** (jamais la pleine résolution de scan/impression — inutile à l'écran, juste plus lourd), rééchantillonnage **"Bicubique plus net (réduction)"**.
-2. Vérifier les bords pour une frange sombre/blanche résiduelle (**Calque > Matriçage > Supprimer la frange**) avant d'exporter.
-3. **Fichier > Exporter > Exporter sous** → **PNG-24** (jamais PNG-8, qui écrase les nuances de gris du grain de pinceau), transparence cochée.
-4. Convertir ensuite en **WebP** pour un gain supplémentaire (~70% de moins que le PNG, sans perte visible) — même redimensionné, un PNG reste plus lourd que nécessaire.
+1. Dans Photoshop, après détourage du fond : **Image > Taille de l'image**, largeur cible **~2000-2500 px**, rééchantillonnage **« Bicubique plus net (réduction) »**.
+2. Vérifier les bords pour une frange résiduelle (**Calque > Matriçage > Supprimer la frange**).
+3. **Fichier > Exporter > Exporter sous** → **PNG-24** (jamais PNG-8), transparence cochée.
+4. Convertir en **WebP** (~70% de moins que le PNG, sans perte visible).
 
-**Étape 2 — Assembler dans Illustrator.** Importer les PNG/WebP allégés en fond transparent à côté des éléments vectorisés, chacun dans un calque nommé.
+**Étape 2 — Assembler dans Illustrator.** Importer les PNG/WebP allégés à côté des éléments vectorisés, chacun dans un calque nommé.
 
-**Étape 3 — Export SVG.** Options d'export : Stylisation **"Attributs de présentation"**, Police **"SVG"**, **Images : "Lier"** (jamais **"Conserver"** — ce réglage encode les images en base64 *dans* le SVG, à leur pleine résolution, et peut multiplier le poids par 10 ou plus — c'est la cause vérifiée d'un fichier passé de 32 Mo à 1,25 Mo une fois corrigé), ID objet **"Noms de calque"**, Responsive coché.
+**Étape 3 — Export SVG.** Stylisation **« Attributs de présentation »**, Police **« SVG »**, **Images : « Lier »** (jamais **« Conserver »** — encode les images en base64 dans le SVG, cause vérifiée d'un fichier passé de 32 Mo à 1,25 Mo une fois corrigé), ID objet **« Noms de calque »**, Responsive coché.
 
 **Étape 4 — Corriger les chemins dans VS Code.**
-- Ouvrir le `.svg` exporté en **éditeur de texte**, pas l'aperçu par défaut (clic droit → *Open With* → *Text Editor* — VS Code ouvre les `.svg` en aperçu image sinon).
-- Les `href` générés par Illustrator sont juste des noms de fichiers (`"territoire.png"`) — les réécrire en chemins relatifs à la **page qui charge le SVG** (via `loadSVG()`), pas à l'emplacement du fichier SVG lui-même : `./svg/[nomStep]/[fichier].webp`.
-- **Vérifier chaque ligne individuellement après un remplacement en série** — un copier-coller répété sur plusieurs éléments similaires (ex: 5 barres) peut laisser le même nom de fichier partout sans qu'on s'en aperçoive visuellement.
+- Ouvrir le `.svg` en **éditeur de texte** (clic droit → *Open With* → *Text Editor*).
+- Réécrire les `href` en chemins relatifs à la **page qui charge le SVG** (via `loadSVG()`), pas à l'emplacement du fichier SVG : `./svg/[nomStep]/[fichier].webp`.
+- **Vérifier chaque ligne individuellement après un remplacement en série.**
 
 **Étape 5 — Déposer les fichiers.** Le `.svg` corrigé et toutes les images qu'il référence, ensemble dans `scrolly/svg/[nomStep]/`.
 
-**Étape 6 — Vérifier avant de considérer que c'est fait.** Ni l'aperçu VS Code ni un navigateur ouvrant le `.svg` directement ne sont des tests valides (les chemins relatifs se résolvent différemment hors contexte). Le seul test fiable : charger via `loadSVG()` dans la vraie page (console du navigateur), onglet **Network** des DevTools, confirmer un code **200** sur chaque ressource — et **vider tout filtre de recherche actif** dans ce panneau avant de conclure qu'une requête manque.
+**Étape 6 — Vérifier.** Ni l'aperçu VS Code ni un navigateur ouvrant le `.svg` directement ne sont des tests valides. Le seul test fiable : la vraie page, onglet **Network** des DevTools, code **200** sur chaque ressource — et **vider tout filtre de recherche actif** avant de conclure qu'une requête manque.
+
+### 7.4 Verrouiller le plan de travail à l'export *(24 septembre 2026, `valeurs.svg`)*
+
+Par défaut, l'export SVG d'Illustrator calcule le `viewBox` à partir de la boîte englobante du **contenu visible** — pas des dimensions du plan de travail, sauf si « Utiliser les plans de travail » est coché ET que le plan de travail a des dimensions intentionnelles.
+
+Symptôme si cette étape est oubliée : retoucher un seul calque fait bouger le `viewBox` global, ce qui décale **tous les autres calques** (constaté : décalage uniforme de +114,78 sur 10 éléments non modifiés).
+
+**Geste préventif** : avant tout réexport, fixer les dimensions du plan de travail (Objet > Plan de travail > Options), PUIS cocher « Utiliser les plans de travail » (Fichier > Exporter > Exporter sous). Pour agrandir un plan de travail (ex. ajouter « Reconnectons à nos valeurs » à droite du rail), l'agrandir **à droite seulement**, puis ajuster le `viewBox` à la main si nécessaire : l'origine des coordonnées ne bouge pas.
+
+**Geste correctif** : comparer avec `git diff` au commit précédent pour isoler ce qui a changé, avant de décider si c'est voulu.
+
+**Noms de calques dupliqués** : si deux calques portent le même nom, Illustrator ajoute un suffixe (`-2`) à l'export, et un id peut finir sur le mauvais élément (cas vie/bienveillance, « Reconnectons »). Après chaque export, vérifier chaque id contre son `href` et contre les données (`valeurs.json`).
+
+### 7.5 Pipeline de couleur Procreate → web *(24 septembre 2026)*
+
+Procreate dessine par défaut en **Display P3**, une gamme plus large que **sRGB**, le seul espace que le web comprend nativement. À l'ouverture dans Photoshop (« Non-concordance des profils incorporés ») :
+- **« Supprimer le profil incorporé »** : les chiffres RGB bruts sont réinterprétés en sRGB → couleur désaturée. **Cause la plus probable d'un résultat « pastel » inattendu.**
+- **« Convertir les couleurs du document selon l'espace de travail »** : conversion contrôlée et prévisible.
+
+**Geste préventif retenu** : régler la toile Procreate en **sRGB IEC61966-2.1** avant de commencer à dessiner (Informations sur la toile > Profil de couleur). Une couleur prélevée à la pipette pour le code (ex. `couleur` de `valeurs.json`) doit aussi l'être en sRGB.
+
+### 7.6 Pipeline de production itérative d'un fichier SVG
+
+1. **Dessin** (Déline sur papier, ou Boris sur Procreate en sRGB, §7.5) — voir `docs/GUIDE_DELINE.md`.
+2. **Export vers Isabel** — PNG ou TIFF, jamais JPEG. Un fichier par élément si possible.
+3. **Préparation Photoshop** (raster) — détourage, redimensionnement (~2000-2500 px), export PNG-24 puis WebP. **Rogner aux pixels transparents** (Image > Rognage, « Pixels transparents ») : une marge non rognée gonfle la boîte englobante et fausse les calculs de recentrage. **Nuance (5 oct, logo Agora)** : avant de rogner, vérifier que l'espace vide ne fait pas partie de la composition (la lune isolée en haut à gauche du logo est voulue).
+4. **Assemblage Illustrator** — plan de travail aux dimensions cibles FIXÉES, calques nommés selon §2.3.
+5. **Export SVG** — **Fichier > Exporter > Exporter sous** (jamais « Enregistrer sous », cause probable des ids en `_x5F_`), « Utiliser les plans de travail » coché, Images « Lier ».
+6. **Correction des chemins dans VS Code** — §7.3. **Technique accélérée** : recherche-remplacement en expression régulière (Ctrl+H, icône `.*`) :
+   - Rechercher : `xlink:href="([a-zA-Z0-9_-]+\.(webp|png))"`
+   - Remplacer : `xlink:href="./svg/[nomStep]/$1"`
+   
+   *(Un script qui automatiserait cette étape et vérifierait l'existence des fichiers et les `href` en double est reporté au prochain projet, 5 oct.)*
+7. **Dépôt des fichiers** — `scrolly/svg/[nomStep]/` (ou dossier équivalent).
+8. **Vérification** — §7.3 Étape 6. Si le fichier remplace un calque existant, comparer le `viewBox` avant/après (`git diff`).
+
+**SVG chargé par `<img>` plutôt que par `loadSVG()`** *(~fin sept, landing)* : un SVG affiché par une balise `<img>` ne charge **aucun** fichier externe (ses `href` vers des `.webp` restent vides). Pour ce cas, produire une version autonome avec l'image embarquée en base64 (ex. `couple_plume_respect.svg`, 66 Ko). C'est la seule exception à la règle « Images : Lier ».
+
+### 7.7 Les éléments fondamentaux d'un script technique
+
+*Ce qu'un script de Déline (ou toute préparation de contenu SVG) devrait préciser avant qu'un fichier existe.*
+
+- **Quels éléments bougent individuellement vs en bloc** (§3.2) — à revalider pour chaque nouveau fichier.
+- **Quel texte reste éditorial/i18n vs quel texte est intégré au SVG.** Règle : tout texte narratif ou variable vit en overlay HTML/CSS avec `resolve()`. **Exception assumée** : un mot figé qui fait partie de l'illustration, par choix graphique (« ISHPENITAMUN / Respect » dans `couple_plume_respect.svg`) ; dans ce cas, prévoir un texte alternatif traduit, et vectoriser le texte (Créer les contours) pour ne pas dépendre de la police.
+- **Dimensions cibles du plan de travail, fixées explicitement** (§7.4), et documentées.
+- **Quels éléments seront probablement retouchés plus tard** — nom de calque stable et descriptif dès le départ.
+- **La couleur cible du dessin (Procreate) est-elle en sRGB ?** (§7.5).
+- **Les points d'ancrage** dont le code aura besoin (ex. où la plume se pose sur un bouton) : un guide dessiné vaut mieux qu'un calcul géométrique (§3.10).
 
 ---
-## 8 — Règles de rédaction
 
-### Voix rédactionnelle (repères tirés des fiches services d'Isabel, [date])
+## 8 — Accessibilité *(principes consolidés, 5-6 oct)*
+
+*Sensibilité EDIA (Registre, 24 août) : pas une conformité formelle visée, mais des décisions intégrées au fil de la construction.*
+
+- **Contraste calculé, pas présumé.** Quand un texte se pose sur une couleur venue des données (couleur de nation), choisir le noir ou le blanc par le ratio de contraste WCAG (luminance relative), avec une petite fonction nommée. Seuils : 4,5:1 pour le texte, 3:1 pour la bordure d'un élément d'interface (critère 1.4.11). Fournir un repli neutre si la couleur est absente ou invalide.
+- **Contenu au survol (WCAG 1.4.13).** Une infobulle doit pouvoir être survolée sans disparaître, rester affichée tant que le pointeur est sur l'élément ou sur elle, et se fermer avec Échap. Elle s'ancre à côté de l'élément (jamais en suivant le curseur), avec un court délai de fermeture (~300 ms). Au toucher, il n'y a pas de survol : premier toucher = afficher, bouton = agir (utiliser `pointerType` plutôt qu'une détection d'appareil). Cible tactile d'au moins 44 px.
+- **Avant de retirer un texte, vérifier s'il est la seule annonce pour les lecteurs d'écran** (`aria-live`, titre de scène). S'il ne l'est pas, le retirer du DOM plutôt que de le rendre transparent : un texte à `opacity: 0` reste lu par les lecteurs d'écran sur toutes les pages suivantes (cas du sous-titre « Spirale de la violence », 5 oct).
+- **Le nom accessible suit la langue.** Préférer `aria-labelledby` pointant vers un titre visible traduit à un `aria-label` figé dans une seule langue. Les `alt` passent par les mêmes données traduites que le texte.
+- **`prefers-reduced-motion`** pour toute animation, y compris les fondus entre les pages et les effets continus (§3.8).
+- **Écriture inclusive et lecteurs d'écran** : certains lecteurs d'écran prononcent le point médian (« né point e »). C'est un compromis accepté, à garder en tête.
+- Lot à traiter et audit formel : voir les points ouverts du Registre.
+
+---
+
+## 9 — Déploiement (GitHub Pages)
+
+- **Chemins** : le site est servi sous `icayer.github.io/FF2EplusADA/`, pas à la racine du domaine. Jamais de chemin absolu (`/shared/...`) ; utiliser `new URL(chemin, import.meta.url)` dans les modules JS.
+- **Cache** : GitHub Pages sert les fichiers avec `max-age=600`. `loadSVG()` ajoute `?v=Date.now()` aux SVG, mais pas aux CSS/JS : un mélange d'anciens CSS/JS et d'un SVG neuf donne des symptômes trompeurs. **Rechargement forcé (Ctrl+Maj+R) avant tout diagnostic**, en local comme en ligne. Des numéros de version sur les CSS/JS sont envisageables, en gardant le piège des modules partagés en tête (§1).
+- **Une fois le site en ligne** : chaque push est public dans les minutes qui suivent. Tester en local avant de pousser, et vérifier qu'aucun drapeau de débogage (`DEBUG_...`) n'est resté à `true`.
+
+---
+
+## 10 — Règles de rédaction
+
+### 10.1 Voix rédactionnelle (repères tirés des fiches services d'Isabel)
 - Jamais de tiret cadratin (—) comme procédé stylistique/rythmique
 - Cadence naturelle des phrases, pas de fragments poétiques en cascade
 - Images ancrées dans le concret et le spécifique, pas l'abstrait générique
 - Ton chaleureux et direct, jamais grandiloquent
 - Clôture par une adresse directe, pas une formule solennelle
 
+### 10.2 Présenter une personne commémorée *(6 oct)*
+- **Une phrase factuelle en appositions** plutôt qu'une fiche sèche ou une voix prêtée : « Gladys, Anishinaabe de Kitigan Zibi, né·e en 1940 ». Elle situe la personne dans le temps et l'espace, et se dégrade naturellement quand une donnée manque (« Gladys, de Kitigan Zibi »).
+- **Jamais de première personne** au nom d'une personne disparue ou assassinée : c'est lui prêter une voix sans son accord, et les protocoles sur la façon d'évoquer les personnes décédées varient d'une nation à l'autre.
+- **Aucun temps de verbe qui présume la mort** : certaines personnes sont disparues, et leur famille n'a peut-être pas accepté ou confirmé un décès.
+- **« né·e en » devant toute année**, pour qu'on ne la lise jamais comme une année de décès.
+- **Le nom de nation pour une personne** passe par les données (`nomPersonne`), jamais en dur dans le code : sa forme (accord, écriture inclusive, forme invariable) relève d'une décision de gouvernance.
+- **Nommer la personne qui raconte** (`redigePar`) reconnaît la mémoire portée par la communauté ; s'assurer de son accord pour être nommée à l'endroit choisi.
+- **Une invitation sans verbe de geste** (« Lire le témoignage → » plutôt que « Cliquez sur l'étoile ») : elle vaut pour la souris, le toucher et le clavier.
+
+---
+
 ## Journal des versions du Playbook
 
 | Version | Date | Ajouts |
 |---|---|---|
 | v0.1 | 19 août 2026 | Création initiale — conventions établies durant le Sprint 1 (arborescence, i18n, steps registry, scoping SVG, symétrie show/hide) |
-| v0.2 | 24 août 2026 | Transitions toujours manuelles (jamais automatiques) ; nommage des nouveaux fichiers JS v2 (descriptif, scopé, pas de numérotation globale) ; nommage explicite des champs de données synthétiques ; centrage/mise à l'échelle SVG toujours mesuré (getScreenCTM), jamais présumé ; convention de z-index face à `loadSVG()` ; méthode d'extraction d'un calque en asset autonome ; notes de vectorisation (Illustrator vs Adobe Express) |
-| v0.3 | 25 août 2026 | Méthode complète de préparation d'un dessin de Déline (raster vs vecteur, Photoshop, export Illustrator "Lier" pas "Conserver", conversion WebP, correction des chemins, vérification par Network/DevTools) — voir aussi `docs/GUIDE_DELINE.md` pour les recommandations en amont destinées à Déline |
-
-# Ajouts au Playbook — semaine du 10 au 24 septembre 2026
-
-*À fusionner dans `docs/PLAYBOOK.md`. Inclut les deux nouvelles sections qu'Isabel avait proposées (7 sept.) et mises de côté "pour dans quelques jours" — assez de matière s'est accumulée depuis pour les remplir. Les autres ajouts complètent des sections déjà existantes.*
-
----
-
-## Nouvelle section — Les éléments fondamentaux d'un script technique
-
-*Ce qu'un script de Déline (ou toute préparation de contenu SVG) devrait préciser avant qu'un fichier existe — pour que l'intégration ne redécouvre pas ces questions à chaque fois.*
-
-Avant de commencer à intégrer un nouveau step ou une nouvelle scène, confirmer explicitement :
-
-- **Quels éléments bougent individuellement vs en bloc** (déjà couvert au §3.2, "un groupe = une intention d'animation" — à revalider pour chaque nouveau fichier, pas présumé stable d'un asset à l'autre).
-- **Quel texte reste éditorial/i18n vs quel texte est baked-in au SVG.** Convention déjà établie : tout texte narratif ou de contenu variable (témoignages, titres de step, mots de valeurs) vit en overlay HTML/CSS avec `resolve()`, jamais dans le fichier SVG — le SVG ne porte que des éléments graphiques stables. Leçon du step D (Ishpenitamun/Respect, 21 sept.) : quand une exception à cette règle existe, la retrouver et la fusionner au système générique dès qu'on la croise, plutôt que la laisser vivre en parallèle.
-- **Dimensions cibles du plan de travail, fixées explicitement** — jamais laissées au préréglage par défaut d'Illustrator (voir §7.4, leçon `valeurs.svg`/`swirl9`). Documenter la dimension choisie quelque part (commentaire dans le fichier, ou ici même) pour qu'un futur réexport sache quoi restaurer.
-- **Quels éléments seront probablement retouchés plus tard** (asset définitif vs prototype rapide) — un élément appelé à changer souvent mérite un nom de calque stable et descriptif dès le départ (§2.3), pour que son remplacement futur ne force pas un renommage en cascade.
-- **La couleur cible du dessin (Procreate) est-elle en sRGB ?** Voir §7.5 — à vérifier à la source, avant même que le dessin commence, pas après réception.
-
-## Nouvelle section — Pipeline de production itérative d'un fichier SVG
-
-*Le cycle complet, du dessin à la vérification en navigateur, pour qu'il soit documenté une fois plutôt que redécouvert à chaque nouvel asset.*
-
-1. **Dessin** (Déline sur papier, ou Boris sur Procreate) — voir `docs/GUIDE_DELINE.md` pour les recommandations non-techniques (résolution, format, fond). Pour Procreate spécifiquement : profil de couleur de la toile réglé à sRGB IEC61966-2.1 avant de commencer (§7.5) — évite une désaturation surprise à l'intégration.
-2. **Export vers Isabel** — PNG ou TIFF, jamais JPEG (perte de transparence et de nuances). Un fichier par élément si possible.
-3. **Préparation Photoshop** (raster) — détourage, redimensionnement (~2000-2500px), export PNG-24 puis conversion WebP. **Rogner aux pixels transparents avant l'export** (Image > Rogner, référence "Pixels transparents") — une marge transparente non rognée gonfle artificiellement la boîte englobante de l'élément une fois importé dans Illustrator, ce qui peut fausser tout calcul de recentrage/mise à l'échelle basé sur `getBBox()` côté code (leçon `swirl9`, 24 sept.).
-4. **Assemblage Illustrator** — plan de travail aux dimensions cibles FIXÉES à l'avance (jamais un préréglage par défaut comme "Google pixel/Pixel 2"), calques nommés selon la convention `[zone]-[élément]-[variante]` (§2.3).
-5. **Export SVG** — **Fichier > Exporter > Exporter sous** (jamais "Enregistrer sous" — cause probable de l'échappement d'ID en `_x5F_`, confirmé empiriquement le 24 sept.). Dans la boîte de dialogue d'export : cocher **"Utiliser les plans de travail"** (verrouille le `viewBox` sur les dimensions du plan de travail plutôt que sur la boîte englobante du contenu — évite une dérive silencieuse à chaque réexport, §7.4). Dans "Options SVG" : Stylisation "Attributs de présentation", Images "Lier" (jamais "Conserver" — §7.3 déjà établi).
-6. **Correction des chemins dans VS Code** — déjà établi au §7.3 (chemins relatifs à la page, pas au fichier SVG). **Technique accélérée** : plutôt qu'une correction manuelle fichier par fichier, utiliser la recherche-remplacement en mode expression régulière de VS Code (Ctrl+H, icône `.*`) :
-   - Rechercher : `xlink:href="([a-zA-Z0-9_-]+\.(webp|png))"`
-   - Remplacer : `xlink:href="./svg/[nomStep]/$1"`
-
-   Un seul geste recolle tous les `href` d'un fichier réexporté, peu importe combien il y en a — plus fiable qu'une répétition manuelle (§7.3 met déjà en garde contre le copier-coller répété qui peut laisser une erreur invisible).
-7. **Dépôt des fichiers** — `scrolly/svg/[nomStep]/` (ou dossier équivalent selon la partie).
-8. **Vérification** — déjà établi au §7.3 Étape 6 (onglet Network, code 200, filtre vidé). **Ajout** : si le fichier remplace un calque existant plutôt que d'être un tout nouvel asset, comparer le `viewBox` avant/après (`git diff` sur la balise `<svg>` racine) — un changement inattendu de dimensions ou de décalage sur des calques non touchés est le signe d'un plan de travail non verrouillé à l'export (§7.4).
-
-## §7.4 (nouveau) — Verrouiller le plan de travail à l'export
-
-*Prolonge §7.3 — leçon du 24 septembre 2026, fichier `valeurs.svg`.*
-
-Par défaut, l'export SVG d'Illustrator calcule le `viewBox` à partir de la boîte englobante réelle de **tout le contenu visible du document** — pas des dimensions déclarées du plan de travail, sauf si l'option "Utiliser les plans de travail" est cochée à l'export ET que le plan de travail lui-même a des dimensions intentionnelles (pas un préréglage par défaut sans rapport avec le contenu).
-
-Symptôme si cette étape est oubliée : remplacer ou retoucher un seul calque peut faire grossir ou rétrécir le `viewBox` global, ce qui décale l'origine des coordonnées de **tous les autres calques** — même ceux jamais touchés intentionnellement. Le symptôme visuel typique (constaté sur `valeurs.svg`) : la composition semble "trop grande" ou "coupée" une fois affichée dans la page, alors que le code qui la met à l'échelle (`getBoundingClientRect()`, `getBBox()`) n'a pourtant pas changé — parce qu'il mesure fidèlement un fichier dont le cadrage de référence, lui, a bougé.
-
-**Geste préventif** : avant tout réexport d'un fichier existant, fixer explicitement les dimensions du plan de travail (Objet > Plan de travail > Options, ou double-clic sur l'outil Plan de travail) aux dimensions cibles connues du projet, PUIS cocher "Utiliser les plans de travail" dans la boîte de dialogue d'export SVG (Fichier > Exporter > Exporter sous).
-
-**Geste correctif si le viewBox a déjà dérivé** : comparer le fichier via `git diff` au commit précédent pour isoler précisément ce qui a changé (viewBox, décalages uniformes sur les autres calques) avant de décider si c'est une intention artistique ou un effet de bord à corriger — ne jamais présumer.
-
-**Rappel d'hygiène (leçon plus large, à part le viewBox)** : rogner tout asset raster aux pixels transparents (Photoshop, Image > Rogner) avant son export en WebP — une marge transparente non rognée gonfle la boîte englobante de l'élément une fois importé, avec le même genre de conséquence sur les calculs de recentrage basés sur `getBBox()`.
-
-## §7.5 (nouveau) — Pipeline de couleur Procreate → web
-
-*Leçon du 24 septembre 2026 — swirls de Boris "trop pastel" une fois intégrés.*
-
-Procreate dessine par défaut dans l'espace de couleur **Display P3** — une gamme plus large que **sRGB**, le seul espace que le web (et donc le SVG final) comprend nativement. Un rouge ou un vert très saturé dessiné en P3 n'a parfois tout simplement pas d'équivalent aussi vif en sRGB.
-
-Le problème n'est pas la différence de gamme en soi, mais la façon dont elle est gérée au moment de l'ouverture du fichier dans Photoshop (boîte de dialogue "Non-concordance des profils incorporés") :
-- **"Supprimer le profil incorporé (pas de gestion des couleurs)"** — garde les mêmes chiffres RGB bruts mais leur retire leur étiquette P3 ; réinterprétés sous les primaires plus ternes de sRGB, ces mêmes chiffres produisent une couleur visiblement désaturée. **Cause la plus probable d'un résultat "pastel" inattendu.**
-- **"Convertir les couleurs du document selon l'espace de travail"** — recalcule chaque pixel pour la couleur la plus proche possible en sRGB. Une perte de saturation reste possible pour les couleurs hors gamme, mais contrôlée et prévisible, pas un effondrement.
-
-**Geste préventif retenu pour ce projet** : régler le profil de couleur de la toile Procreate à **sRGB IEC61966-2.1** directement à la source (Informations sur la toile > Profil de couleur, dans Procreate), avant même de commencer à dessiner. L'artiste voit alors, en dessinant, la vraie plage de couleurs qui sera effectivement disponible sur le site — élimine le problème plutôt que de le corriger après coup.
-
-## §2.6 — Complément : champs de données réels vs synthétiques (mise à jour)
-
-Rappel du principe déjà établi : toute donnée générée/approximative porte un nom qui le dit clairement (`decennieNaissanceApprox` vs `portrait.dateNaissance`). Précision ajoutée le 24 septembre : quand une vraie donnée remplace un placeholder (ex. les 10 premières étoiles-témoignage), **auditer systématiquement les champs dérivés** qui dépendaient de l'ancienne valeur synthétique avant de considérer l'intégration terminée — dans ce cas précis, `decennieNaissanceApprox` devait être recalculé à partir de la vraie `dateNaissance`, et une dépendance oubliée (`ORDRE_DECENNIES` ne couvrant pas les décennies antérieures à 1950) est restée invisible tant qu'aucune vraie donnée ne l'avait mise à l'épreuve.
-
-## §3.5 — Complément : un mécanisme jamais mis à l'épreuve par la faible densité de données réelles
-
-Prolonge la leçon `goToStep()` déjà documentée. Deuxième instance trouvée le 24 septembre : le paramètre `rayonCollision` de `calculerDisposition()` (`univers/js/constellations.js`) avait une valeur par défaut sous-dimensionnée, invisible tant qu'une seule vraie étoile-témoignage existait — deux vraies étoiles ne pouvaient statistiquement jamais entrer en collision avec un échantillon de un. Le passage à 10 vraies étoiles l'a exposé immédiatement. **Leçon générale** : un mécanisme conçu et testé avec des données synthétiques abondantes (221 placeholders) peut cacher un défaut qui ne se révèle qu'avec un petit nombre de vraies données concentrées dans le même secteur — tester explicitement le cas "peu de vraies données, densément groupées" plutôt que présumer que "ça marchait avec 221" suffit.
+| v0.2 | 24 août 2026 | Transitions toujours manuelles ; nommage des nouveaux fichiers JS v2 ; nommage explicite des données synthétiques ; centrage SVG toujours mesuré ; convention de z-index ; extraction d'un calque ; notes de vectorisation |
+| v0.3 | 25 août 2026 | Méthode complète de préparation d'un dessin de Déline — voir aussi `docs/GUIDE_DELINE.md` |
+| v0.4 | 24 sept 2026 | Verrouillage du plan de travail (§7.4) ; pipeline couleur Procreate (§7.5) ; pipeline itératif (§7.6) ; éléments fondamentaux d'un script technique (§7.7) ; compléments données synthétiques et données denses |
+| v0.5 | 6 oct 2026 | Fusion des ajouts de septembre dans la numérotation ; leçons du résumé d'octobre (SVG atomique, `opacity` et clics, `getBBox`, noms de calques dupliqués, SVG par `<img>`, guides dessinés, cache et chemins GitHub Pages) ; navigation entre pages (fondu natif, mémoire `sessionStorage`) ; gabarits i18n ; réglages de gouvernance dans les données ; `data-page` ; données retirées à la source ; échappement HTML ; timelines GSAP par labels ; effets continus ; structure des prompts et niveaux de vérification ; calibrage de planification ; nouvelles sections Accessibilité (§8), Déploiement (§9) et présentation d'une personne commémorée (§10.2) |

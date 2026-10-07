@@ -1,6 +1,6 @@
 {
   "mot-colonisation":             { "svg": "Colonisation-VI",                     "minuteur": "aucun",        "fr": "Colonisation",                    "en": "Colonization" },
-  "mot-nuit-des-temps-1":         { "svg": "Depuis_la_nuit_des_temps-S1",         "minuteur": "chaque-step",  "fr": "Depuis la nuit des temps",        "en": "Since time immemorial" },
+  "mot-nuit-des-temps-1":         { "svg": "Depuis_la_nuit_des_temps-S1",         "minuteur": "chaque-step",  "uneLigne": true, "fr": "Depuis la nuit des temps",        "en": "Since time immemorial" },
   "mot-ensemble-1":               { "svg": "Ensemble-S2",                         "minuteur": "chaque-step",  "fr": "Ensemble",                        "en": "Together" },
   "mot-territoire-1":             { "svg": "Le_territoire-S3",                    "minuteur": "chaque-step",  "fr": "Le territoire",                   "en": "The land" },
   "mot-valeurs-unissaient-1":     { "svg": "Les_valeurs_qui_nous_unissaient-S4",  "minuteur": "chaque-step",  "fr": "Les valeurs qui nous unissaient", "en": "The values that united us" },

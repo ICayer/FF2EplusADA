@@ -23,6 +23,14 @@
 //                    étoile, une vie" : continu S9 → S10, puis minuteur
 //                    à l'arrivée sur S10)
 //   "aucun"        → affiché en continu sur toute sa plage
+// Champ OPTIONNEL "uneLigne" (booléen) de motsSteps.json — à true, le mot
+// ne passe jamais à la ligne (white-space: nowrap, classe
+// .mot-step--une-ligne) : la boîte s'élargit pour contenir le texte, du
+// côté opposé à l'ancrage (même règle que l'élargissement à 2 lignes), en
+// FR comme en EN. Absent ou false : règle habituelle, 2 lignes au plus.
+// Exemple : "mot-nuit-des-temps-1": { ..., "uneLigne": true, ... }
+// (demande de Déline, 7 octobre 2026). Réglage dans les données,
+// réutilisable pour un autre mot sans toucher au code.
 // Numéro de step N → étape de parcours.json : fourni par l'appelant
 // (railParcours.js, qui détient la table perle→étape) — jamais dupliqué ici.
 //
@@ -67,7 +75,9 @@ const PAS_ELARGISSEMENT_PX = 8;
 const DUREE_FONDU_MS = 400; // doit correspondre à .mot-step (railParcours.css)
 // Durée d'affichage avant disparition (champ "minuteur") — point de
 // départ, Isabel ajustera à l'œil.
-const DUREE_AFFICHAGE_MOT_MS = 6000; // milieu de la plage 5-7 s demandée
+// Exportée : le fondu de la spirale du step 1 (avantColonisation.js) en
+// dérive sa durée — si l'une change, l'autre suit.
+export const DUREE_AFFICHAGE_MOT_MS = 6000; // milieu de la plage 5-7 s demandée
 const MINUTEURS_VALIDES = new Set(["chaque-step", "dernier-step", "aucun"]);
 
 let railEl = null;
@@ -265,14 +275,25 @@ function positionnerMot(mot) {
   // Largeur de départ = largeur du guide ; hauteur minimale = hauteur du
   // guide (le texte y est centré verticalement, 1 ou 2 lignes, en CSS).
   let largeur = rBoite.width;
-  el.style.width = `${largeur}px`;
   el.style.minHeight = `${rBoite.height}px`;
 
-  // Jamais plus de 2 lignes : élargir jusqu'à ce que le texte réel
-  // (langue active + taille A-/A/A+) tienne — borné à la largeur du rail.
-  while (nombreLignes(texteEl) > LIGNES_MAX && largeur < rRail.width) {
-    largeur += PAS_ELARGISSEMENT_PX;
+  if (entree.uneLigne === true) {
+    // Une seule ligne (champ "uneLigne", voir l'en-tête) : largeur = la
+    // plus grande entre le guide et le texte réel non coupé (langue active
+    // + taille A-/A/A+). Pas de borne à la largeur du rail : le texte
+    // n'est jamais coupé.
+    el.classList.add("mot-step--une-ligne");
+    el.style.width = "max-content";
+    largeur = Math.max(rBoite.width, el.offsetWidth);
     el.style.width = `${largeur}px`;
+  } else {
+    el.style.width = `${largeur}px`;
+    // Jamais plus de 2 lignes : élargir jusqu'à ce que le texte réel
+    // (langue active + taille A-/A/A+) tienne — borné à la largeur du rail.
+    while (nombreLignes(texteEl) > LIGNES_MAX && largeur < rRail.width) {
+      largeur += PAS_ELARGISSEMENT_PX;
+      el.style.width = `${largeur}px`;
+    }
   }
 
   const largeurFinale = el.offsetWidth;

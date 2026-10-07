@@ -26,6 +26,20 @@
 import { loadSVG } from "../../../shared/js/utils.js";
 import { resolve, getLanguage } from "../../../shared/js/i18n.js";
 import { reduitMouvement } from "../../../shared/js/navigationEtat.js";
+import { DUREE_AFFICHAGE_MOT_MS } from "../../../shared/js/motsSteps.js";
+
+// Step A (nuit-des-temps) — demande de Déline (7 octobre 2026) : la spirale
+// apparaît en fondu doux et lent, EN MÊME TEMPS que le mot « Depuis la nuit
+// des temps » (même tick : allerEtAfficher() appelle show() puis
+// definirEtapeActive() → afficherMotsEtape()), et termine juste avant sa
+// disparition. Durée DÉRIVÉE de celle du mot (DUREE_AFFICHAGE_MOT_MS,
+// motsSteps.js) moins cette marge — jamais recopiée — avec un plancher.
+const MARGE_FIN_SPIRALE_S = 0.5;
+const DUREE_MIN_FONDU_SPIRALE_S = 5;
+const DUREE_FONDU_SPIRALE_S = Math.max(
+  DUREE_MIN_FONDU_SPIRALE_S,
+  DUREE_AFFICHAGE_MOT_MS / 1000 - MARGE_FIN_SPIRALE_S
+);
 
 // Step C (lien-territoire) — pause entre deux groupes de perles : perlesN+1
 // démarre ECART_GROUPES_PERLES_S secondes après la FIN de la vague de
@@ -549,14 +563,30 @@ export async function showNuitDesTemps() {
   if (!revele.spirale) {
     // revele.spirale n'est marqué vrai qu'à la fin RÉELLE du fondu (onComplete),
     // pas au moment où le tween est programmé — sinon un aller-retour rapide qui
-    // interrompt le délai +=3 (timelineActuelle.kill() du show suivant) marque la
+    // interrompt le fondu (timelineActuelle.kill() du show suivant) marque la
     // révélation comme faite alors que la spirale n'a jamais atteint opacity:1,
     // et plus rien ne la rattrape puisque hideNuitDesTemps() ne touche à rien.
-    timelineActuelle.to(spiraleEl, {
-      opacity: 1,
-      duration: 1.5,
-      onComplete: () => { revele.spirale = true; },
-    }, "+=3");
+    if (reduitMouvement()) {
+      // Mouvement réduit : comportement d'avant le 7 octobre conservé tel quel
+      // (fondu de 1,5 s après 3 s, easing GSAP par défaut).
+      timelineActuelle.to(spiraleEl, {
+        opacity: 1,
+        duration: 1.5,
+        onComplete: () => { revele.spirale = true; },
+      }, "+=3");
+    } else {
+      // Position 0 de timelineActuelle, créée au DÉBUT de show() (avant le
+      // chargement de scrolly.svg) : le fondu est calé sur l'apparition du
+      // mot S1, pas sur la fin du chargement — si le SVG met du temps à
+      // arriver, la spirale démarre déjà partiellement visible et finit
+      // quand même à l'heure prévue, juste avant la disparition du mot.
+      timelineActuelle.to(spiraleEl, {
+        opacity: 1,
+        duration: DUREE_FONDU_SPIRALE_S,
+        ease: "sine.inOut",
+        onComplete: () => { revele.spirale = true; },
+      }, 0);
+    }
   } else {
     gsap.set(spiraleEl, { opacity: 1 });
   }

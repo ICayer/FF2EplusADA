@@ -202,6 +202,13 @@
   opacity: 1;
 }
 
+/* Mot à une seule ligne (champ "uneLigne" de motsSteps.json, posé par
+   motsSteps.js) : jamais de retour à la ligne — la boîte s'élargit à la
+   place, du côté opposé à l'ancrage. */
+.mot-step--une-ligne {
+  white-space: nowrap;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .mot-step {
     transition: none;
