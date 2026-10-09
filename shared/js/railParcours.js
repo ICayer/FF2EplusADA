@@ -283,8 +283,39 @@ function creerSvgSuperpose(container) {
       height: `${rPrincipal.height}px`,
     });
   };
-  synchroniser();
-  window.addEventListener("resize", synchroniser);
+
+  // Centrage MESURÉ (9 octobre 2026) : le point où la bande de rupture
+  // croise la ligne du temps — centre rendu de #rupture_stripe, mesuré
+  // (getBoundingClientRect, Playbook §3.3) — est placé au centre horizontal
+  // de la fenêtre, en décalant le <svg> principal (translateX). Remplace le
+  // centrage qui dépendait du viewBox (« -90 0 1260 140 ») : le réexport du
+  // 7 octobre l'a remis à « 0 0 1260 140 » et décentré le rail. Une mesure
+  // survit aux réexports. Le <svg> superposé (bande, plume) est resynchronisé
+  // sur la boîte décalée ; les mots de la trame (motsSteps.js) et la plume
+  // mesurent déjà le rendu, donc suivent sans autre changement.
+  // Le décalage est cumulé (mesuré AVEC le décalage courant) : un recalcul
+  // dont rien n'a bougé donne un écart nul.
+  let decalageRail = 0;
+  const centrer = () => {
+    synchroniser();
+    const stripe = svgSuperpose.querySelector("#rupture_stripe");
+    if (!stripe) return; // déjà signalé plus haut (❌ introuvable)
+    const rStripe = stripe.getBoundingClientRect();
+    const centreFenetre = document.documentElement.clientWidth / 2; // sans la barre de défilement
+    decalageRail += centreFenetre - (rStripe.left + rStripe.width / 2);
+    svgPrincipal.style.transform = `translateX(${decalageRail}px)`;
+    synchroniser();
+  };
+  centrer();
+  window.addEventListener("resize", centrer);
+  // A-/A/A+ (headerControls.js) ne dispatche aucun événement : il réécrit
+  // seulement --echelle-texte dans le style de <html> — même observation
+  // que motsSteps.js. Le rail n'en dépend pas aujourd'hui (hauteur fixe),
+  // recalcul par précaution, sans effet si rien n'a bougé.
+  new MutationObserver(centrer).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["style"],
+  });
 }
 
 // Retire "actif" de toutes les perles/boutons du rail et l'ajoute à celui
@@ -335,7 +366,13 @@ const ETAPES_INDICE_CLIC = new Set([
 
 function majIndiceClic(id) {
   const indiceEl = document.querySelector(".rail-parcours [id='curseur_plume-indice-clic']");
-  if (!indiceEl) return;
+  if (!indiceEl) {
+    // Signalé, plus ignoré en silence : un réexport Illustrator de
+    // timeline.svg a déjà perdu cet id (commit 21fdd23, 7 octobre 2026) —
+    // la flèche restait alors visible sur toutes les étapes, sans erreur.
+    console.warn("⚠️ Rail SVG : #curseur_plume-indice-clic introuvable dans timeline.svg — l'indice de clic ne peut plus être masqué hors de S1/S2");
+    return;
+  }
   indiceEl.style.display = ETAPES_INDICE_CLIC.has(id) ? "" : "none";
 }
 

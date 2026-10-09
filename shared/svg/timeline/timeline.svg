@@ -198,7 +198,7 @@
         </g>
       </g>
     </g>
-    <path d="M222.79,84.29s20.78,9.74,40.26,1.95,25.97-19.48,25.97-19.48l-14.94,3.25,12.99,8.44" fill="none" stroke="#000" stroke-miterlimit="10"/>
+    <path id="curseur_plume-indice-clic" d="M222.79,84.29s20.78,9.74,40.26,1.95,25.97-19.48,25.97-19.48l-14.94,3.25,12.99,8.44" fill="none" stroke="#000" stroke-miterlimit="10"/>
   </g>
   <g id="mots_steps_scrolly">
     <g id="Visible-initiale">

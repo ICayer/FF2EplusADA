@@ -49,11 +49,14 @@
 }
 
 /* Le <svg> de timeline.svg, chargé directement dans .rail-parcours par
-   construireRailParcours() — hauteur native fixe (viewBox -90 0 1260 140 depuis le 1er octobre 2026 —
-   décalé de -90 pour garder la bande de rupture centrée),
-   largeur calculée par le navigateur selon ce ratio (jamais déformée),
-   centré. Fenêtre < 1080px non traitée ici, dépend de la décision "support
-   mobile" toujours en suspens (Registre, Sprint 6, S6B1T1). */
+   construireRailParcours() — hauteur native fixe, largeur calculée par le
+   navigateur selon le ratio du viewBox (jamais déformée), centré par
+   margin:auto PUIS décalé en JS (translateX, creerSvgSuperpose() dans
+   railParcours.js) pour que le croisement bande de rupture / ligne du temps
+   tombe au centre de la fenêtre — centrage MESURÉ depuis le 9 octobre 2026,
+   indépendant du viewBox (l'ancien décalage -90 du viewBox a disparu au
+   réexport du 7 octobre). Fenêtre < 1080px non traitée ici, dépend de la
+   décision "support mobile" toujours en suspens (Registre, Sprint 6, S6B1T1). */
 .rail-parcours svg {
   display: block;
   /* Même source que --h-rail-svg dans variables.css (composant de
@@ -107,10 +110,18 @@
   outline-offset: 2px;
 }
 
+/* Verrouillé : couleur PLEINE, opaque (9 octobre 2026, retour de Déline) —
+   l'ancien rendu (filter grayscale + opacity 0.55) laissait voir le fil du
+   rail au travers des perles et du cœur. Beige #f2ede2 = même beige que
+   les boutons (.bouton-passage, variables.css), choix d'Isabel. Seuls les
+   <circle> sont peints : perles, et fond du bouton valeurs ; le cœur blanc
+   (fill="#fff" dans le SVG) reste blanc. Le verrouillage lui-même et le
+   curseur ne changent pas. */
 .rail-parcours [data-etape-id].verrouille {
-  filter: grayscale(1) brightness(1.3);
-  opacity: 0.55;
   cursor: not-allowed;
+}
+.rail-parcours [data-etape-id].verrouille circle {
+  fill: #f2ede2;
 }
 
 /* Placeholder — traitement visuel de l'étape active sur une perle SVG,
@@ -125,6 +136,19 @@
    par ex.) — à revoir, aucune règle de Déline ne le prévoit encore. */
 .rail-parcours [data-etape-id].page-actuelle {
   filter: drop-shadow(0 0 2px var(--color-border));
+}
+
+/* Aucun contour sur aucune perle ni sur le bouton valeurs (décision
+   d'Isabel, 9 octobre 2026). Le « contour » visible sur les perles
+   verrouillées beiges venait du drop-shadow de .page-actuelle ci-dessus :
+   sur scrolly/, les perles 1 à 9 ont toutes .page-actuelle, pas la perle 10
+   (page univers) — d'où l'exception. Neutralise aussi le halo .actif et
+   tout stroke éventuel. Placée APRÈS .actif/.page-actuelle (même
+   spécificité : la dernière l'emporte). bouton_accueil garde ses filtres. */
+.rail-parcours [id^="perle_step"][data-etape-id],
+.rail-parcours [id="bouton_valeur"][data-etape-id] {
+  filter: none;
+  stroke: none;
 }
 
 /* Bulle "Pas encore débloqué" — positionnée par JS (afficherBulleVerrouillee,
