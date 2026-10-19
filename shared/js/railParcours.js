@@ -55,6 +55,24 @@ const DUREE_BULLE_MS = 1400;
 // ici contre 1,5-2s là-bas), pas la forme de la courbe.
 const DUREE_DEPLACEMENT_S = 0.35;
 
+// --- Trait de rupture (#rupture_stripe, trait de pastel de Déline) ---
+// Se trace de gauche à droite à l'arrivée sur "rupture-coloniale" (S5)
+// depuis S1-S4 — révélation par clip-path inset(), même technique que les
+// barres du step 5 (avantColonisation.js). Valeurs de départ, à ajuster à
+// l'œil par Isabel.
+const DUREE_TRACE_RUPTURE_S = 2.5;
+const EASE_TRACE_RUPTURE = "power1.inOut";
+// Effacement au recul vers S1-S4 : même durée que le fondu des mots
+// (DUREE_FONDU_MS = 400 dans motsSteps.js, .mot-step dans railParcours.css)
+// — le trait et « Colonisation » disparaissent ensemble.
+const DUREE_EFFACEMENT_RUPTURE_S = 0.4;
+const ETAPE_RUPTURE = "rupture-coloniale";
+// Point guide du mot « Colonisation » (trame poétique, timeline.svg), placé
+// par Isabel exactement au point de rupture — repère du centrage du rail.
+// Si le calque est renommé dans Illustrator, mettre cet id à jour (sinon :
+// avertissement console et repli sur le centre de #rupture_stripe).
+const ID_POINT_CENTRAGE_RAIL = "Colonisation-VI-point";
+
 // Chemin relatif à la PAGE (loadSVG() fait fetch(path) directement, pas de
 // new URL(..., import.meta.url)) — scrolly/, univers/ et valeurs/ sont à
 // la même profondeur depuis la racine, donc ce chemin fonctionne
@@ -181,6 +199,9 @@ export async function construireRailParcours(container, { pageCourante, onClicEt
   pageCouranteRail = pageCourante;
   const curseurPlumeEl = container.querySelector("#curseur_plume");
   if (curseurPlumeEl) curseurPlumeEl.style.visibility = "hidden";
+  // Trait de rupture caché jusqu'au premier definirEtapeActive() de la page
+  // (majTraitRupture() décide alors : caché, posé directement ou tracé).
+  cacherTraitRuptureSansAnimation();
 
   Object.entries(CORRESPONDANCE_PERLE_ETAPE).forEach(([idSVG, etapeId]) => {
     const cible = resultat.querySelector(`#${idSVG}`);
@@ -247,15 +268,17 @@ export async function construireRailParcours(container, { pageCourante, onClicEt
   );
 }
 
-// Ordre d'empilement voulu (1er octobre 2026) : perles < mots-clés de step
-// (.mot-step, HTML) < bande de rupture < plume. Un seul <svg> ne peut pas
-// passer en partie au-dessus et en partie au-dessous d'un <div> HTML :
-// #rupture_stripe puis #curseur_plume sont donc DÉPLACÉS (appendChild,
-// jamais cloneNode — pas d'id en double, rien à synchroniser) dans un 2e
-// <svg> au MÊME viewBox, superposé exactement au principal. Même viewBox +
-// même boîte à l'écran = même système de coordonnées : deplacerCurseurPlume()
-// fonctionne sans changement (getBBox() de perle_noire1 et des perles reste
-// comparable). L'ordre d'ajout peint la plume par-dessus la bande.
+// Ordre d'empilement voulu : trait de rupture < perles < mots-clés de step
+// (.mot-step, HTML) < plume. Depuis le 19 octobre 2026, #rupture_stripe
+// (nouveau trait de pastel de Déline) RESTE dans le <svg> principal, à sa
+// place d'origine SOUS les perles (comme dans Illustrator) — il n'est plus
+// déplacé. Seul #curseur_plume l'est encore : un seul <svg> ne peut pas
+// passer en partie au-dessus et en partie au-dessous d'un <div> HTML, la
+// plume est donc DÉPLACÉE (appendChild, jamais cloneNode — pas d'id en
+// double, rien à synchroniser) dans un 2e <svg> au MÊME viewBox, superposé
+// exactement au principal. Même viewBox + même boîte à l'écran = même
+// système de coordonnées : deplacerCurseurPlume() fonctionne sans
+// changement (getBBox() de perle_noire1 et des perles reste comparable).
 function creerSvgSuperpose(container) {
   const svgPrincipal = container.querySelector("svg");
   const svgSuperpose = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -263,11 +286,9 @@ function creerSvgSuperpose(container) {
   svgSuperpose.setAttribute("class", "rail-superpose");
   svgSuperpose.setAttribute("aria-hidden", "true");
 
-  ["rupture_stripe", "curseur_plume"].forEach((id) => {
-    const groupe = svgPrincipal.querySelector(`#${id}`);
-    if (groupe) svgSuperpose.appendChild(groupe);
-    else console.error(`❌ Rail SVG : #${id} introuvable — non déplacé vers le <svg> superposé`);
-  });
+  const groupePlume = svgPrincipal.querySelector("#curseur_plume");
+  if (groupePlume) svgSuperpose.appendChild(groupePlume);
+  else console.error("❌ Rail SVG : #curseur_plume introuvable — non déplacé vers le <svg> superposé");
   container.appendChild(svgSuperpose);
 
   // Boîte du <svg> superposé = boîte RÉELLE du principal, mesurée
@@ -284,25 +305,36 @@ function creerSvgSuperpose(container) {
     });
   };
 
-  // Centrage MESURÉ (9 octobre 2026) : le point où la bande de rupture
-  // croise la ligne du temps — centre rendu de #rupture_stripe, mesuré
-  // (getBoundingClientRect, Playbook §3.3) — est placé au centre horizontal
-  // de la fenêtre, en décalant le <svg> principal (translateX). Remplace le
-  // centrage qui dépendait du viewBox (« -90 0 1260 140 ») : le réexport du
-  // 7 octobre l'a remis à « 0 0 1260 140 » et décentré le rail. Une mesure
-  // survit aux réexports. Le <svg> superposé (bande, plume) est resynchronisé
-  // sur la boîte décalée ; les mots de la trame (motsSteps.js) et la plume
-  // mesurent déjà le rendu, donc suivent sans autre changement.
+  // Centrage MESURÉ (9 octobre 2026) : le point de rupture est placé au
+  // centre horizontal de la fenêtre, en décalant le <svg> principal
+  // (translateX). Depuis le 19 octobre, ce point est le centre rendu du
+  // point guide de « Colonisation » (ID_POINT_CENTRAGE_RAIL, placé par
+  // Isabel exactement au point de rupture ; masqué en visibility:hidden,
+  // donc toujours mesurable) — indépendant de la visibilité du trait, qui
+  // se trace et s'efface. Repli, avec avertissement, sur le centre rendu
+  // de #rupture_stripe si le point est introuvable. Mesure
+  // (getBoundingClientRect, Playbook §3.3) : survit aux réexports, au
+  // contraire d'un centrage qui dépend du viewBox. Le <svg> superposé
+  // (plume) est resynchronisé sur la boîte décalée ; les mots de la trame
+  // (motsSteps.js) et la plume mesurent déjà le rendu, donc suivent.
   // Le décalage est cumulé (mesuré AVEC le décalage courant) : un recalcul
   // dont rien n'a bougé donne un écart nul.
   let decalageRail = 0;
+  let repliSignale = false;
   const centrer = () => {
     synchroniser();
-    const stripe = svgSuperpose.querySelector("#rupture_stripe");
-    if (!stripe) return; // déjà signalé plus haut (❌ introuvable)
-    const rStripe = stripe.getBoundingClientRect();
+    let repere = svgPrincipal.querySelector(`[id="${ID_POINT_CENTRAGE_RAIL}"]`);
+    if (!repere) {
+      repere = svgPrincipal.querySelector("#rupture_stripe");
+      if (!repliSignale) {
+        console.warn(`⚠️ Rail SVG : point guide "${ID_POINT_CENTRAGE_RAIL}" introuvable — centrage sur #rupture_stripe (ancien calcul)`);
+        repliSignale = true;
+      }
+    }
+    if (!repere) return;
+    const rRepere = repere.getBoundingClientRect();
     const centreFenetre = document.documentElement.clientWidth / 2; // sans la barre de défilement
-    decalageRail += centreFenetre - (rStripe.left + rStripe.width / 2);
+    decalageRail += centreFenetre - (rRepere.left + rRepere.width / 2);
     svgPrincipal.style.transform = `translateX(${decalageRail}px)`;
     synchroniser();
   };
@@ -327,9 +359,96 @@ export function definirEtapeActive(id) {
   document.querySelectorAll(".rail-parcours [data-etape-id]").forEach((b) => {
     b.classList.toggle("actif", b.dataset.etapeId === id);
   });
+  const modeRupture = majTraitRupture(id);
   placerPlume(id);
   majIndiceClic(id);
-  afficherMotsEtape(id);
+  // modeRupture transmis aux mots : « Colonisation » (suitTraitRupture dans
+  // motsSteps.json) apparaît en fondu en même temps que le tracé, ou
+  // directement si le trait est posé sans animation.
+  afficherMotsEtape(id, { modeRupture });
+}
+
+// --- Trait de rupture : tracé / pose directe / effacement ---
+// Visible sur toute étape à partir de "rupture-coloniale" dans l'ordre de
+// parcours.json (S5 à S10, univers, valeurs) ; caché de S1 à S4.
+//   - arrivée sur S5 DEPUIS S1-S4 (même page, ou page de départ mémorisée)
+//     → "trace" : tracé de gauche à droite ;
+//   - toute autre arrivée sur une étape où il doit être visible (S6-S10,
+//     univers, valeurs, rechargement, sessionStorage, S5 depuis plus loin)
+//     → "direct" : déjà tracé, sans animation ;
+//   - recul vers S1-S4 alors qu'il est visible → "efface" : fondu de
+//     sortie ; le tracé se rejoue au prochain passage S4 → S5 ;
+//   - rien à changer (ex. languagechange sur la même étape) → null.
+// prefers-reduced-motion : jamais de tracé ni de fondu (pose/retrait direct).
+let etapeRuptureConnue = false; // false jusqu'au premier definirEtapeActive() de la page
+let etapePrecedenteRupture = null;
+let traitRuptureVisible = false;
+
+function indexParcours(id) {
+  return obtenirParcours().findIndex((e) => e.id === id);
+}
+
+function imageTraitRupture() {
+  return document.querySelector(".rail-parcours #rupture_stripe image");
+}
+
+// État de départ, posé à la construction du rail : trait caché (jamais
+// affiché avant la première décision de majTraitRupture()).
+function cacherTraitRuptureSansAnimation() {
+  const img = imageTraitRupture();
+  if (!img) {
+    console.warn("⚠️ Rail SVG : <image> de #rupture_stripe introuvable — trait de rupture non animé");
+    return;
+  }
+  gsap.set(img, { opacity: 0, clipPath: "inset(0% 100% 0% 0%)" });
+}
+
+function majTraitRupture(id) {
+  // Étape précédente : celle de cette page, ou au premier appel, l'étape
+  // de départ mémorisée par le rail sur la page précédente (même lecture
+  // unique que la plume, lireNavigationRail()).
+  let precedente = etapePrecedenteRupture;
+  if (!etapeRuptureConnue) {
+    const navigation = lireNavigationRail();
+    precedente = navigation && navigation.pageVisee === pageCouranteRail ? navigation.etapeDepart : null;
+    etapeRuptureConnue = true;
+  }
+  etapePrecedenteRupture = id;
+
+  const indexRupture = indexParcours(ETAPE_RUPTURE);
+  const doitEtreVisible = indexParcours(id) >= indexRupture;
+  const img = imageTraitRupture();
+  if (!img || doitEtreVisible === traitRuptureVisible) return null;
+  traitRuptureVisible = doitEtreVisible;
+  gsap.killTweensOf(img);
+
+  if (!doitEtreVisible) {
+    if (reduitMouvement()) {
+      gsap.set(img, { opacity: 0, clipPath: "inset(0% 100% 0% 0%)" });
+    } else {
+      gsap.to(img, {
+        opacity: 0,
+        duration: DUREE_EFFACEMENT_RUPTURE_S,
+        ease: "power1.out",
+        onComplete: () => gsap.set(img, { clipPath: "inset(0% 100% 0% 0%)" }),
+      });
+    }
+    return "efface";
+  }
+
+  const indexPrecedente = precedente ? indexParcours(precedente) : -1;
+  const tracer = id === ETAPE_RUPTURE && indexPrecedente >= 0 && indexPrecedente < indexRupture && !reduitMouvement();
+  if (!tracer) {
+    gsap.set(img, { opacity: 1, clipPath: "inset(0% 0% 0% 0%)" });
+    return "direct";
+  }
+  gsap.set(img, { opacity: 1, clipPath: "inset(0% 100% 0% 0%)" });
+  gsap.to(img, {
+    clipPath: "inset(0% 0% 0% 0%)",
+    duration: DUREE_TRACE_RUPTURE_S,
+    ease: EASE_TRACE_RUPTURE,
+  });
+  return "trace";
 }
 
 // Premier placement de la page : continuité depuis l'étape de départ
@@ -364,15 +483,39 @@ const ETAPES_INDICE_CLIC = new Set([
   CORRESPONDANCE_PERLE_ETAPE.perle_step2,
 ]);
 
-function majIndiceClic(id) {
-  const indiceEl = document.querySelector(".rail-parcours [id='curseur_plume-indice-clic']");
-  if (!indiceEl) {
-    // Signalé, plus ignoré en silence : un réexport Illustrator de
-    // timeline.svg a déjà perdu cet id (commit 21fdd23, 7 octobre 2026) —
-    // la flèche restait alors visible sur toutes les étapes, sans erreur.
-    console.warn("⚠️ Rail SVG : #curseur_plume-indice-clic introuvable dans timeline.svg — l'indice de clic ne peut plus être masqué hors de S1/S2");
-    return;
+// Trouve la flèche d'indice de clic PAR SA PLACE plutôt que par son id :
+// l'id "curseur_plume-indice-clic" se perd à chaque export depuis
+// Illustrator (déjà deux fois : 7 et 19 octobre 2026), et le fichier
+// Illustrator reste la source de vérité — on ne corrige pas le SVG exporté.
+//   1. #curseur_plume-indice-clic, si un futur export le rétablit ;
+//   2. sinon, l'enfant DIRECT de #curseur_plume qui ne contient pas #plume
+//      (aujourd'hui : un <g> sans id avec #plume et #perle, et le tracé de
+//      la flèche).
+// Condition pour que ça marche : dans le fichier Illustrator, la flèche
+// doit rester un enfant direct de curseur_plume, à côté du groupe de la
+// plume. Aucun candidat ou plusieurs : avertissement (une fois par page),
+// rien n'est masqué ni affiché.
+let indiceClicSignale = false;
+function trouverIndiceClic() {
+  const parId = document.querySelector(".rail-parcours [id='curseur_plume-indice-clic']");
+  if (parId) return parId;
+
+  const curseurPlumeEl = document.querySelector(".rail-parcours #curseur_plume");
+  const candidats = curseurPlumeEl
+    ? [...curseurPlumeEl.children].filter((enfant) => enfant.id !== "plume" && !enfant.querySelector("#plume"))
+    : [];
+  if (candidats.length === 1) return candidats[0];
+
+  if (!indiceClicSignale) {
+    console.warn(`⚠️ Rail SVG : flèche d'indice de clic introuvable dans #curseur_plume (${candidats.length} candidat(s)) — indice ni masqué ni affiché. Elle doit rester un enfant direct de curseur_plume dans Illustrator.`);
+    indiceClicSignale = true;
   }
+  return null;
+}
+
+function majIndiceClic(id) {
+  const indiceEl = trouverIndiceClic();
+  if (!indiceEl) return;
   indiceEl.style.display = ETAPES_INDICE_CLIC.has(id) ? "" : "none";
 }
 

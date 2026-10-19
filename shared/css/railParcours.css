@@ -68,9 +68,10 @@
 }
 
 /* <svg> superposé (creerSvgSuperpose(), railParcours.js) : reçoit
-   #rupture_stripe et #curseur_plume, déplacés du <svg> principal pour
-   passer AU-DESSUS des mots-clés de step. left/top/width/height posés en
-   JS (mesure réelle du <svg> principal) — l'emporte sur la hauteur/le
+   #curseur_plume, déplacé du <svg> principal pour passer AU-DESSUS des
+   mots-clés de step (#rupture_stripe, lui, reste dans le <svg> principal,
+   sous les perles, depuis le 19 octobre 2026). left/top/width/height posés
+   en JS (mesure réelle du <svg> principal) — l'emporte sur la hauteur/le
    centrage de la règle ci-dessus. Empilement : <svg> principal < .mot-step
    (1) < .rail-superpose (2) < .bulle-verrouillee (3). pointer-events:none :
    la perle sous la plume reste cliquable. */
@@ -78,6 +79,14 @@
   position: absolute;
   z-index: 2;
   margin: 0;
+  pointer-events: none;
+}
+
+/* Trait de rupture (trait de pastel de Déline) : sous les perles dans le
+   <svg> principal, tracé/effacé par railParcours.js (majTraitRupture,
+   clip-path + opacity). Jamais cliquable : les perles 5 à 9 qu'il
+   traverse restent seules à recevoir le clic. */
+.rail-parcours #rupture_stripe {
   pointer-events: none;
 }
 
@@ -112,8 +121,8 @@
 
 /* Verrouillé : couleur PLEINE, opaque (9 octobre 2026, retour de Déline) —
    l'ancien rendu (filter grayscale + opacity 0.55) laissait voir le fil du
-   rail au travers des perles et du cœur. Beige #f2ede2 = même beige que
-   les boutons (.bouton-passage, variables.css), choix d'Isabel. Seuls les
+   rail au travers des perles et du cœur. Noir #000000, choix d'Isabel
+   (après un essai en beige #f2ede2, couleur des boutons). Seuls les
    <circle> sont peints : perles, et fond du bouton valeurs ; le cœur blanc
    (fill="#fff" dans le SVG) reste blanc. Le verrouillage lui-même et le
    curseur ne changent pas. */
@@ -121,7 +130,7 @@
   cursor: not-allowed;
 }
 .rail-parcours [data-etape-id].verrouille circle {
-  fill: #f2ede2;
+  fill: #000000;
 }
 
 /* Placeholder — traitement visuel de l'étape active sur une perle SVG,
@@ -157,7 +166,7 @@
    autour de ce point calculé. */
 .bulle-verrouillee {
   position: absolute;
-  z-index: 3; /* au-dessus des mots-clés (.mot-step, 1) ET du <svg> superposé plume/rupture (2) */
+  z-index: 3; /* au-dessus des mots-clés (.mot-step, 1) ET du <svg> superposé de la plume (2) */
   transform: translateX(-50%);
   background: #222;
   color: #fff;
@@ -205,7 +214,7 @@
    rectangle-guide. Texte toujours centré verticalement (1 ou 2 lignes). */
 .mot-step {
   position: absolute;
-  z-index: 1; /* au-dessus du <svg> principal, sous le <svg> superposé plume/rupture (2) et la bulle (3) */
+  z-index: 1; /* au-dessus du <svg> principal, sous le <svg> superposé de la plume (2) et la bulle (3) */
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

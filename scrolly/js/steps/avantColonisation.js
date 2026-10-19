@@ -682,8 +682,13 @@ export async function showLienValeurs() {
   positionnerElementsRelatifsSpirale();
 
   // Contrairement à A/B/C, D bascule vraiment à chaque entrée/sortie —
-  // pas de garde "déjà révélé" ici, c'est voulu.
-  gsap.set(cercles, { opacity: 0 });
+  // pas de garde "déjà révélé" ici, c'est voulu. visibility rétablie ICI,
+  // AVANT le fondu d'entrée et au même niveau que hideLienValeurs() (les
+  // <image> de #cercles-valeurs, Playbook §3.1) : hide() les passe en
+  // visibility:hidden pour qu'ils ne soient ni survolables, ni cliquables,
+  // ni focalisables hors du step D (Playbook §3.6). Le fondu ci-dessous
+  // n'anime que l'opacité.
+  gsap.set(cercles, { opacity: 0, visibility: "visible" });
   // reduitMouvement() : apparition directe des 10 cercles, sans stagger
   // animé (même réflexe que la plume du rail, shared/js/railParcours.js) —
   // absent de l'ancien système (jamais vérifié ici avant cette tranche),
@@ -706,7 +711,15 @@ export async function showLienValeurs() {
 
 export function hideLienValeurs() {
   detruireGlows(); // killTweensOf, puis retrait — disparaît avec les spots
-  if (groupeCercles) gsap.set(groupeCercles.children, { opacity: 0 });
+  // autoAlpha:0 = opacity 0 ET visibility:hidden (bug du 19 octobre 2026 :
+  // à opacity 0 seule, les spots restaient survolables/focalisables au step
+  // E et ouvraient leur carte — Playbook §3.6). visibility et non display :
+  // leur géométrie reste mesurable (tri horaire, glows). killTweensOf : un
+  // fondu d'entrée encore en cours ne doit pas les rendre visibles après.
+  if (groupeCercles) {
+    gsap.killTweensOf(groupeCercles.children);
+    gsap.set(groupeCercles.children, { autoAlpha: 0 });
+  }
   cacherCarteValeur();
 }
 

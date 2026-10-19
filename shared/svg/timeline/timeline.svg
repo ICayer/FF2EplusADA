@@ -133,6 +133,11 @@
       <circle cx="870.06" cy="37.42" r="8.96" transform="translate(-.07 1.57)" fill="#eae6e5" stroke="#f9f7f7" stroke-miterlimit="10" stroke-width="1.12"/>
     </g>
   </g>
+  <g id="rupture_stripe">
+    <g id="Calque_27" data-name="Calque 27">
+      <image width="1258" height="450" transform="translate(442.37 15.21) rotate(-3.92) scale(.28)" xlink:href="../shared/svg/timeline/rupture_stripe.webp"/>
+    </g>
+  </g>
   <g id="perles_steps">
     <g id="perle_step1">
       <circle cx="229.5" cy="39.01" r="12.5" transform="translate(190.19 268.45) rotate(-89.92)"/>
@@ -165,9 +170,6 @@
       <circle cx="850.99" cy="37.53" r="12.5"/>
     </g>
   </g>
-  <g id="rupture_stripe">
-    <image width="516" height="2511" transform="translate(538.38 -4.38) rotate(26.28) scale(.08 .05)" xlink:href="../shared/svg/timeline/trait_rouge_rupture.webp"/>
-  </g>
   <g id="curseur_plume">
     <g>
       <g id="plume">
@@ -198,7 +200,7 @@
         </g>
       </g>
     </g>
-    <path id="curseur_plume-indice-clic" d="M222.79,84.29s20.78,9.74,40.26,1.95,25.97-19.48,25.97-19.48l-14.94,3.25,12.99,8.44" fill="none" stroke="#000" stroke-miterlimit="10"/>
+    <path d="M222.79,84.29s20.78,9.74,40.26,1.95,25.97-19.48,25.97-19.48l-14.94,3.25,12.99,8.44" fill="none" stroke="#000" stroke-miterlimit="10"/>
   </g>
   <g id="mots_steps_scrolly">
     <g id="Visible-initiale">
@@ -214,7 +216,7 @@
         <circle cx="183.59" cy="93.48" r="6.64" fill="#32ff00"/>
       </g>
       <g id="Depuis_la_nuit_des_temps-S1-mot" data-name="Depuis la nuit des temps-S1-mot">
-        <text transform="translate(218.45 112.69)" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15" font-size="24"><tspan x="0" y="0">Depuis</tspan><tspan x="56.93" y="0" letter-spacing="-.01em"> </tspan><tspan x="62.64" y="0">la</tspan><tspan x="79.1" y="0" letter-spacing="-.01em"> </tspan><tspan x="84.82" y="0">nuit</tspan><tspan x="117.6" y="0" letter-spacing=".06em"> </tspan><tspan x="125.04" y="0">des</tspan><tspan x="151.94" y="0" letter-spacing="-.02em"> </tspan><tspan x="157.34" y="0" letter-spacing="0em">temps</tspan></text>
+        <text transform="translate(218.45 112.69)" font-family="&apos;Agoradp_15-Regular&apos;, Agoradp_15" font-size="24"><tspan x="0" y="0">Depuis</tspan><tspan x="56.93" y="0" letter-spacing="-.01em"> </tspan><tspan x="62.64" y="0">la</tspan><tspan x="79.1" y="0" letter-spacing="-.01em"> </tspan><tspan x="84.82" y="0">nuit</tspan><tspan x="117.6" y="0" letter-spacing=".06em"> </tspan><tspan x="125.04" y="0">des</tspan><tspan x="151.94" y="0" letter-spacing="-.02em"> </tspan><tspan x="157.34" y="0">temps</tspan></text>
       </g>
     </g>
     <g id="Step2">

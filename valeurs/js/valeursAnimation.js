@@ -516,14 +516,14 @@ export async function initValeurs(selecteurGraphic) {
   // supplémentaire ici, univers/ a déjà fait sa propre pause avant de
   // naviguer (voir CORRECTION 1, transitionValeurs.js).
   if (spirale) {
-    tl.to(spirale, { opacity: 1, duration: 1.5, ease: "power1.out" });
+    tl.to(spirale, { opacity: 1, duration: 3, ease: "sine.inOut" }, 1.5);
   }
 
   // +=2 : délai avant le fondu du couple (script technique), maintenant
   // relatif à la fin du fondu de la spirale plutôt qu'au chargement de la
   // page.
   if (couple) {
-    tl.to(couple, { opacity: 1, duration: 1.5, ease: "power1.out" }, "+=2");
+    tl.to(couple, { opacity: 1, duration: 3, ease: "power1.out" }, "+=2");
   }
 
   // Toutes les vagues de perles démarrent à la MÊME position — un label

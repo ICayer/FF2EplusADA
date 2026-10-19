@@ -31,6 +31,11 @@
 // Exemple : "mot-nuit-des-temps-1": { ..., "uneLigne": true, ... }
 // (demande de Déline, 7 octobre 2026). Réglage dans les données,
 // réutilisable pour un autre mot sans toucher au code.
+// Champ OPTIONNEL "suitTraitRupture" (booléen) — à true, l'apparition du
+// mot suit le trait de rupture du rail (railParcours.js, majTraitRupture) :
+// fondu en même temps que le tracé ; apparition directe, sans fondu,
+// quand le trait est posé sans animation (arrivée directe sur S6-S9,
+// rechargement…). Exemple : "mot-colonisation" (19 octobre 2026).
 // Numéro de step N → étape de parcours.json : fourni par l'appelant
 // (railParcours.js, qui détient la table perle→étape) — jamais dupliqué ici.
 //
@@ -52,19 +57,19 @@ import { reduitMouvement } from "./navigationEtat.js";
 const ID_GROUPE_MOTS = "mots_steps_scrolly";
 const ID_VISIBLE_INITIALE = "Visible-initiale";
 
-// Plage d'affichage continu de #Visible-initiale ("Colonisation") — UN
-// seul repère permanent, jamais ré-animé d'un step à l'autre dans cette
-// plage. Plage demandée : nuit-des-temps → hommage-victimes (perle_step1
-// à perle_step6, table de railParcours.js). ⚠️ À confirmer par Isabel :
-// l'epoque "avant" de stepsOrder.json ne couvre que les 4 premiers steps
-// (rupture-coloniale = "rupture", hommage-victimes = "apres").
+// Plage d'affichage continu du mot du groupe #Visible-initiale
+// ("Colonisation") — UN seul repère permanent, jamais ré-animé d'un step à
+// l'autre dans cette plage. Depuis le 19 octobre 2026 (demande de Déline) :
+// rupture-coloniale → seuil-univers (S5 à S9, fin du scrolly) — il apparaît
+// avec le tracé du trait de rupture (voir "suitTraitRupture" plus haut),
+// plus du tout de S1 à S4. (Le nom du groupe Illustrator, "Visible-
+// initiale", est historique : c'est cette constante qui fixe la plage.)
 const PLAGE_VISIBLE_INITIALE = new Set([
-  "nuit-des-temps",
-  "lien-communaute",
-  "lien-territoire",
-  "lien-valeurs",
   "rupture-coloniale",
   "hommage-victimes",
+  "transformation-coeur",
+  "communaute-etoiles",
+  "seuil-univers",
 ]);
 
 // Écart max (px écran) entre le point-guide et le bord/centre détecté —
@@ -83,6 +88,7 @@ const MINUTEURS_VALIDES = new Set(["chaque-step", "dernier-step", "aucun"]);
 let railEl = null;
 let mots = []; // [{ cle, entree, etapes:Set, boite, point, el, minuteur, expire }]
 let etapeEnAttente = null; // étape demandée avant la fin de initMotsSteps()
+let modeRuptureEnAttente = null; // son modeRupture (voir afficherMotsEtape)
 let pret = false;
 let derniereEtape = null; // garde "même étape" — Playbook §3.5
 
@@ -127,7 +133,7 @@ export async function initMotsSteps(container, etapeDepuisNumero) {
   });
 
   pret = true;
-  if (etapeEnAttente) afficherMotsEtape(etapeEnAttente);
+  if (etapeEnAttente) afficherMotsEtape(etapeEnAttente, { modeRupture: modeRuptureEnAttente });
 }
 
 // "-S9-S10" → étapes des steps 9 à 10 ; "-S4" → step 4 seulement.
@@ -154,9 +160,13 @@ function etapesDepuisSuffixe(base, etapeDepuisNumero) {
 // Rappel sur la MÊME étape (ex. "languagechange" → definirEtapeActive du
 // step courant) : rien à faire — sinon un mot déjà expiré réapparaîtrait
 // et son minuteur repartirait (même garde que goToStep, Playbook §3.5).
-export function afficherMotsEtape(etapeId) {
+// `modeRupture` (railParcours.js, majTraitRupture) : "direct" → un mot
+// "suitTraitRupture" qui apparaît maintenant le fait sans fondu, comme le
+// trait posé sans animation ; "trace" ou absent → fondu habituel.
+export function afficherMotsEtape(etapeId, { modeRupture = null } = {}) {
   if (!pret) {
     etapeEnAttente = etapeId;
+    modeRuptureEnAttente = modeRupture;
     return;
   }
   if (etapeId === derniereEtape) return;
@@ -171,7 +181,7 @@ export function afficherMotsEtape(etapeId) {
       if (mot.el) retirerMot(mot);
       return;
     }
-    if (!mot.el) creerMot(mot);
+    if (!mot.el) creerMot(mot, { sansFondu: mot.entree.suitTraitRupture === true && modeRupture === "direct" });
     else if (mot.expire) reafficherMot(mot);
     if (minuteurApplique(mot, etapeId)) demarrerMinuteur(mot);
   });
@@ -205,7 +215,7 @@ function reafficherMot(mot) {
   mot.el.classList.add("visible");
 }
 
-function creerMot(mot) {
+function creerMot(mot, { sansFondu = false } = {}) {
   const el = document.createElement("div");
   el.className = "mot-step";
   const texte = document.createElement("span");
@@ -215,8 +225,19 @@ function creerMot(mot) {
   railEl.appendChild(el);
   mot.el = el;
   positionnerMot(mot);
-  if (reduitMouvement()) el.classList.add("visible");
-  else requestAnimationFrame(() => el.classList.add("visible"));
+  if (reduitMouvement()) {
+    el.classList.add("visible");
+  } else if (sansFondu) {
+    // positionnerMot() a déjà calculé le style (opacity:0) : couper la
+    // transition le temps d'afficher, puis la rétablir pour le fondu de
+    // sortie (recul vers S1-S4).
+    el.style.transition = "none";
+    el.classList.add("visible");
+    void el.offsetWidth;
+    el.style.transition = "";
+  } else {
+    requestAnimationFrame(() => el.classList.add("visible"));
+  }
 }
 
 function retirerMot(mot) {

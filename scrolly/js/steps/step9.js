@@ -97,10 +97,10 @@ step9Timeline.to({}, {
   if (femmeEl) {
     step9Timeline.to(femmeEl, { 
       opacity: 0, 
-      duration: 2,
+      duration: 5,
       ease: "power2.out",
       onStart: () => console.log("📻 Femme fade-out")
-    }, 0);
+    }, 3);
   }
 
   step9Timeline.to({}, { duration: 1, onStart: () => console.log("⏸ Pause 1s avant morphing") });
