@@ -36,8 +36,8 @@
     "audio": { "innu-aimun": "espoir.mp3" }
   },
   {
-    "id": "amour-de-soi",
-    "nom": { "fr": "Amour de soi", "en": "Self-love", "innu-aimun": "Shatshitun" },
+    "id": "amour",
+    "nom": { "fr": "Amour", "en": "Love", "innu-aimun": "Shatshitun" },
     "couleur": "#fffa61",
     "audio": { "innu-aimun": "amour-de-soi.mp3" }
   },
@@ -49,7 +49,7 @@
   },
   {
     "id": "confiance",
-    "nom": { "fr": "Confiance", "en": "Trust", "innu-aimun": "Shutshenimeu" },
+    "nom": { "fr": "Confiance", "en": "Trust", "innu-aimun": "Shutshenitamun" },
     "couleur": "#ff8f00",
     "audio": { "innu-aimun": "confiance.mp3" }
   },
